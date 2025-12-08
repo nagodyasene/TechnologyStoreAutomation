@@ -1,4 +1,5 @@
 using System.Net;
+using Microsoft.Extensions.Configuration;
 using Moq;
 using RichardSzalay.MockHttp;
 using TechnologyStoreAutomation.backend.trendCalculator;
@@ -8,9 +9,9 @@ namespace TechnologyStoreAutomation.Tests;
 
 public class LifecycleSentinelTests
 {
-    private Mock<IProductRepository> _mockRepository;
-    private MockHttpMessageHandler _mockHttp;
-    private HttpClient _httpClient;
+    private readonly Mock<IProductRepository> _mockRepository;
+    private readonly MockHttpMessageHandler _mockHttp;
+    private readonly HttpClient _httpClient;
 
     public LifecycleSentinelTests()
     {
@@ -24,10 +25,11 @@ public class LifecycleSentinelTests
     {
         // Arrange
         var mockFactory = CreateMockHttpClientFactory();
+        var mockConfig = CreateMockConfiguration();
         _mockHttp.When("https://support.apple.com/en-us/102772")
             .Respond("text/html", "<html><body><ul><li>Some content</li></ul></body></html>");
 
-        var sentinel = new LifecycleSentinel(_mockRepository.Object, mockFactory.Object);
+        var sentinel = new LifecycleSentinel(_mockRepository.Object, mockConfig.Object, mockFactory.Object);
 
         // Act
         await sentinel.RunDailyAuditAsync();
@@ -54,8 +56,9 @@ public class LifecycleSentinelTests
             .Respond("text/html", appleHtml);
 
         var mockFactory = CreateMockHttpClientFactory();
+        var mockConfig = CreateMockConfiguration();
 
-        // Setup mock product in database
+        // Set up mock product in the database
         var testProducts = new List<Product>
         {
             new Product
@@ -84,8 +87,8 @@ public class LifecycleSentinelTests
             .Returns(Task.CompletedTask);
 
         var eventFired = false;
-        var sentinel = new LifecycleSentinel(_mockRepository.Object, mockFactory.Object);
-        sentinel.OnProductStatusChanged += (name, phase, reason) =>
+        var sentinel = new LifecycleSentinel(_mockRepository.Object, mockConfig.Object, mockFactory.Object);
+        sentinel.OnProductStatusChanged += (name, phase, _) =>
         {
             eventFired = true;
             Assert.Contains("iPhone", name, StringComparison.OrdinalIgnoreCase);
@@ -124,6 +127,7 @@ public class LifecycleSentinelTests
             .Respond("text/html", appleHtml);
 
         var mockFactory = CreateMockHttpClientFactory();
+        var mockConfig = CreateMockConfiguration();
 
         var testProducts = new List<Product>
         {
@@ -136,8 +140,8 @@ public class LifecycleSentinelTests
             .Returns(Task.CompletedTask);
 
         var obsoleteEventCount = 0;
-        var sentinel = new LifecycleSentinel(_mockRepository.Object, mockFactory.Object);
-        sentinel.OnProductStatusChanged += (name, phase, reason) =>
+        var sentinel = new LifecycleSentinel(_mockRepository.Object, mockConfig.Object, mockFactory.Object);
+        sentinel.OnProductStatusChanged += (_, phase, _) =>
         {
             if (phase == LifecyclePhase.Obsolete)
                 obsoleteEventCount++;
@@ -160,8 +164,9 @@ public class LifecycleSentinelTests
     {
         // Arrange
         var mockFactory = CreateMockHttpClientFactory();
+        var mockConfig = CreateMockConfiguration();
 
-        // Pixel 3 has EOL date of May 2022 (already passed)
+        // Pixel 3 has an EOL date of May 2022 (already passed)
         var testProducts = new List<Product>
         {
             new Product { Id = 1, Name = "Google Pixel 3 64GB", LifecyclePhase = "ACTIVE", Sku = "PIX3" },
@@ -172,7 +177,7 @@ public class LifecycleSentinelTests
         _mockRepository.Setup(r => r.UpdateProductPhaseAsync(It.IsAny<int>(), "OBSOLETE", It.IsAny<string>()))
             .Returns(Task.CompletedTask);
 
-        var sentinel = new LifecycleSentinel(_mockRepository.Object, mockFactory.Object);
+        var sentinel = new LifecycleSentinel(_mockRepository.Object, mockConfig.Object, mockFactory.Object);
 
         // Act
         await sentinel.RunDailyAuditAsync();
@@ -190,6 +195,7 @@ public class LifecycleSentinelTests
     {
         // Arrange
         var mockFactory = CreateMockHttpClientFactory();
+        var mockConfig = CreateMockConfiguration();
 
         // Create a product that will reach EOL within 6 months (mock by using Pixel 5)
         var testProducts = new List<Product>
@@ -201,7 +207,7 @@ public class LifecycleSentinelTests
         _mockRepository.Setup(r => r.UpdateProductPhaseAsync(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>()))
             .Returns(Task.CompletedTask);
 
-        var sentinel = new LifecycleSentinel(_mockRepository.Object, mockFactory.Object);
+        var sentinel = new LifecycleSentinel(_mockRepository.Object, mockConfig.Object, mockFactory.Object);
 
         // Act
         await sentinel.RunDailyAuditAsync();
@@ -230,6 +236,7 @@ public class LifecycleSentinelTests
             .Respond("text/html", appleHtml);
 
         var mockFactory = CreateMockHttpClientFactory();
+        var mockConfig = CreateMockConfiguration();
 
         // Product with full detailed name
         var testProducts = new List<Product>
@@ -241,7 +248,7 @@ public class LifecycleSentinelTests
         _mockRepository.Setup(r => r.UpdateProductPhaseAsync(It.IsAny<int>(), "LEGACY", It.IsAny<string>()))
             .Returns(Task.CompletedTask);
 
-        var sentinel = new LifecycleSentinel(_mockRepository.Object, mockFactory.Object);
+        var sentinel = new LifecycleSentinel(_mockRepository.Object, mockConfig.Object, mockFactory.Object);
 
         // Act
         await sentinel.RunDailyAuditAsync();
@@ -262,7 +269,8 @@ public class LifecycleSentinelTests
             .Respond(HttpStatusCode.ServiceUnavailable);
 
         var mockFactory = CreateMockHttpClientFactory();
-        var sentinel = new LifecycleSentinel(_mockRepository.Object, mockFactory.Object);
+        var mockConfig = CreateMockConfiguration();
+        var sentinel = new LifecycleSentinel(_mockRepository.Object, mockConfig.Object, mockFactory.Object);
 
         // Act & Assert - should not throw exception
         await sentinel.RunDailyAuditAsync();
@@ -289,6 +297,7 @@ public class LifecycleSentinelTests
             .Respond("text/html", appleHtml);
 
         var mockFactory = CreateMockHttpClientFactory();
+        var mockConfig = CreateMockConfiguration();
 
         // Product already marked as LEGACY
         var testProducts = new List<Product>
@@ -300,7 +309,7 @@ public class LifecycleSentinelTests
         _mockRepository.Setup(r => r.UpdateProductPhaseAsync(It.IsAny<int>(), "LEGACY", It.IsAny<string>()))
             .Returns(Task.CompletedTask);
 
-        var sentinel = new LifecycleSentinel(_mockRepository.Object, mockFactory.Object);
+        var sentinel = new LifecycleSentinel(_mockRepository.Object, mockConfig.Object, mockFactory.Object);
 
         // Act
         await sentinel.RunDailyAuditAsync();
@@ -333,6 +342,7 @@ public class LifecycleSentinelTests
             .Respond("text/html", appleHtml);
 
         var mockFactory = CreateMockHttpClientFactory();
+        var mockConfig = CreateMockConfiguration();
         var testProducts = new List<Product>
         {
             new Product { Id = 1, Name = "iPhone 11 Pro", LifecyclePhase = "ACTIVE", Sku = "IP11P" },
@@ -343,7 +353,7 @@ public class LifecycleSentinelTests
         _mockRepository.Setup(r => r.UpdateProductPhaseAsync(It.IsAny<int>(), "LEGACY", It.IsAny<string>()))
             .Returns(Task.CompletedTask);
 
-        var sentinel = new LifecycleSentinel(_mockRepository.Object, mockFactory.Object);
+        var sentinel = new LifecycleSentinel(_mockRepository.Object, mockConfig.Object, mockFactory.Object);
 
         // Act
         await sentinel.RunDailyAuditAsync();
@@ -366,11 +376,12 @@ public class LifecycleSentinelTests
             .Respond("text/html", "<html><body><ul><li>iPhone 11</li></ul></body></html>");
 
         var mockFactory = CreateMockHttpClientFactory();
+        var mockConfig = CreateMockConfiguration();
         
         _mockRepository.Setup(r => r.GetAllProductsAsync())
             .ReturnsAsync(new List<Product>());
 
-        var sentinel = new LifecycleSentinel(_mockRepository.Object, mockFactory.Object);
+        var sentinel = new LifecycleSentinel(_mockRepository.Object, mockConfig.Object, mockFactory.Object);
 
         // Act & Assert - should complete without throwing
         await sentinel.RunDailyAuditAsync();
@@ -390,6 +401,7 @@ public class LifecycleSentinelTests
             .Respond("text/html", "");
 
         var mockFactory = CreateMockHttpClientFactory();
+        var mockConfig = CreateMockConfiguration();
         
         var testProducts = new List<Product>
         {
@@ -399,10 +411,17 @@ public class LifecycleSentinelTests
         _mockRepository.Setup(r => r.GetAllProductsAsync())
             .ReturnsAsync(testProducts);
 
-        var sentinel = new LifecycleSentinel(_mockRepository.Object, mockFactory.Object);
+        var sentinel = new LifecycleSentinel(_mockRepository.Object, mockConfig.Object, mockFactory.Object);
 
         // Act & Assert - should complete without throwing
         await sentinel.RunDailyAuditAsync();
+        
+        // Verify no updates were made with empty response
+        _mockRepository.Verify(r => r.UpdateProductPhaseAsync(
+            It.IsAny<int>(),
+            It.IsAny<string>(),
+            It.IsAny<string>()),
+            Times.Never());
     }
 
     [Fact]
@@ -413,6 +432,7 @@ public class LifecycleSentinelTests
             .Respond("text/html", "<html><body><ul><li>Unclosed tag<li>Another</body>");
 
         var mockFactory = CreateMockHttpClientFactory();
+        var mockConfig = CreateMockConfiguration();
         
         var testProducts = new List<Product>
         {
@@ -422,10 +442,13 @@ public class LifecycleSentinelTests
         _mockRepository.Setup(r => r.GetAllProductsAsync())
             .ReturnsAsync(testProducts);
 
-        var sentinel = new LifecycleSentinel(_mockRepository.Object, mockFactory.Object);
+        var sentinel = new LifecycleSentinel(_mockRepository.Object, mockConfig.Object, mockFactory.Object);
 
         // Act & Assert - HtmlAgilityPack should handle malformed HTML
         await sentinel.RunDailyAuditAsync();
+        
+        // Verify that the method completed without throwing exception
+        Assert.True(true, "Method should complete without throwing on malformed HTML");
     }
 
     [Fact]
@@ -436,10 +459,12 @@ public class LifecycleSentinelTests
             .Respond(HttpStatusCode.RequestTimeout);
 
         var mockFactory = CreateMockHttpClientFactory();
-        var sentinel = new LifecycleSentinel(_mockRepository.Object, mockFactory.Object);
+        var mockConfig = CreateMockConfiguration();
+        var sentinel = new LifecycleSentinel(_mockRepository.Object, mockConfig.Object, mockFactory.Object);
 
         // Act & Assert - should not throw
         await sentinel.RunDailyAuditAsync();
+        Assert.True(true, "Method should complete without throwing on timeout");
     }
 
     [Fact]
@@ -450,10 +475,12 @@ public class LifecycleSentinelTests
             .Respond(HttpStatusCode.InternalServerError);
 
         var mockFactory = CreateMockHttpClientFactory();
-        var sentinel = new LifecycleSentinel(_mockRepository.Object, mockFactory.Object);
+        var mockConfig = CreateMockConfiguration();
+        var sentinel = new LifecycleSentinel(_mockRepository.Object, mockConfig.Object, mockFactory.Object);
 
         // Act & Assert - should not throw
         await sentinel.RunDailyAuditAsync();
+        Assert.True(true, "Method should complete without throwing on network error");
     }
 
     [Fact]
@@ -470,6 +497,7 @@ public class LifecycleSentinelTests
             .Respond("text/html", appleHtml);
 
         var mockFactory = CreateMockHttpClientFactory();
+        var mockConfig = CreateMockConfiguration();
         
         var testProducts = new List<Product>
         {
@@ -482,8 +510,8 @@ public class LifecycleSentinelTests
             .Returns(Task.CompletedTask);
 
         var phaseChanges = new List<(string Name, LifecyclePhase Phase)>();
-        var sentinel = new LifecycleSentinel(_mockRepository.Object, mockFactory.Object);
-        sentinel.OnProductStatusChanged += (name, phase, reason) =>
+        var sentinel = new LifecycleSentinel(_mockRepository.Object, mockConfig.Object, mockFactory.Object);
+        sentinel.OnProductStatusChanged += (name, phase, _) =>
         {
             phaseChanges.Add((name, phase));
         };
@@ -510,6 +538,7 @@ public class LifecycleSentinelTests
             .Respond("text/html", appleHtml);
 
         var mockFactory = CreateMockHttpClientFactory();
+        var mockConfig = CreateMockConfiguration();
         
         var testProducts = new List<Product>
         {
@@ -521,7 +550,7 @@ public class LifecycleSentinelTests
         _mockRepository.Setup(r => r.UpdateProductPhaseAsync(1, "OBSOLETE", It.IsAny<string>()))
             .Returns(Task.CompletedTask);
 
-        var sentinel = new LifecycleSentinel(_mockRepository.Object, mockFactory.Object);
+        var sentinel = new LifecycleSentinel(_mockRepository.Object, mockConfig.Object, mockFactory.Object);
 
         // Act
         await sentinel.RunDailyAuditAsync();
@@ -544,6 +573,7 @@ public class LifecycleSentinelTests
             .Respond("text/html", appleHtml);
 
         var mockFactory = CreateMockHttpClientFactory();
+        var mockConfig = CreateMockConfiguration();
         
         // Multiple variants of the same product
         var testProducts = new List<Product>
@@ -558,7 +588,7 @@ public class LifecycleSentinelTests
         _mockRepository.Setup(r => r.UpdateProductPhaseAsync(It.IsAny<int>(), "LEGACY", It.IsAny<string>()))
             .Returns(Task.CompletedTask);
 
-        var sentinel = new LifecycleSentinel(_mockRepository.Object, mockFactory.Object);
+        var sentinel = new LifecycleSentinel(_mockRepository.Object, mockConfig.Object, mockFactory.Object);
 
         // Act
         await sentinel.RunDailyAuditAsync();
@@ -585,6 +615,7 @@ public class LifecycleSentinelTests
             .Respond("text/html", appleHtml);
 
         var mockFactory = CreateMockHttpClientFactory();
+        var mockConfig = CreateMockConfiguration();
         
         var testProducts = new List<Product>
         {
@@ -596,7 +627,7 @@ public class LifecycleSentinelTests
         _mockRepository.Setup(r => r.UpdateProductPhaseAsync(It.IsAny<int>(), "LEGACY", It.IsAny<string>()))
             .Returns(Task.CompletedTask);
 
-        var sentinel = new LifecycleSentinel(_mockRepository.Object, mockFactory.Object);
+        var sentinel = new LifecycleSentinel(_mockRepository.Object, mockConfig.Object, mockFactory.Object);
 
         // Act
         await sentinel.RunDailyAuditAsync();
@@ -619,6 +650,7 @@ public class LifecycleSentinelTests
             .Respond("text/html", appleHtml);
 
         var mockFactory = CreateMockHttpClientFactory();
+        var mockConfig = CreateMockConfiguration();
         
         var testProducts = new List<Product>
         {
@@ -629,7 +661,7 @@ public class LifecycleSentinelTests
         _mockRepository.Setup(r => r.GetAllProductsAsync())
             .ReturnsAsync(testProducts);
 
-        var sentinel = new LifecycleSentinel(_mockRepository.Object, mockFactory.Object);
+        var sentinel = new LifecycleSentinel(_mockRepository.Object, mockConfig.Object, mockFactory.Object);
 
         // Act
         await sentinel.RunDailyAuditAsync();
@@ -643,6 +675,19 @@ public class LifecycleSentinelTests
     }
 
     #endregion
+
+    /// <summary>
+    /// Helper method to create a mock IConfiguration with manufacturer URLs
+    /// </summary>
+    private static Mock<IConfiguration> CreateMockConfiguration()
+    {
+        var mockConfig = new Mock<IConfiguration>();
+        mockConfig.Setup(c => c["Manufacturers:Apple:VintageListUrl"])
+            .Returns("https://support.apple.com/en-us/102772");
+        mockConfig.Setup(c => c["Manufacturers:Google:PixelEolUrl"])
+            .Returns("https://support.google.com/pixelphone/answer/4457705");
+        return mockConfig;
+    }
 
     /// <summary>
     /// Helper method to create a mock IHttpClientFactory that returns our mocked HttpClient

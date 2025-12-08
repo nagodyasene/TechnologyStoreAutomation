@@ -193,22 +193,6 @@ public static class GlobalExceptionHandler
     }
 
     /// <summary>
-    /// Safely executes an async action with exception handling
-    /// </summary>
-    public static async Task SafeExecuteAsync(Func<Task> action, string context = "")
-    {
-        try
-        {
-            await action();
-        }
-        catch (Exception ex)
-        {
-            ReportException(ex, context);
-            HandleException(ex, context);
-        }
-    }
-
-    /// <summary>
     /// Safely executes a function and returns a default value on failure
     /// </summary>
     public static T SafeExecute<T>(Func<T> func, T defaultValue, string context = "")
@@ -221,6 +205,22 @@ public static class GlobalExceptionHandler
         {
             ReportException(ex, context);
             return defaultValue;
+        }
+    }
+
+    /// <summary>
+    /// Safely executes an async action with exception handling
+    /// </summary>
+    public static async Task SafeExecuteAsync(Func<Task> action, string context = "")
+    {
+        try
+        {
+            await action();
+        }
+        catch (Exception ex)
+        {
+            ReportException(ex, context);
+            HandleException(ex, context);
         }
     }
 }

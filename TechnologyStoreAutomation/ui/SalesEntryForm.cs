@@ -309,7 +309,7 @@ public partial class SalesEntryForm : Form
     /// <summary>
     /// Displays validation errors to the user
     /// </summary>
-    private void ShowValidationErrors(List<string> errors)
+    private static void ShowValidationErrors(List<string> errors)
     {
         var message = string.Join(Environment.NewLine, errors.Select(e => $"• {e}"));
         MessageBox.Show(

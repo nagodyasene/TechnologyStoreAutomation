@@ -17,6 +17,8 @@ namespace TechnologyStoreAutomation
         private Button? _btnRecordSale;
         private Button? _btnHealthCheck;
 
+        private const string ErrorTitle = "Error";
+
         /// <summary>
         /// Creates a new MainForm with injected dependencies
         /// </summary>
@@ -74,7 +76,7 @@ namespace TechnologyStoreAutomation
             catch (Exception ex)
             {
                 GlobalExceptionHandler.ReportException(ex, "Manual Dashboard Refresh");
-                MessageBox.Show($"Refresh failed: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Refresh failed: {ex.Message}", ErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -261,7 +263,7 @@ namespace TechnologyStoreAutomation
             catch (Exception ex)
             {
                 GlobalExceptionHandler.ReportException(ex, "Simulate Launch");
-                MessageBox.Show($"Failed to simulate launch: {ex.Message}", "Error", 
+                MessageBox.Show($"Failed to simulate launch: {ex.Message}", ErrorTitle, 
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -280,7 +282,7 @@ namespace TechnologyStoreAutomation
             catch (Exception ex)
             {
                 GlobalExceptionHandler.ReportException(ex, "Record Sale");
-                MessageBox.Show($"Failed to record sale: {ex.Message}", "Error", 
+                MessageBox.Show($"Failed to record sale: {ex.Message}", ErrorTitle, 
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -324,7 +326,7 @@ namespace TechnologyStoreAutomation
             catch (Exception ex)
             {
                 GlobalExceptionHandler.ReportException(ex, "Health Check");
-                MessageBox.Show($"Health check failed: {ex.Message}", "Error",
+                MessageBox.Show($"Health check failed: {ex.Message}", ErrorTitle,
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally

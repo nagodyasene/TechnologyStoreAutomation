@@ -113,8 +113,9 @@ public static class ServiceConfiguration
         services.AddSingleton<LifecycleSentinel>(sp =>
         {
             var repository = sp.GetRequiredService<IProductRepository>();
+            var config = sp.GetRequiredService<IConfiguration>();
             var httpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
-            return new LifecycleSentinel(repository, httpClientFactory);
+            return new LifecycleSentinel(repository, config, httpClientFactory);
         });
         
         // Register background job service
@@ -122,7 +123,8 @@ public static class ServiceConfiguration
         {
             var settings = sp.GetRequiredService<DatabaseSettings>();
             var repository = sp.GetRequiredService<IProductRepository>();
-            return new BackgroundJobService(settings.ConnectionString, repository);
+            var config = sp.GetRequiredService<IConfiguration>();
+            return new BackgroundJobService(settings.ConnectionString, repository, config);
         });
         
         // Register health check service
@@ -155,8 +157,8 @@ public static class ServiceConfiguration
     {
         return "Database connection is not configured.\n\n" +
                "Please set one of the following environment variable options:\n" +
-               "1) DB_CONNECTION_STRING (full libpq string)\n" +
-               "2) DATABASE_URL (postgres://user:pass@host:port/dbname)\n" +
+               "1) DB_CONNECTION_STRING\n" +
+               "2) DATABASE_URL\n" +
                "3) DB_HOST / DB_NAME / DB_USER / DB_PASSWORD (and optional DB_PORT)\n\n" +
                "The application cannot continue without a configured database connection.";
     }

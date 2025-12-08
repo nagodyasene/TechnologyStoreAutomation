@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Text;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 
@@ -46,9 +47,11 @@ public class HealthReport
     /// </summary>
     public string GetSummary()
     {
-        var summary = $"Health Check Report - {OverallStatus}\n";
-        summary += $"Checked at: {CheckedAt:yyyy-MM-dd HH:mm:ss}\n";
-        summary += $"Total duration: {TotalDuration.TotalMilliseconds:F0}ms\n\n";
+        var sb = new StringBuilder();
+        sb.AppendLine($"Health Check Report - {OverallStatus}");
+        sb.AppendLine($"Checked at: {CheckedAt:yyyy-MM-dd HH:mm:ss}");
+        sb.AppendLine($"Total duration: {TotalDuration.TotalMilliseconds:F0}ms");
+        sb.AppendLine();
 
         foreach (var result in Results)
         {
@@ -60,16 +63,16 @@ public class HealthReport
                 _ => "❓"
             };
             
-            summary += $"{statusIcon} {result.Name}: {result.Status} ({result.Duration.TotalMilliseconds:F0}ms)\n";
+            sb.AppendLine($"{statusIcon} {result.Name}: {result.Status} ({result.Duration.TotalMilliseconds:F0}ms)");
             
             if (!string.IsNullOrEmpty(result.Description))
-                summary += $"   {result.Description}\n";
+                sb.AppendLine($"   {result.Description}");
             
             if (result.Exception != null)
-                summary += $"   Error: {result.Exception.Message}\n";
+                sb.AppendLine($"   Error: {result.Exception.Message}");
         }
 
-        return summary;
+        return sb.ToString();
     }
 }
 
@@ -110,18 +113,18 @@ public class HealthCheckService
         overallStopwatch.Stop();
 
         // Determine overall status (worst status wins)
-        var overallStatus = HealthStatus.Healthy;
-        foreach (var result in results)
+        HealthStatus overallStatus;
+        if (results.Any(r => r.Status == HealthStatus.Unhealthy))
         {
-            if (result.Status == HealthStatus.Unhealthy)
-            {
-                overallStatus = HealthStatus.Unhealthy;
-                break;
-            }
-            if (result.Status == HealthStatus.Degraded && overallStatus == HealthStatus.Healthy)
-            {
-                overallStatus = HealthStatus.Degraded;
-            }
+            overallStatus = HealthStatus.Unhealthy;
+        }
+        else if (results.Any(r => r.Status == HealthStatus.Degraded))
+        {
+            overallStatus = HealthStatus.Degraded;
+        }
+        else
+        {
+            overallStatus = HealthStatus.Healthy;
         }
 
         var report = new HealthReport

@@ -132,7 +132,7 @@ public class ProductRepositoryTests
     public async Task RecordSaleAsync_WithSpecificDate_PassesDateCorrectly()
     {
         // Arrange
-        var saleDate = new DateTime(2025, 12, 1);
+        var saleDate = new DateTime(2025, 12, 1, 0, 0, 0, DateTimeKind.Utc);
         _mockRepository.Setup(r => r.RecordSaleAsync(1, 2, 199.98m, saleDate))
             .ReturnsAsync(101);
 
