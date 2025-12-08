@@ -13,11 +13,18 @@ namespace TechnologyStoreAutomation.Tests.Integration;
 [Collection("PostgreSQL")]
 public class CachedProductRepositoryIntegrationTests : IAsyncLifetime
 {
+    #region Constants
+    
+    private const string ObsoletePhase = "OBSOLETE";
+    
+    #endregion
+
+    #region Fields
+
     private readonly PostgreSqlFixture _fixture;
     private ProductRepository _innerRepository = null!;
     private CachedProductRepository _cachedRepository = null!;
     private IMemoryCache _cache = null!;
-    private CachingSettings _cachingSettings = null!;
 
     public CachedProductRepositoryIntegrationTests(PostgreSqlFixture fixture)
     {
@@ -30,7 +37,7 @@ public class CachedProductRepositoryIntegrationTests : IAsyncLifetime
         
         _innerRepository = new ProductRepository(_fixture.ConnectionString);
         _cache = new MemoryCache(new MemoryCacheOptions { SizeLimit = 100 });
-        _cachingSettings = new CachingSettings
+        var cachingSettings = new CachingSettings
         {
             DashboardDataExpirationSeconds = 60,
             ProductListExpirationSeconds = 120,
@@ -42,7 +49,7 @@ public class CachedProductRepositoryIntegrationTests : IAsyncLifetime
         _cachedRepository = new CachedProductRepository(
             _innerRepository, 
             _cache, 
-            _cachingSettings, 
+            cachingSettings, 
             logger.Object);
     }
 
@@ -51,6 +58,8 @@ public class CachedProductRepositoryIntegrationTests : IAsyncLifetime
         _cache.Dispose();
         return Task.CompletedTask;
     }
+
+    #endregion
 
     #region Caching Behavior Tests
 
@@ -64,14 +73,14 @@ public class CachedProductRepositoryIntegrationTests : IAsyncLifetime
         var firstCall = (await _cachedRepository.GetAllProductsAsync()).ToList();
         
         // Modify database directly (bypass cache)
-        await _innerRepository.UpdateProductPhaseAsync(firstCall[0].Id, "OBSOLETE", "Direct update");
+        await _innerRepository.UpdateProductPhaseAsync(firstCall[0].Id, ObsoletePhase, "Direct update");
         
         // The second call should return cached data (not see the update)
         var secondCall = (await _cachedRepository.GetAllProductsAsync()).ToList();
 
         // Assert - cached data should still show original phase
         var cachedProduct = secondCall.First(p => p.Id == firstCall[0].Id);
-        Assert.NotEqual("OBSOLETE", cachedProduct.LifecyclePhase);
+        Assert.NotEqual(ObsoletePhase, cachedProduct.LifecyclePhase);
     }
 
     [Fact]
@@ -180,14 +189,14 @@ public class CachedProductRepositoryIntegrationTests : IAsyncLifetime
 
         // Modify data directly
         var products = (await _innerRepository.GetAllProductsAsync()).ToList();
-        await _innerRepository.UpdateProductPhaseAsync(products[0].Id, "OBSOLETE", "Test");
+        await _innerRepository.UpdateProductPhaseAsync(products[0].Id, ObsoletePhase, "Test");
 
         // Get data through cached repo (should fetch fresh data)
         var freshProducts = (await _cachedRepository.GetAllProductsAsync()).ToList();
         var updatedProduct = freshProducts.First(p => p.Id == products[0].Id);
 
         // Assert - should see the update
-        Assert.Equal("OBSOLETE", updatedProduct.LifecyclePhase);
+        Assert.Equal(ObsoletePhase, updatedProduct.LifecyclePhase);
     }
 
     #endregion

@@ -4,6 +4,19 @@ namespace TechnologyStoreAutomation.Tests;
 
 public class RecommendationEngineTests
 {
+    #region Constants
+    
+    private const string ObsoletePhase = "OBSOLETE";
+    private const string LegacyPhase = "LEGACY";
+    private const string ActivePhase = "ACTIVE";
+    private const string CriticalAlert = "CRITICAL";
+    private const string UrgentAlert = "URGENT";
+    private const string ReorderRecommendation = "Reorder";
+    private const string TrendingUpMessage = "TRENDING UP";
+    private const string NormalMessage = "Normal";
+    
+    #endregion
+
     private readonly IRecommendationEngine _engine = new RecommendationEngine();
     
     private static TrendAnalysis CreateAnalysis(
@@ -32,7 +45,7 @@ public class RecommendationEngineTests
     public void GenerateRecommendation_ObsoleteWithStock_ReturnsLiquidate()
     {
         var analysis = CreateAnalysis(currentStock: 10);
-        var result = _engine.GenerateRecommendation(analysis, "OBSOLETE");
+        var result = _engine.GenerateRecommendation(analysis, ObsoletePhase);
         Assert.True(result.Contains("LIQUIDATE"), $"Expected 'LIQUIDATE' in '{result}'");
     }
 
@@ -40,7 +53,7 @@ public class RecommendationEngineTests
     public void GenerateRecommendation_ObsoleteNoStock_ReturnsDiscontinue()
     {
         var analysis = CreateAnalysis(currentStock: 3);
-        var result = _engine.GenerateRecommendation(analysis, "OBSOLETE");
+        var result = _engine.GenerateRecommendation(analysis, ObsoletePhase);
         Assert.True(result.Contains("Discontinue"), $"Expected 'Discontinue' in '{result}'");
     }
 
@@ -48,7 +61,7 @@ public class RecommendationEngineTests
     public void GenerateRecommendation_LegacyLowRunway_ReturnsDiscount()
     {
         var analysis = CreateAnalysis(runwayDays: 20);
-        var result = _engine.GenerateRecommendation(analysis, "LEGACY");
+        var result = _engine.GenerateRecommendation(analysis, LegacyPhase);
         Assert.True(result.Contains("Discount"), $"Expected 'Discount' in '{result}'");
     }
 
@@ -56,7 +69,7 @@ public class RecommendationEngineTests
     public void GenerateRecommendation_LegacyHighRunway_ReturnsMonitor()
     {
         var analysis = CreateAnalysis(runwayDays: 60);
-        var result = _engine.GenerateRecommendation(analysis, "LEGACY");
+        var result = _engine.GenerateRecommendation(analysis, LegacyPhase);
         Assert.True(result.Contains("Monitor"), $"Expected 'Monitor' in '{result}'");
     }
 
@@ -65,24 +78,24 @@ public class RecommendationEngineTests
     public void GenerateRecommendation_CriticalRunway_ReturnsCriticalAlert()
     {
         var analysis = CreateAnalysis(runwayDays: 2);
-        var result = _engine.GenerateRecommendation(analysis, "ACTIVE");
-        Assert.True(result.Contains("CRITICAL"), $"Expected 'CRITICAL' in '{result}'");
+        var result = _engine.GenerateRecommendation(analysis, ActivePhase);
+        Assert.True(result.Contains(CriticalAlert), $"Expected '{CriticalAlert}' in '{result}'");
     }
 
     [Fact]
     public void GenerateRecommendation_UrgentRunway_ReturnsUrgentAlert()
     {
         var analysis = CreateAnalysis(runwayDays: 5);
-        var result = _engine.GenerateRecommendation(analysis, "ACTIVE");
-        Assert.True(result.Contains("URGENT"), $"Expected 'URGENT' in '{result}'");
+        var result = _engine.GenerateRecommendation(analysis, ActivePhase);
+        Assert.True(result.Contains(UrgentAlert), $"Expected '{UrgentAlert}' in '{result}'");
     }
 
     [Fact]
     public void GenerateRecommendation_LowRunway_ReturnsReorderRecommended()
     {
         var analysis = CreateAnalysis(runwayDays: 10);
-        var result = _engine.GenerateRecommendation(analysis, "ACTIVE");
-        Assert.True(result.Contains("Reorder"), $"Expected 'Reorder' in '{result}'");
+        var result = _engine.GenerateRecommendation(analysis, ActivePhase);
+        Assert.True(result.Contains(ReorderRecommendation), $"Expected '{ReorderRecommendation}' in '{result}'");
     }
 
     // Trend-Based Recommendations
@@ -93,7 +106,7 @@ public class RecommendationEngineTests
             runwayDays: 30,
             direction: TrendDirection.Rising,
             isAccelerating: true);
-        var result = _engine.GenerateRecommendation(analysis, "ACTIVE");
+        var result = _engine.GenerateRecommendation(analysis, ActivePhase);
         Assert.True(result.Contains("ACCELERATING"), $"Expected 'ACCELERATING' in '{result}'");
     }
 
@@ -104,8 +117,8 @@ public class RecommendationEngineTests
             runwayDays: 30,
             direction: TrendDirection.Rising,
             trendStrength: 0.5);
-        var result = _engine.GenerateRecommendation(analysis, "ACTIVE");
-        Assert.True(result.Contains("TRENDING UP"), $"Expected 'TRENDING UP' in '{result}'");
+        var result = _engine.GenerateRecommendation(analysis, ActivePhase);
+        Assert.True(result.Contains(TrendingUpMessage), $"Expected '{TrendingUpMessage}' in '{result}'");
     }
 
     [Fact]
@@ -115,7 +128,7 @@ public class RecommendationEngineTests
             runwayDays: 30,
             direction: TrendDirection.Falling,
             trendStrength: -0.5);
-        var result = _engine.GenerateRecommendation(analysis, "ACTIVE");
+        var result = _engine.GenerateRecommendation(analysis, ActivePhase);
         Assert.True(result.Contains("DECLINING"), $"Expected 'DECLINING' in '{result}'");
     }
 
@@ -125,7 +138,7 @@ public class RecommendationEngineTests
         var analysis = CreateAnalysis(
             runwayDays: 30,
             direction: TrendDirection.Volatile);
-        var result = _engine.GenerateRecommendation(analysis, "ACTIVE");
+        var result = _engine.GenerateRecommendation(analysis, ActivePhase);
         Assert.True(result.Contains("VOLATILE"), $"Expected 'VOLATILE' in '{result}'");
     }
 
@@ -133,8 +146,8 @@ public class RecommendationEngineTests
     public void GenerateRecommendation_NormalStock_ReturnsNormal()
     {
         var analysis = CreateAnalysis(runwayDays: 45);
-        var result = _engine.GenerateRecommendation(analysis, "ACTIVE");
-        Assert.True(result.Contains("Normal"), $"Expected 'Normal' in '{result}'");
+        var result = _engine.GenerateRecommendation(analysis, ActivePhase);
+        Assert.True(result.Contains(NormalMessage), $"Expected '{NormalMessage}' in '{result}'");
     }
 
     // Reorder Quantity Tests
@@ -207,47 +220,47 @@ public class RecommendationEngineTests
     public void GenerateRecommendation_ZeroOrNegativeRunway_ReturnsCritical(int runwayDays)
     {
         var analysis = CreateAnalysis(runwayDays: runwayDays);
-        var result = _engine.GenerateRecommendation(analysis, "ACTIVE");
-        Assert.Contains("CRITICAL", result);
+        var result = _engine.GenerateRecommendation(analysis, ActivePhase);
+        Assert.Contains(CriticalAlert, result);
     }
 
     [Fact]
     public void GenerateRecommendation_ExactlyThreeDaysRunway_ReturnsCritical()
     {
         var analysis = CreateAnalysis(runwayDays: 3);
-        var result = _engine.GenerateRecommendation(analysis, "ACTIVE");
-        Assert.Contains("CRITICAL", result);
+        var result = _engine.GenerateRecommendation(analysis, ActivePhase);
+        Assert.Contains(CriticalAlert, result);
     }
 
     [Fact]
     public void GenerateRecommendation_ExactlySevenDaysRunway_ReturnsUrgent()
     {
         var analysis = CreateAnalysis(runwayDays: 7);
-        var result = _engine.GenerateRecommendation(analysis, "ACTIVE");
-        Assert.Contains("URGENT", result);
+        var result = _engine.GenerateRecommendation(analysis, ActivePhase);
+        Assert.Contains(UrgentAlert, result);
     }
 
     [Fact]
     public void GenerateRecommendation_ExactlyFourteenDaysRunway_ReturnsReorder()
     {
         var analysis = CreateAnalysis(runwayDays: 14);
-        var result = _engine.GenerateRecommendation(analysis, "ACTIVE");
-        Assert.Contains("Reorder", result);
+        var result = _engine.GenerateRecommendation(analysis, ActivePhase);
+        Assert.Contains(ReorderRecommendation, result);
     }
 
     [Fact]
     public void GenerateRecommendation_VeryHighRunway_ReturnsNormal()
     {
         var analysis = CreateAnalysis(runwayDays: 999);
-        var result = _engine.GenerateRecommendation(analysis, "ACTIVE");
-        Assert.Contains("Normal", result);
+        var result = _engine.GenerateRecommendation(analysis, ActivePhase);
+        Assert.Contains(NormalMessage, result);
     }
 
     [Fact]
     public void GenerateRecommendation_LegacyWithExactly30DaysRunway_ReturnsDiscount()
     {
         var analysis = CreateAnalysis(runwayDays: 30);
-        var result = _engine.GenerateRecommendation(analysis, "LEGACY");
+        var result = _engine.GenerateRecommendation(analysis, LegacyPhase);
         Assert.Contains("Monitor", result);
     }
 
@@ -255,7 +268,7 @@ public class RecommendationEngineTests
     public void GenerateRecommendation_LegacyWith29DaysRunway_ReturnsDiscount()
     {
         var analysis = CreateAnalysis(runwayDays: 29);
-        var result = _engine.GenerateRecommendation(analysis, "LEGACY");
+        var result = _engine.GenerateRecommendation(analysis, LegacyPhase);
         Assert.Contains("Discount", result);
     }
 
@@ -263,7 +276,7 @@ public class RecommendationEngineTests
     public void GenerateRecommendation_ObsoleteWithExactly5Stock_ReturnsDiscontinue()
     {
         var analysis = CreateAnalysis(currentStock: 5);
-        var result = _engine.GenerateRecommendation(analysis, "OBSOLETE");
+        var result = _engine.GenerateRecommendation(analysis, ObsoletePhase);
         Assert.Contains("Discontinue", result);
     }
 
@@ -271,7 +284,7 @@ public class RecommendationEngineTests
     public void GenerateRecommendation_ObsoleteWith6Stock_ReturnsLiquidate()
     {
         var analysis = CreateAnalysis(currentStock: 6);
-        var result = _engine.GenerateRecommendation(analysis, "OBSOLETE");
+        var result = _engine.GenerateRecommendation(analysis, ObsoletePhase);
         Assert.Contains("LIQUIDATE", result);
     }
 
@@ -292,7 +305,7 @@ public class RecommendationEngineTests
     {
         var analysis = CreateAnalysis(runwayDays: 45);
         var result = _engine.GenerateRecommendation(analysis, "UNKNOWN_PHASE");
-        Assert.Contains("Normal", result);
+        Assert.Contains(NormalMessage, result);
     }
 
     [Fact]
@@ -300,7 +313,7 @@ public class RecommendationEngineTests
     {
         var analysis = CreateAnalysis(runwayDays: 45);
         var result = _engine.GenerateRecommendation(analysis, "");
-        Assert.Contains("Normal", result);
+        Assert.Contains(NormalMessage, result);
     }
 
     [Fact]
@@ -311,8 +324,8 @@ public class RecommendationEngineTests
             direction: TrendDirection.Rising,
             trendStrength: 0.4,
             isAccelerating: false);
-        var result = _engine.GenerateRecommendation(analysis, "ACTIVE");
-        Assert.Contains("TRENDING UP", result);
+        var result = _engine.GenerateRecommendation(analysis, ActivePhase);
+        Assert.Contains(TrendingUpMessage, result);
     }
 
     [Fact]
@@ -323,7 +336,7 @@ public class RecommendationEngineTests
             direction: TrendDirection.Rising,
             trendStrength: 0.1,
             isAccelerating: false);
-        var result = _engine.GenerateRecommendation(analysis, "ACTIVE");
+        var result = _engine.GenerateRecommendation(analysis, ActivePhase);
         Assert.Contains("Slight increase", result);
     }
 
@@ -334,7 +347,7 @@ public class RecommendationEngineTests
             runwayDays: 30,
             direction: TrendDirection.Falling,
             trendStrength: -0.1);
-        var result = _engine.GenerateRecommendation(analysis, "ACTIVE");
+        var result = _engine.GenerateRecommendation(analysis, ActivePhase);
         Assert.Contains("Watch closely", result);
     }
 
@@ -421,28 +434,28 @@ public class RecommendationEngineTests
     public void GenerateRecommendation_BoundaryRunway4Days_ReturnsUrgent()
     {
         var analysis = CreateAnalysis(runwayDays: 4);
-        var result = _engine.GenerateRecommendation(analysis, "ACTIVE");
-        Assert.Contains("URGENT", result);
+        var result = _engine.GenerateRecommendation(analysis, ActivePhase);
+        Assert.Contains(UrgentAlert, result);
     }
 
     [Fact]
     public void GenerateRecommendation_BoundaryRunway8Days_ReturnsReorder()
     {
         var analysis = CreateAnalysis(runwayDays: 8);
-        var result = _engine.GenerateRecommendation(analysis, "ACTIVE");
-        Assert.Contains("Reorder", result);
+        var result = _engine.GenerateRecommendation(analysis, ActivePhase);
+        Assert.Contains(ReorderRecommendation, result);
     }
 
     [Fact]
     public void GenerateRecommendation_BoundaryRunway15Days_ReturnsNormalOrTrendBased()
     {
         var analysis = CreateAnalysis(runwayDays: 15);
-        var result = _engine.GenerateRecommendation(analysis, "ACTIVE");
+        var result = _engine.GenerateRecommendation(analysis, ActivePhase);
         // Should fall through to trend-based or Normal
         Assert.NotNull(result);
-        Assert.DoesNotContain("CRITICAL", result);
-        Assert.DoesNotContain("URGENT", result);
-        Assert.DoesNotContain("Reorder", result);
+        Assert.DoesNotContain(CriticalAlert, result);
+        Assert.DoesNotContain(UrgentAlert, result);
+        Assert.DoesNotContain(ReorderRecommendation, result);
     }
 
     [Fact]
@@ -452,9 +465,9 @@ public class RecommendationEngineTests
             runwayDays: 30,
             direction: TrendDirection.Rising,
             trendStrength: 0.3);
-        var result = _engine.GenerateRecommendation(analysis, "ACTIVE");
+        var result = _engine.GenerateRecommendation(analysis, ActivePhase);
         // At exactly 0.3, should NOT be trending up (needs > 0.3)
-        Assert.DoesNotContain("TRENDING UP", result);
+        Assert.DoesNotContain(TrendingUpMessage, result);
     }
 
     [Fact]
@@ -464,8 +477,8 @@ public class RecommendationEngineTests
             runwayDays: 30,
             direction: TrendDirection.Rising,
             trendStrength: 0.31);
-        var result = _engine.GenerateRecommendation(analysis, "ACTIVE");
-        Assert.Contains("TRENDING UP", result);
+        var result = _engine.GenerateRecommendation(analysis, ActivePhase);
+        Assert.Contains(TrendingUpMessage, result);
     }
 
     #endregion
