@@ -108,7 +108,7 @@ public class TrendCalculatorTests
 
         // Assert
         Assert.Equal(42, result.ProductId);
-        Assert.Equal((string?)"iPhone 15", (string?)result.ProductName);
+        Assert.Equal("iPhone 15", result.ProductName);
         Assert.Equal(50, result.CurrentStock);
     }
 

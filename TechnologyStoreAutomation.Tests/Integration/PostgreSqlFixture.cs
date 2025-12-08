@@ -12,6 +12,78 @@ public class PostgreSqlFixture : IAsyncLifetime
 {
     private readonly PostgreSqlContainer _container;
     
+    private const string DatabaseSchema = @"
+        -- Create ENUM type for lifecycle phases (if not exists)
+        DO $$ BEGIN
+            CREATE TYPE lifecycle_phase_type AS ENUM ('ACTIVE', 'LEGACY', 'OBSOLETE');
+        EXCEPTION
+            WHEN duplicate_object THEN null;
+        END $$;
+
+        -- Products table
+        CREATE TABLE IF NOT EXISTS products (
+            id SERIAL PRIMARY KEY,
+            name VARCHAR(200) NOT NULL,
+            sku VARCHAR(100) UNIQUE NOT NULL,
+            category VARCHAR(100),
+            unit_price DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
+            current_stock INT NOT NULL DEFAULT 0,
+            lifecycle_phase lifecycle_phase_type NOT NULL DEFAULT 'ACTIVE',
+            successor_product_id INT REFERENCES products(id),
+            created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            last_updated TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+        );
+
+        -- Sales Transactions table
+        CREATE TABLE IF NOT EXISTS sales_transactions (
+            id SERIAL PRIMARY KEY,
+            product_id INT NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+            quantity_sold INT NOT NULL CHECK (quantity_sold > 0),
+            total_amount DECIMAL(10, 2) NOT NULL,
+            sale_date DATE NOT NULL DEFAULT CURRENT_DATE,
+            created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            notes TEXT
+        );
+
+        -- Inventory Transactions table
+        CREATE TABLE IF NOT EXISTS inventory_transactions (
+            id SERIAL PRIMARY KEY,
+            product_id INT NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+            quantity_change INT NOT NULL,
+            transaction_type VARCHAR(50) NOT NULL,
+            transaction_date DATE NOT NULL DEFAULT CURRENT_DATE,
+            created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            notes TEXT
+        );
+
+        -- Daily Summaries table
+        CREATE TABLE IF NOT EXISTS daily_summaries (
+            id SERIAL PRIMARY KEY,
+            summary_date DATE NOT NULL,
+            product_id INT NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+            closing_stock INT NOT NULL DEFAULT 0,
+            total_sold INT NOT NULL DEFAULT 0,
+            created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(summary_date, product_id)
+        );
+
+        -- Lifecycle Audit Log
+        CREATE TABLE IF NOT EXISTS lifecycle_audit_log (
+            id SERIAL PRIMARY KEY,
+            product_id INT NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+            old_phase lifecycle_phase_type,
+            new_phase lifecycle_phase_type NOT NULL,
+            reason TEXT,
+            changed_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+        );
+
+        -- Create indexes
+        CREATE INDEX IF NOT EXISTS idx_sales_product_date ON sales_transactions(product_id, sale_date DESC);
+        CREATE INDEX IF NOT EXISTS idx_daily_summaries_date ON daily_summaries(summary_date DESC, product_id);
+        CREATE INDEX IF NOT EXISTS idx_inventory_transactions_product ON inventory_transactions(product_id, transaction_date DESC);
+        CREATE INDEX IF NOT EXISTS idx_lifecycle_audit_product ON lifecycle_audit_log(product_id, changed_at DESC);
+    ";
+    
     public string ConnectionString => _container.GetConnectionString();
 
     public PostgreSqlFixture()
@@ -43,8 +115,7 @@ public class PostgreSqlFixture : IAsyncLifetime
         await using var connection = new NpgsqlConnection(ConnectionString);
         await connection.OpenAsync();
 
-        var schema = GetDatabaseSchema();
-        await using var command = new NpgsqlCommand(schema, connection);
+        await using var command = new NpgsqlCommand(DatabaseSchema, connection);
         await command.ExecuteNonQueryAsync();
     }
 
@@ -94,89 +165,11 @@ public class PostgreSqlFixture : IAsyncLifetime
     }
 
     /// <summary>
-    /// Gets the database schema SQL
+    /// Collection definition for sharing the PostgreSQL container across tests
     /// </summary>
-    private static string GetDatabaseSchema()
+    [CollectionDefinition("PostgreSQL")]
+    public class PostgreSqlCollection : ICollectionFixture<PostgreSqlFixture>
     {
-        return @"
-            -- Create ENUM type for lifecycle phases (if not exists)
-            DO $$ BEGIN
-                CREATE TYPE lifecycle_phase_type AS ENUM ('ACTIVE', 'LEGACY', 'OBSOLETE');
-            EXCEPTION
-                WHEN duplicate_object THEN null;
-            END $$;
-
-            -- Products table
-            CREATE TABLE IF NOT EXISTS products (
-                id SERIAL PRIMARY KEY,
-                name VARCHAR(200) NOT NULL,
-                sku VARCHAR(100) UNIQUE NOT NULL,
-                category VARCHAR(100),
-                unit_price DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
-                current_stock INT NOT NULL DEFAULT 0,
-                lifecycle_phase lifecycle_phase_type NOT NULL DEFAULT 'ACTIVE',
-                successor_product_id INT REFERENCES products(id),
-                created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                last_updated TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-            );
-
-            -- Sales Transactions table
-            CREATE TABLE IF NOT EXISTS sales_transactions (
-                id SERIAL PRIMARY KEY,
-                product_id INT NOT NULL REFERENCES products(id) ON DELETE CASCADE,
-                quantity_sold INT NOT NULL CHECK (quantity_sold > 0),
-                total_amount DECIMAL(10, 2) NOT NULL,
-                sale_date DATE NOT NULL DEFAULT CURRENT_DATE,
-                created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                notes TEXT
-            );
-
-            -- Inventory Transactions table
-            CREATE TABLE IF NOT EXISTS inventory_transactions (
-                id SERIAL PRIMARY KEY,
-                product_id INT NOT NULL REFERENCES products(id) ON DELETE CASCADE,
-                quantity_change INT NOT NULL,
-                transaction_type VARCHAR(50) NOT NULL,
-                transaction_date DATE NOT NULL DEFAULT CURRENT_DATE,
-                created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                notes TEXT
-            );
-
-            -- Daily Summaries table
-            CREATE TABLE IF NOT EXISTS daily_summaries (
-                id SERIAL PRIMARY KEY,
-                summary_date DATE NOT NULL,
-                product_id INT NOT NULL REFERENCES products(id) ON DELETE CASCADE,
-                closing_stock INT NOT NULL DEFAULT 0,
-                total_sold INT NOT NULL DEFAULT 0,
-                created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                UNIQUE(summary_date, product_id)
-            );
-
-            -- Lifecycle Audit Log
-            CREATE TABLE IF NOT EXISTS lifecycle_audit_log (
-                id SERIAL PRIMARY KEY,
-                product_id INT NOT NULL REFERENCES products(id) ON DELETE CASCADE,
-                old_phase lifecycle_phase_type,
-                new_phase lifecycle_phase_type NOT NULL,
-                reason TEXT,
-                changed_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-            );
-
-            -- Create indexes
-            CREATE INDEX IF NOT EXISTS idx_sales_product_date ON sales_transactions(product_id, sale_date DESC);
-            CREATE INDEX IF NOT EXISTS idx_daily_summaries_date ON daily_summaries(summary_date DESC, product_id);
-            CREATE INDEX IF NOT EXISTS idx_inventory_transactions_product ON inventory_transactions(product_id, transaction_date DESC);
-            CREATE INDEX IF NOT EXISTS idx_lifecycle_audit_product ON lifecycle_audit_log(product_id, changed_at DESC);
-        ";
     }
-}
-
-/// <summary>
-/// Collection definition for sharing the PostgreSQL container across tests
-/// </summary>
-[CollectionDefinition("PostgreSQL")]
-public class PostgreSqlCollection : ICollectionFixture<PostgreSqlFixture>
-{
 }
 

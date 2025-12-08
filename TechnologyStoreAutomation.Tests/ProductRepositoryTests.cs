@@ -10,6 +10,14 @@ namespace TechnologyStoreAutomation.Tests;
 /// </summary>
 public class ProductRepositoryTests
 {
+    #region Constants
+    
+    private const string ActivePhase = "ACTIVE";
+    private const string LegacyPhase = "LEGACY";
+    private const string ObsoletePhase = "OBSOLETE";
+    
+    #endregion
+
     private readonly Mock<IProductRepository> _mockRepository;
 
     public ProductRepositoryTests()
@@ -20,7 +28,7 @@ public class ProductRepositoryTests
     #region Helper Methods
 
     private static Product CreateTestProduct(int id = 1, string name = "Test Product", int stock = 100, 
-        string phase = "ACTIVE", decimal price = 99.99m)
+        string phase = ActivePhase, decimal price = 99.99m)
     {
         return new Product
         {
@@ -105,7 +113,7 @@ public class ProductRepositoryTests
         Assert.Equal(1, result.Id);
         Assert.Equal("Test iPhone", result.Name);
         Assert.Equal(100, result.CurrentStock);
-        Assert.Equal("ACTIVE", result.LifecyclePhase);
+        Assert.Equal(ActivePhase, result.LifecyclePhase);
         Assert.Equal(999.99m, result.UnitPrice);
     }
 
@@ -225,18 +233,18 @@ public class ProductRepositoryTests
     public async Task UpdateProductPhaseAsync_ValidPhase_CompletesSuccessfully()
     {
         // Arrange
-        _mockRepository.Setup(r => r.UpdateProductPhaseAsync(1, "LEGACY", "Product entering vintage status"))
+        _mockRepository.Setup(r => r.UpdateProductPhaseAsync(1, LegacyPhase, "Product entering vintage status"))
             .Returns(Task.CompletedTask);
 
         // Act & Assert (no exception should be thrown)
-        await _mockRepository.Object.UpdateProductPhaseAsync(1, "LEGACY", "Product entering vintage status");
-        _mockRepository.Verify(r => r.UpdateProductPhaseAsync(1, "LEGACY", "Product entering vintage status"), Times.Once);
+        await _mockRepository.Object.UpdateProductPhaseAsync(1, LegacyPhase, "Product entering vintage status");
+        _mockRepository.Verify(r => r.UpdateProductPhaseAsync(1, LegacyPhase, "Product entering vintage status"), Times.Once);
     }
 
     [Theory]
-    [InlineData("ACTIVE")]
-    [InlineData("LEGACY")]
-    [InlineData("OBSOLETE")]
+    [InlineData(ActivePhase)]
+    [InlineData(LegacyPhase)]
+    [InlineData(ObsoletePhase)]
     public async Task UpdateProductPhaseAsync_AllValidPhases_CallsRepository(string phase)
     {
         // Arrange
@@ -300,7 +308,7 @@ public class ProductRepositoryTests
             {
                 Id = 1,
                 Name = "iPhone 15",
-                Phase = "ACTIVE",
+                Phase = ActivePhase,
                 CurrentStock = 50,
                 SalesLast7Days = 35,
                 RunwayDays = 10,
@@ -310,7 +318,7 @@ public class ProductRepositoryTests
             {
                 Id = 2,
                 Name = "iPhone 12",
-                Phase = "LEGACY",
+                Phase = LegacyPhase,
                 CurrentStock = 10,
                 SalesLast7Days = 3,
                 RunwayDays = 45,
@@ -326,8 +334,8 @@ public class ProductRepositoryTests
 
         // Assert
         Assert.Equal(2, result.Count);
-        Assert.Contains(result, p => p.Phase == "ACTIVE");
-        Assert.Contains(result, p => p.Phase == "LEGACY");
+        Assert.Contains(result, p => p.Phase == ActivePhase);
+        Assert.Contains(result, p => p.Phase == LegacyPhase);
         Assert.All(result, p => Assert.False(string.IsNullOrEmpty(p.Recommendation)));
     }
 
@@ -355,7 +363,7 @@ public class ProductRepositoryTests
             {
                 Id = 1,
                 Name = "Critical Stock Item",
-                Phase = "ACTIVE",
+                Phase = ActivePhase,
                 CurrentStock = 5,
                 SalesLast7Days = 21, // 3/day average
                 RunwayDays = 1, // Only 1 day of stock left!
@@ -412,8 +420,8 @@ public class ProductRepositoryTests
     {
         // Arrange
         var productId = 1;
-        var initialPhase = "ACTIVE";
-        var newPhase = "LEGACY";
+        var initialPhase = ActivePhase;
+        var newPhase = LegacyPhase;
 
         var productBeforeUpdate = CreateTestProduct(productId, "iPhone 12", 10, initialPhase);
         var productAfterUpdate = CreateTestProduct(productId, "iPhone 12", 10, newPhase);
@@ -452,7 +460,7 @@ public class ProductRepositoryTests
             Category = "Electronics",
             UnitPrice = 299.99m,
             CurrentStock = 50,
-            LifecyclePhase = "ACTIVE",
+            LifecyclePhase = ActivePhase,
             SuccessorProductId = 2,
             CreatedAt = DateTime.Now.AddDays(-30),
             LastUpdated = DateTime.Now
@@ -464,7 +472,7 @@ public class ProductRepositoryTests
         Assert.Equal("Electronics", product.Category);
         Assert.Equal(299.99m, product.UnitPrice);
         Assert.Equal(50, product.CurrentStock);
-        Assert.Equal("ACTIVE", product.LifecyclePhase);
+        Assert.Equal(ActivePhase, product.LifecyclePhase);
         Assert.Equal(2, product.SuccessorProductId);
     }
 
@@ -497,7 +505,7 @@ public class ProductRepositoryTests
         {
             Id = 1,
             Name = "Dashboard Product",
-            Phase = "ACTIVE",
+            Phase = ActivePhase,
             Recommendation = "Reorder soon",
             CurrentStock = 25,
             SalesLast7Days = 20,
@@ -506,7 +514,7 @@ public class ProductRepositoryTests
 
         Assert.Equal(1, dto.Id);
         Assert.Equal("Dashboard Product", dto.Name);
-        Assert.Equal("ACTIVE", dto.Phase);
+        Assert.Equal(ActivePhase, dto.Phase);
         Assert.Equal("Reorder soon", dto.Recommendation);
         Assert.Equal(25, dto.CurrentStock);
         Assert.Equal(20, dto.SalesLast7Days);

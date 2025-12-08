@@ -320,18 +320,20 @@ public class LifecycleSentinel
     /// </summary>
     private static string NormalizeProductName(string name)
     {
+        var timeout = TimeSpan.FromMilliseconds(100);
+        
         // Remove common prefixes/suffixes
-        name = Regex.Replace(name, @"\b(Apple|Google|Samsung|Sony)\b", "", RegexOptions.IgnoreCase);
+        name = Regex.Replace(name, @"\b(Apple|Google|Samsung|Sony)\b", "", RegexOptions.IgnoreCase, timeout);
 
         // Remove storage capacities
-        name = Regex.Replace(name, @"\b\d+\s*(GB|TB|MB)\b", "", RegexOptions.IgnoreCase);
+        name = Regex.Replace(name, @"\b\d+\s*(GB|TB|MB)\b", "", RegexOptions.IgnoreCase, timeout);
 
         // Remove colors
         name = Regex.Replace(name, @"\b(Black|White|Silver|Gold|Blue|Green|Red|Pink|Purple|Gray|Grey|Space Gray)\b",
-            "", RegexOptions.IgnoreCase);
+            "", RegexOptions.IgnoreCase, timeout);
 
         // Remove extra whitespace
-        name = Regex.Replace(name, @"\s+", " ");
+        name = Regex.Replace(name, @"\s+", " ", RegexOptions.None, timeout);
 
         return name.Trim();
     }
@@ -341,6 +343,8 @@ public class LifecycleSentinel
     /// </summary>
     private static string ExtractModelIdentifier(string name)
     {
+        var timeout = TimeSpan.FromMilliseconds(100);
+        
         // Match patterns like "iPhone 12", "Pixel 6 Pro", "MacBook Air (2020)"
         var patterns = new[]
         {
@@ -352,7 +356,7 @@ public class LifecycleSentinel
 
         foreach (var pattern in patterns)
         {
-            var match = Regex.Match(name, pattern, RegexOptions.IgnoreCase);
+            var match = Regex.Match(name, pattern, RegexOptions.IgnoreCase, timeout);
             if (match.Success)
                 return match.Value.Trim();
         }

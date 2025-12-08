@@ -9,6 +9,12 @@ namespace TechnologyStoreAutomation.Tests.Integration;
 [Collection("PostgreSQL")]
 public class ProductRepositoryIntegrationTests : IAsyncLifetime
 {
+    #region Constants
+    
+    private const string TestIphoneSku = "TEST-IP15PRO";
+    
+    #endregion
+
     private readonly PostgreSqlFixture _fixture;
     private ProductRepository _repository = null!;
 
@@ -60,7 +66,7 @@ public class ProductRepositoryIntegrationTests : IAsyncLifetime
 
         // Act
         var products = (await _repository.GetAllProductsAsync()).ToList();
-        var iPhone = products.First(p => p.Sku == "TEST-IP15PRO");
+        var iPhone = products.First(p => p.Sku == TestIphoneSku);
 
         // Assert
         Assert.Equal("iPhone 15 Pro", iPhone.Name);
@@ -80,7 +86,7 @@ public class ProductRepositoryIntegrationTests : IAsyncLifetime
         // Arrange
         await _fixture.SeedTestDataAsync();
         var products = (await _repository.GetAllProductsAsync()).ToList();
-        var productId = products.First(p => p.Sku == "TEST-IP15PRO").Id;
+        var productId = products.First(p => p.Sku == TestIphoneSku).Id;
 
         // Act
         var transactionId = await _repository.RecordSaleAsync(productId, 2, 1999.98m);
@@ -95,7 +101,7 @@ public class ProductRepositoryIntegrationTests : IAsyncLifetime
         // Arrange
         await _fixture.SeedTestDataAsync();
         var products = (await _repository.GetAllProductsAsync()).ToList();
-        var product = products.First(p => p.Sku == "TEST-IP15PRO");
+        var product = products.First(p => p.Sku == TestIphoneSku);
         var initialStock = product.CurrentStock;
 
         // Act
@@ -115,7 +121,7 @@ public class ProductRepositoryIntegrationTests : IAsyncLifetime
         // Arrange
         await _fixture.SeedTestDataAsync();
         var products = (await _repository.GetAllProductsAsync()).ToList();
-        var productId = products.First(p => p.Sku == "TEST-IP15PRO").Id;
+        var productId = products.First(p => p.Sku == TestIphoneSku).Id;
         var saleDate = DateTime.Today;
 
         // Act
@@ -137,7 +143,7 @@ public class ProductRepositoryIntegrationTests : IAsyncLifetime
         // Arrange
         await _fixture.SeedTestDataAsync();
         var products = (await _repository.GetAllProductsAsync()).ToList();
-        var productId = products.First(p => p.Sku == "TEST-IP15PRO").Id;
+        var productId = products.First(p => p.Sku == TestIphoneSku).Id;
         var pastDate = DateTime.Today.AddDays(-5);
 
         // Act
@@ -175,7 +181,7 @@ public class ProductRepositoryIntegrationTests : IAsyncLifetime
         // Arrange
         await _fixture.SeedTestDataAsync();
         var products = (await _repository.GetAllProductsAsync()).ToList();
-        var productId = products.First(p => p.Sku == "TEST-IP15PRO").Id;
+        var productId = products.First(p => p.Sku == TestIphoneSku).Id;
 
         // Record sales over several days
         await _repository.RecordSaleAsync(productId, 1, 999.99m, DateTime.Today);
@@ -285,7 +291,7 @@ public class ProductRepositoryIntegrationTests : IAsyncLifetime
         // Arrange
         await _fixture.SeedTestDataAsync();
         var products = (await _repository.GetAllProductsAsync()).ToList();
-        var productId = products.First(p => p.Sku == "TEST-IP15PRO").Id;
+        var productId = products.First(p => p.Sku == TestIphoneSku).Id;
 
         // Record some sales
         for (int i = 0; i < 7; i++)
@@ -338,7 +344,7 @@ public class ProductRepositoryIntegrationTests : IAsyncLifetime
         // Arrange
         await _fixture.SeedTestDataAsync();
         var products = (await _repository.GetAllProductsAsync()).ToList();
-        var product = products.First(p => p.Sku == "TEST-IP15PRO");
+        var product = products.First(p => p.Sku == TestIphoneSku);
         var initialStock = product.CurrentStock;
         var salesCount = 10;
 

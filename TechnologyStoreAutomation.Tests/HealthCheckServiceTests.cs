@@ -6,6 +6,12 @@ namespace TechnologyStoreAutomation.Tests;
 /// </summary>
 public class HealthCheckServiceTests
 {
+    #region Constants
+    
+    private const string DatabaseCheckName = "Database";
+    
+    #endregion
+
     #region Test Helpers
     
     /// <summary>
@@ -116,7 +122,7 @@ public class HealthCheckServiceTests
             TotalDuration = TimeSpan.FromMilliseconds(100),
             Results = new List<HealthCheckResult>
             {
-                new() { Name = "Database", Status = HealthStatus.Healthy, Duration = TimeSpan.FromMilliseconds(50) },
+                new() { Name = DatabaseCheckName, Status = HealthStatus.Healthy, Duration = TimeSpan.FromMilliseconds(50) },
                 new() { Name = "Memory", Status = HealthStatus.Degraded, Duration = TimeSpan.FromMilliseconds(10) }
             }
         };
@@ -146,7 +152,7 @@ public class HealthCheckServiceTests
             {
                 new() 
                 { 
-                    Name = "Database", 
+                    Name = DatabaseCheckName, 
                     Status = HealthStatus.Unhealthy, 
                     Duration = TimeSpan.FromMilliseconds(50),
                     Exception = new Exception("Connection refused")
@@ -213,7 +219,7 @@ public class HealthCheckServiceTests
         var result = await service.CheckDatabaseAsync();
 
         // Assert
-        Assert.Equal("Database", result.Name);
+        Assert.Equal(DatabaseCheckName, result.Name);
         Assert.Equal(HealthStatus.Unhealthy, result.Status);
         Assert.NotNull(result.Exception);
         Assert.Contains("failed", result.Description, StringComparison.OrdinalIgnoreCase);
