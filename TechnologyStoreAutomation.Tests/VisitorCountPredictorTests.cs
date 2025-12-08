@@ -120,7 +120,7 @@ public class VisitorCountPredictorTests
     public void ApplySpecialDayAdjustments_BlackFriday_Returns250Percent()
     {
         // Black Friday 2025: November 28 (4th Friday)
-        var blackFriday = new DateTime(2025, 11, 28);
+        var blackFriday = new DateTime(2025, 11, 28, 0, 0, 0, DateTimeKind.Utc);
         var result = InvokePrivateMethod<int>("ApplySpecialDayAdjustments", blackFriday, 100);
         Assert.Equal(250, result); // 100 * 2.5
     }
@@ -129,20 +129,17 @@ public class VisitorCountPredictorTests
     public void ApplySpecialDayAdjustments_CyberMonday_Returns200Percent()
     {
         // Cyber Monday 2025: December 1
-        var cyberMonday = new DateTime(2025, 12, 1);
-        var result = InvokePrivateMethod<int>("ApplySpecialDayAdjustments", cyberMonday, 100);
-        
         // December 1 is not in November, so it won't match Cyber Monday rule
         // Let's check with a proper Cyber Monday date
-        var cyberMonday2024 = new DateTime(2024, 11, 25); // Monday after Black Friday 2024
-        result = InvokePrivateMethod<int>("ApplySpecialDayAdjustments", cyberMonday2024, 100);
+        var cyberMonday2024 = new DateTime(2024, 11, 25, 0, 0, 0, DateTimeKind.Utc); // Monday after Black Friday 2024
+        var result = InvokePrivateMethod<int>("ApplySpecialDayAdjustments", cyberMonday2024, 100);
         Assert.Equal(200, result); // 100 * 2.0
     }
 
     [Fact]
     public void ApplySpecialDayAdjustments_ChristmasEve_Returns180Percent()
     {
-        var christmasEve = new DateTime(2025, 12, 24);
+        var christmasEve = new DateTime(2025, 12, 24, 0, 0, 0, DateTimeKind.Utc);
         var result = InvokePrivateMethod<int>("ApplySpecialDayAdjustments", christmasEve, 100);
         Assert.Equal(180, result); // 100 * 1.8
     }
@@ -150,7 +147,7 @@ public class VisitorCountPredictorTests
     [Fact]
     public void ApplySpecialDayAdjustments_PostChristmas_Returns150Percent()
     {
-        var boxingDay = new DateTime(2025, 12, 26);
+        var boxingDay = new DateTime(2025, 12, 26, 0, 0, 0, DateTimeKind.Utc);
         var result = InvokePrivateMethod<int>("ApplySpecialDayAdjustments", boxingDay, 100);
         Assert.Equal(150, result); // 100 * 1.5
     }
@@ -158,7 +155,7 @@ public class VisitorCountPredictorTests
     [Fact]
     public void ApplySpecialDayAdjustments_NewYearSales_Returns130Percent()
     {
-        var newYear = new DateTime(2025, 1, 3);
+        var newYear = new DateTime(2025, 1, 3, 0, 0, 0, DateTimeKind.Utc);
         var result = InvokePrivateMethod<int>("ApplySpecialDayAdjustments", newYear, 100);
         Assert.Equal(130, result); // 100 * 1.3
     }
@@ -166,7 +163,7 @@ public class VisitorCountPredictorTests
     [Fact]
     public void ApplySpecialDayAdjustments_AppleLaunchSeason_Returns140Percent()
     {
-        var appleLaunch = new DateTime(2025, 9, 15);
+        var appleLaunch = new DateTime(2025, 9, 15, 0, 0, 0, DateTimeKind.Utc);
         var result = InvokePrivateMethod<int>("ApplySpecialDayAdjustments", appleLaunch, 100);
         Assert.Equal(140, result); // 100 * 1.4
     }
@@ -175,7 +172,7 @@ public class VisitorCountPredictorTests
     public void ApplySpecialDayAdjustments_Saturday_Returns120Percent()
     {
         // Find a Saturday that doesn't fall on other special dates
-        var saturday = new DateTime(2025, 3, 15); // A regular Saturday in March
+        var saturday = new DateTime(2025, 3, 15, 0, 0, 0, DateTimeKind.Utc); // A regular Saturday in March
         var result = InvokePrivateMethod<int>("ApplySpecialDayAdjustments", saturday, 100);
         Assert.Equal(120, result); // 100 * 1.2
     }
@@ -184,7 +181,7 @@ public class VisitorCountPredictorTests
     public void ApplySpecialDayAdjustments_Sunday_Returns110Percent()
     {
         // Find a Sunday that doesn't fall on other special dates
-        var sunday = new DateTime(2025, 3, 16); // A regular Sunday in March
+        var sunday = new DateTime(2025, 3, 16, 0, 0, 0, DateTimeKind.Utc); // A regular Sunday in March
         var result = InvokePrivateMethod<int>("ApplySpecialDayAdjustments", sunday, 100);
         Assert.Equal(110, result); // 100 * 1.1
     }
@@ -193,7 +190,7 @@ public class VisitorCountPredictorTests
     public void ApplySpecialDayAdjustments_RegularWeekday_ReturnsUnchanged()
     {
         // Regular Wednesday in March (no special adjustments)
-        var regularDay = new DateTime(2025, 3, 12);
+        var regularDay = new DateTime(2025, 3, 12, 0, 0, 0, DateTimeKind.Utc);
         var result = InvokePrivateMethod<int>("ApplySpecialDayAdjustments", regularDay, 100);
         Assert.Equal(100, result); // No adjustment
     }
@@ -460,7 +457,7 @@ public class VisitorCountPredictorTests
     [Fact]
     public void ApplySpecialDayAdjustments_ZeroBaseVisitors_ReturnsZero()
     {
-        var regularDay = new DateTime(2025, 3, 12);
+        var regularDay = new DateTime(2025, 3, 12, 0, 0, 0, DateTimeKind.Utc);
         var result = InvokePrivateMethod<int>("ApplySpecialDayAdjustments", regularDay, 0);
         Assert.Equal(0, result);
     }
@@ -468,7 +465,7 @@ public class VisitorCountPredictorTests
     [Fact]
     public void ApplySpecialDayAdjustments_LargeBaseVisitors_HandlesCorrectly()
     {
-        var blackFriday = new DateTime(2025, 11, 28);
+        var blackFriday = new DateTime(2025, 11, 28, 0, 0, 0, DateTimeKind.Utc);
         var result = InvokePrivateMethod<int>("ApplySpecialDayAdjustments", blackFriday, 10000);
         Assert.Equal(25000, result); // 10000 * 2.5
     }

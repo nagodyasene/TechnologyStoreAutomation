@@ -186,7 +186,7 @@ public class VisitorCountPredictor : IVisitorCountPredictor
             HasData = true,
             AverageDailyVisitors = (int)Math.Round(avgDaily),
             WeeklyTrendPercent = Math.Round(trend * 100, 1),
-            TrendDirection = trend > RisingTrendThreshold ? "Rising" : trend < FallingTrendThreshold ? "Falling" : "Stable",
+            TrendDirection = DetermineTrendDirection(trend),
             PeakDate = peakDay.Date,
             PeakVisitors = peakDay.EstimatedVisitors,
             SlowestDate = slowestDay.Date,
@@ -195,6 +195,20 @@ public class VisitorCountPredictor : IVisitorCountPredictor
             TomorrowPrediction = predictions.FirstOrDefault(),
             WeekAheadPredictions = predictions
         };
+    }
+
+    /// <summary>
+    /// Determines trend direction based on trend value
+    /// </summary>
+    private string DetermineTrendDirection(double trend)
+    {
+        if (trend > RisingTrendThreshold)
+            return "Rising";
+        
+        if (trend < FallingTrendThreshold)
+            return "Falling";
+        
+        return "Stable";
     }
 
     /// <summary>

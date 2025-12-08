@@ -96,9 +96,9 @@ public static class DatabaseConfig
         if (string.IsNullOrWhiteSpace(connectionString))
         {
             throw new InvalidOperationException(
-                "Database connection string not configured. Please set one of the following:\n" +
-                "1) DB_CONNECTION_STRING (full libpq string)\n" +
-                "2) DATABASE_URL (postgres://user:pass@host:port/dbname)\n" +
+                "Database connection string not configured. Please set one of the following environment variables:\n" +
+                "1) DB_CONNECTION_STRING\n" +
+                "2) DATABASE_URL\n" +
                 "3) DB_HOST, DB_NAME, DB_USER, DB_PASSWORD (and optional DB_PORT)");
         }
 

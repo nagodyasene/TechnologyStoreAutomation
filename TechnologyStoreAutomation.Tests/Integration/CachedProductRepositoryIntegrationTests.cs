@@ -64,13 +64,13 @@ public class CachedProductRepositoryIntegrationTests : IAsyncLifetime
         var firstCall = (await _cachedRepository.GetAllProductsAsync()).ToList();
         
         // Modify database directly (bypass cache)
-        await _innerRepository.UpdateProductPhaseAsync(firstCall.First().Id, "OBSOLETE", "Direct update");
+        await _innerRepository.UpdateProductPhaseAsync(firstCall[0].Id, "OBSOLETE", "Direct update");
         
-        // Second call should return cached data (not see the update)
+        // The second call should return cached data (not see the update)
         var secondCall = (await _cachedRepository.GetAllProductsAsync()).ToList();
 
         // Assert - cached data should still show original phase
-        var cachedProduct = secondCall.First(p => p.Id == firstCall.First().Id);
+        var cachedProduct = secondCall.First(p => p.Id == firstCall[0].Id);
         Assert.NotEqual("OBSOLETE", cachedProduct.LifecyclePhase);
     }
 
@@ -82,7 +82,6 @@ public class CachedProductRepositoryIntegrationTests : IAsyncLifetime
 
         // Act - First call
         var firstCall = (await _cachedRepository.GetDashboardDataAsync()).ToList();
-        var firstCallTime = DateTime.Now;
 
         // Small delay
         await Task.Delay(10);
@@ -100,7 +99,7 @@ public class CachedProductRepositoryIntegrationTests : IAsyncLifetime
         // Arrange
         await _fixture.SeedTestDataAsync();
         var products = (await _cachedRepository.GetAllProductsAsync()).ToList();
-        var product = products.First();
+        var product = products[0];
 
         // Populate cache
         var initialDashboard = (await _cachedRepository.GetDashboardDataAsync()).ToList();
@@ -158,8 +157,8 @@ public class CachedProductRepositoryIntegrationTests : IAsyncLifetime
         // Assert - Different products have different cache entries
         Assert.Single(history1);
         Assert.Single(history2);
-        Assert.Equal(1, history1.First().QuantitySold);
-        Assert.Equal(2, history2.First().QuantitySold);
+        Assert.Equal(1, history1[0].QuantitySold);
+        Assert.Equal(2, history2[0].QuantitySold);
     }
 
     #endregion
@@ -181,11 +180,11 @@ public class CachedProductRepositoryIntegrationTests : IAsyncLifetime
 
         // Modify data directly
         var products = (await _innerRepository.GetAllProductsAsync()).ToList();
-        await _innerRepository.UpdateProductPhaseAsync(products.First().Id, "OBSOLETE", "Test");
+        await _innerRepository.UpdateProductPhaseAsync(products[0].Id, "OBSOLETE", "Test");
 
         // Get data through cached repo (should fetch fresh data)
         var freshProducts = (await _cachedRepository.GetAllProductsAsync()).ToList();
-        var updatedProduct = freshProducts.First(p => p.Id == products.First().Id);
+        var updatedProduct = freshProducts.First(p => p.Id == products[0].Id);
 
         // Assert - should see the update
         Assert.Equal("OBSOLETE", updatedProduct.LifecyclePhase);
@@ -203,7 +202,7 @@ public class CachedProductRepositoryIntegrationTests : IAsyncLifetime
         
         // Act - Multiple operations through cached repository
         var products = (await _cachedRepository.GetAllProductsAsync()).ToList();
-        var product = products.First();
+        var product = products[0];
         
         // Record multiple sales
         for (int i = 0; i < 5; i++)

@@ -47,23 +47,53 @@ public class RecommendationEngine : IRecommendationEngine
     public string GenerateRecommendation(TrendAnalysis analysis, string lifecyclePhase)
     {
         // Priority 1: Lifecycle phase overrides
+        var lifecycleRecommendation = GetLifecycleRecommendation(analysis, lifecyclePhase);
+        if (lifecycleRecommendation != null) 
+            return lifecycleRecommendation;
+
+        // Priority 2: Critical stock alerts
+        var stockRecommendation = GetStockLevelRecommendation(analysis);
+        if (stockRecommendation != null) 
+            return stockRecommendation;
+
+        // Priority 3: Trend-based recommendations
+        var trendRecommendation = GetTrendRecommendation(analysis);
+        if (trendRecommendation != null) 
+            return trendRecommendation;
+
+        // Default: All good
+        return analysis.RunwayDays > AdequateRunwayDays 
+            ? "✅ Normal - Stock adequate" 
+            : "✅ Normal";
+    }
+
+    /// <summary>
+    /// Gets recommendation based on lifecycle phase
+    /// </summary>
+    private static string? GetLifecycleRecommendation(TrendAnalysis analysis, string lifecyclePhase)
+    {
         if (lifecyclePhase == "OBSOLETE")
         {
-            if (analysis.CurrentStock > 5)
-                return "🔴 LIQUIDATE - Clear remaining stock";
-            else
-                return "🔴 OBSOLETE - Discontinue";
+            return analysis.CurrentStock > 5
+                ? "🔴 LIQUIDATE - Clear remaining stock"
+                : "🔴 OBSOLETE - Discontinue";
         }
 
         if (lifecyclePhase == "LEGACY")
         {
-            if (analysis.RunwayDays < 30)
-                return "🟡 LEGACY - Discount 15% to clear";
-            else
-                return "🟡 LEGACY - Monitor, reduce orders";
+            return analysis.RunwayDays < 30
+                ? "🟡 LEGACY - Discount 15% to clear"
+                : "🟡 LEGACY - Monitor, reduce orders";
         }
 
-        // Priority 2: Critical stock alerts
+        return null;
+    }
+
+    /// <summary>
+    /// Gets recommendation based on stock runway
+    /// </summary>
+    private string? GetStockLevelRecommendation(TrendAnalysis analysis)
+    {
         if (analysis.RunwayDays <= CriticalRunwayDays)
             return "🚨 CRITICAL - Reorder IMMEDIATELY";
 
@@ -73,36 +103,48 @@ public class RecommendationEngine : IRecommendationEngine
         if (analysis.RunwayDays <= ReorderRunwayDays)
             return "📦 Reorder recommended";
 
-        // Priority 3: Trend-based recommendations
-        if (analysis.Direction == TrendDirection.Rising)
-        {
-            if (analysis.IsAccelerating)
-                return "🚀 ACCELERATING - Increase stock levels";
-            else if (analysis.TrendStrength > StrongTrendThreshold)
-                return "📈 TRENDING UP - Monitor for restock";
-            else
-                return "✅ Normal - Slight increase";
-        }
-
-        if (analysis.Direction == TrendDirection.Falling)
-        {
-            if (analysis.TrendStrength < -StrongTrendThreshold)
-                return "📉 DECLINING - Reduce orders";
-            else
-                return "⚠️ Slight decline - Watch closely";
-        }
-
-        if (analysis.Direction == TrendDirection.Volatile)
-        {
-            return "⚡ VOLATILE - Review pricing/promotion";
-        }
-
-        // Default: All good
-        if (analysis.RunwayDays > AdequateRunwayDays)
-            return "✅ Normal - Stock adequate";
-
-        return "✅ Normal";
+        return null;
     }
+
+    /// <summary>
+    /// Gets recommendation based on trend analysis
+    /// </summary>
+    private string? GetTrendRecommendation(TrendAnalysis analysis)
+    {
+        return analysis.Direction switch
+        {
+            TrendDirection.Rising => GetRisingTrendRecommendation(analysis),
+            TrendDirection.Falling => GetFallingTrendRecommendation(analysis),
+            TrendDirection.Volatile => "⚡ VOLATILE - Review pricing/promotion",
+            _ => null
+        };
+    }
+
+    /// <summary>
+    /// Gets recommendation for rising trend
+    /// </summary>
+    private string GetRisingTrendRecommendation(TrendAnalysis analysis)
+    {
+        if (analysis.IsAccelerating)
+            return "🚀 ACCELERATING - Increase stock levels";
+        
+        if (analysis.TrendStrength > StrongTrendThreshold)
+            return "📈 TRENDING UP - Monitor for restock";
+        
+        return "✅ Normal - Slight increase";
+    }
+
+    /// <summary>
+    /// Gets recommendation for falling trend
+    /// </summary>
+    private static string GetFallingTrendRecommendation(TrendAnalysis analysis)
+    {
+        if (analysis.TrendStrength < -StrongTrendThreshold)
+            return "📉 DECLINING - Reduce orders";
+        
+        return "⚠️ Slight decline - Watch closely";
+    }
+
 
     /// <summary>
     /// Calculates suggested reorder quantity based on trends

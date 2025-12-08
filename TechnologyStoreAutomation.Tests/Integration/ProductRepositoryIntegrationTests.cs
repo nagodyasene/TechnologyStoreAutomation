@@ -160,7 +160,7 @@ public class ProductRepositoryIntegrationTests : IAsyncLifetime
         // Arrange
         await _fixture.SeedTestDataAsync();
         var products = (await _repository.GetAllProductsAsync()).ToList();
-        var productId = products.First().Id;
+        var productId = products[0].Id;
 
         // Act
         var history = await _repository.GetSalesHistoryAsync(productId, 30);
@@ -314,13 +314,18 @@ public class ProductRepositoryIntegrationTests : IAsyncLifetime
         // Arrange
         await _fixture.SeedTestDataAsync();
         var yesterday = DateTime.Today.AddDays(-1);
+        var initialDashboardData = (await _repository.GetDashboardDataAsync()).ToList();
 
         // Act
         await _repository.GenerateDailySnapshotAsync(yesterday);
-
-        // Assert - snapshot should exist (no exception thrown)
-        // We can verify by running it again - should not fail due to ON CONFLICT
+        
+        // Verify by calling it again - should not fail due to ON CONFLICT
         await _repository.GenerateDailySnapshotAsync(yesterday);
+
+        // Assert - verify snapshot was created by checking dashboard data persists
+        var finalDashboardData = (await _repository.GetDashboardDataAsync()).ToList();
+        Assert.Equal(initialDashboardData.Count, finalDashboardData.Count);
+        Assert.Equal(4, finalDashboardData.Count);
     }
 
     #endregion

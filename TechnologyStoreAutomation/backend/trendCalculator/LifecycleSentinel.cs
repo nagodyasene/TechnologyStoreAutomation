@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using TechnologyStoreAutomation.backend.trendCalculator.data;
@@ -17,23 +18,26 @@ public enum LifecyclePhase
 /// </summary>
 public class LifecycleSentinel
 {
-    private readonly IHttpClientFactory? _httpClientFactory;
     private readonly HttpClient _httpClient;
     private readonly IProductRepository _repository;
     private readonly ILogger<LifecycleSentinel> _logger;
-
-    private const string UrlAppleVintage = "https://support.apple.com/en-us/102772";
-    private const string UrlGooglePixel = "https://support.google.com/pixelphone/answer/4457705";
+    private readonly string _urlAppleVintage;
 
     // Event for external subscribers (optional, mainly for testing)
     public event Action<string, LifecyclePhase, string>? OnProductStatusChanged;
 
-    public LifecycleSentinel(IProductRepository repository, IHttpClientFactory? httpClientFactory = null)
+    public LifecycleSentinel(IProductRepository repository, IConfiguration configuration, IHttpClientFactory? httpClientFactory = null)
     {
         _repository = repository;
         _logger = AppLogger.CreateLogger<LifecycleSentinel>();
-        _httpClientFactory = httpClientFactory;
         _httpClient = httpClientFactory?.CreateClient() ?? new HttpClient();
+
+        // Read URLs from configuration
+        _urlAppleVintage = configuration["Manufacturers:Apple:VintageListUrl"]
+            ?? throw new InvalidOperationException("Manufacturers:Apple:VintageListUrl configuration is required");
+        
+        // Note: Google Pixel EOL URL is configured but not currently used
+        // (using hardcoded EOL dates instead until JS-rendered page scraping is implemented)
 
         // Configure HttpClient timeout and headers
         _httpClient.Timeout = TimeSpan.FromSeconds(30);
@@ -71,9 +75,9 @@ public class LifecycleSentinel
     {
         try
         {
-            _logger.LogInformation("Checking Apple vintage list at {Url}", UrlAppleVintage);
+            _logger.LogInformation("Checking Apple vintage list at {Url}", _urlAppleVintage);
 
-            string html = await _httpClient.GetStringAsync(UrlAppleVintage);
+            string html = await _httpClient.GetStringAsync(_urlAppleVintage);
             var doc = new HtmlAgilityPack.HtmlDocument();
             doc.LoadHtml(html);
 
@@ -87,48 +91,7 @@ public class LifecycleSentinel
                 return;
             }
 
-            int vintageCount = 0;
-            int obsoleteCount = 0;
-            bool inVintageSection = false;
-            bool inObsoleteSection = false;
-
-            foreach (var item in allListItems)
-            {
-                string text = item.InnerText.Trim();
-
-                // Skip empty items
-                if (string.IsNullOrWhiteSpace(text)) continue;
-
-                // Detect section headers
-                if (text.Contains("Vintage", StringComparison.OrdinalIgnoreCase))
-                {
-                    inVintageSection = true;
-                    inObsoleteSection = false;
-                    continue;
-                }
-                if (text.Contains("Obsolete", StringComparison.OrdinalIgnoreCase))
-                {
-                    inObsoleteSection = true;
-                    inVintageSection = false;
-                    continue;
-                }
-
-                // Extract product name (format: "iPhone 11 Pro" or "MacBook Air (Retina, 13-inch, 2018)")
-                if ((inVintageSection || inObsoleteSection) && IsProductName(text))
-                {
-                    var phase = inObsoleteSection ? LifecyclePhase.Obsolete : LifecyclePhase.Legacy;
-                    var phaseString = phase == LifecyclePhase.Obsolete ? "OBSOLETE" : "LEGACY";
-                    var reason = $"Found on Apple {phaseString} list";
-
-                    await UpdateProductPhaseByName(text, phaseString, reason);
-
-                    // Fire event for subscribers
-                    OnProductStatusChanged?.Invoke(text, phase, reason);
-
-                    if (inVintageSection) vintageCount++;
-                    else obsoleteCount++;
-                }
-            }
+            var (vintageCount, obsoleteCount) = await ProcessAppleListItems(allListItems);
 
             _logger.LogInformation(
                 "Apple check complete: {VintageCount} vintage, {ObsoleteCount} obsolete products found",
@@ -142,6 +105,71 @@ public class LifecycleSentinel
         {
             _logger.LogError(ex, "Error checking Apple vintage list");
         }
+    }
+
+    /// <summary>
+    /// Processes list items from Apple's vintage page and updates product phases
+    /// </summary>
+    private async Task<(int VintageCount, int ObsoleteCount)> ProcessAppleListItems(HtmlAgilityPack.HtmlNodeCollection allListItems)
+    {
+        int vintageCount = 0;
+        int obsoleteCount = 0;
+        bool inVintageSection = false;
+        bool inObsoleteSection = false;
+
+        foreach (var item in allListItems)
+        {
+            string text = item.InnerText.Trim();
+
+            // Skip empty items
+            if (string.IsNullOrWhiteSpace(text)) continue;
+
+            // Update section state based on section headers
+            UpdateSectionState(text, ref inVintageSection, ref inObsoleteSection);
+
+            // Process product if in a recognized section
+            if ((inVintageSection || inObsoleteSection) && IsProductName(text))
+            {
+                await ProcessAppleProduct(text, inObsoleteSection);
+                
+                if (inVintageSection) vintageCount++;
+                else obsoleteCount++;
+            }
+        }
+
+        return (vintageCount, obsoleteCount);
+    }
+
+    /// <summary>
+    /// Updates the section state based on section header detection
+    /// </summary>
+    private static void UpdateSectionState(string text, ref bool inVintageSection, ref bool inObsoleteSection)
+    {
+        if (text.Contains("Vintage", StringComparison.OrdinalIgnoreCase))
+        {
+            inVintageSection = true;
+            inObsoleteSection = false;
+        }
+        else if (text.Contains("Obsolete", StringComparison.OrdinalIgnoreCase))
+        {
+            inObsoleteSection = true;
+            inVintageSection = false;
+        }
+    }
+
+    /// <summary>
+    /// Processes a single Apple product and updates its phase
+    /// </summary>
+    private async Task ProcessAppleProduct(string productName, bool isObsolete)
+    {
+        var phase = isObsolete ? LifecyclePhase.Obsolete : LifecyclePhase.Legacy;
+        var phaseString = isObsolete ? "OBSOLETE" : "LEGACY";
+        var reason = $"Found on Apple {phaseString} list";
+
+        await UpdateProductPhaseByName(productName, phaseString, reason);
+
+        // Fire event for subscribers
+        OnProductStatusChanged?.Invoke(productName, phase, reason);
     }
 
     /// <summary>
@@ -159,30 +187,30 @@ public class LifecycleSentinel
             // Source: https://support.google.com/pixelphone/answer/4457705
             var pixelEolDates = new Dictionary<string, DateTime>
             {
-                { "Pixel", new DateTime(2018, 12, 1) },
-                { "Pixel XL", new DateTime(2018, 12, 1) },
-                { "Pixel 2", new DateTime(2020, 10, 1) },
-                { "Pixel 2 XL", new DateTime(2020, 10, 1) },
-                { "Pixel 3", new DateTime(2022, 5, 1) },
-                { "Pixel 3 XL", new DateTime(2022, 5, 1) },
-                { "Pixel 3a", new DateTime(2022, 5, 1) },
-                { "Pixel 3a XL", new DateTime(2022, 5, 1) },
-                { "Pixel 4", new DateTime(2023, 10, 1) },
-                { "Pixel 4 XL", new DateTime(2023, 10, 1) },
-                { "Pixel 4a", new DateTime(2023, 8, 1) },
-                { "Pixel 5", new DateTime(2024, 10, 1) },
-                { "Pixel 5a", new DateTime(2024, 8, 1) },
-                { "Pixel 6", new DateTime(2026, 10, 1) },
-                { "Pixel 6 Pro", new DateTime(2026, 10, 1) },
-                { "Pixel 6a", new DateTime(2027, 7, 1) },
-                { "Pixel 7", new DateTime(2027, 10, 1) },
-                { "Pixel 7 Pro", new DateTime(2027, 10, 1) },
-                { "Pixel 7a", new DateTime(2028, 5, 1) },
-                { "Pixel 8", new DateTime(2030, 10, 1) },
-                { "Pixel 8 Pro", new DateTime(2030, 10, 1) },
+                { "Pixel", new DateTime(2018, 12, 1, 0, 0, 0, DateTimeKind.Utc) },
+                { "Pixel XL", new DateTime(2018, 12, 1, 0, 0, 0, DateTimeKind.Utc) },
+                { "Pixel 2", new DateTime(2020, 10, 1, 0, 0, 0, DateTimeKind.Utc) },
+                { "Pixel 2 XL", new DateTime(2020, 10, 1, 0, 0, 0, DateTimeKind.Utc) },
+                { "Pixel 3", new DateTime(2022, 5, 1, 0, 0, 0, DateTimeKind.Utc) },
+                { "Pixel 3 XL", new DateTime(2022, 5, 1, 0, 0, 0, DateTimeKind.Utc) },
+                { "Pixel 3a", new DateTime(2022, 5, 1, 0, 0, 0, DateTimeKind.Utc) },
+                { "Pixel 3a XL", new DateTime(2022, 5, 1, 0, 0, 0, DateTimeKind.Utc) },
+                { "Pixel 4", new DateTime(2023, 10, 1, 0, 0, 0, DateTimeKind.Utc) },
+                { "Pixel 4 XL", new DateTime(2023, 10, 1, 0, 0, 0, DateTimeKind.Utc) },
+                { "Pixel 4a", new DateTime(2023, 8, 1, 0, 0, 0, DateTimeKind.Utc) },
+                { "Pixel 5", new DateTime(2024, 10, 1, 0, 0, 0, DateTimeKind.Utc) },
+                { "Pixel 5a", new DateTime(2024, 8, 1, 0, 0, 0, DateTimeKind.Utc) },
+                { "Pixel 6", new DateTime(2026, 10, 1, 0, 0, 0, DateTimeKind.Utc) },
+                { "Pixel 6 Pro", new DateTime(2026, 10, 1, 0, 0, 0, DateTimeKind.Utc) },
+                { "Pixel 6a", new DateTime(2027, 7, 1, 0, 0, 0, DateTimeKind.Utc) },
+                { "Pixel 7", new DateTime(2027, 10, 1, 0, 0, 0, DateTimeKind.Utc) },
+                { "Pixel 7 Pro", new DateTime(2027, 10, 1, 0, 0, 0, DateTimeKind.Utc) },
+                { "Pixel 7a", new DateTime(2028, 5, 1, 0, 0, 0, DateTimeKind.Utc) },
+                { "Pixel 8", new DateTime(2030, 10, 1, 0, 0, 0, DateTimeKind.Utc) },
+                { "Pixel 8 Pro", new DateTime(2030, 10, 1, 0, 0, 0, DateTimeKind.Utc) },
             };
 
-            var now = DateTime.Now;
+            var now = DateTime.UtcNow;
             int obsoleteCount = 0;
             int legacyCount = 0;
 
@@ -258,7 +286,7 @@ public class LifecycleSentinel
     /// Fuzzy matches product names to handle variations
     /// Example: "iPhone 12" matches "Apple iPhone 12 128GB"
     /// </summary>
-    private bool FuzzyMatchProductName(string dbProductName, string scrapedName)
+    private static bool FuzzyMatchProductName(string dbProductName, string scrapedName)
     {
         if (string.IsNullOrWhiteSpace(dbProductName) || string.IsNullOrWhiteSpace(scrapedName))
             return false;
@@ -290,7 +318,7 @@ public class LifecycleSentinel
     /// <summary>
     /// Normalizes product name by removing common variations
     /// </summary>
-    private string NormalizeProductName(string name)
+    private static string NormalizeProductName(string name)
     {
         // Remove common prefixes/suffixes
         name = Regex.Replace(name, @"\b(Apple|Google|Samsung|Sony)\b", "", RegexOptions.IgnoreCase);
@@ -311,7 +339,7 @@ public class LifecycleSentinel
     /// <summary>
     /// Extracts core model identifier (e.g., "iPhone 12 Pro" from "Apple iPhone 12 Pro 256GB Silver")
     /// </summary>
-    private string ExtractModelIdentifier(string name)
+    private static string ExtractModelIdentifier(string name)
     {
         // Match patterns like "iPhone 12", "Pixel 6 Pro", "MacBook Air (2020)"
         var patterns = new[]
@@ -335,7 +363,7 @@ public class LifecycleSentinel
     /// <summary>
     /// Determines if text is likely a product name (not a section header or description)
     /// </summary>
-    private bool IsProductName(string text)
+    private static bool IsProductName(string text)
     {
         // Filter out section headers and non-product text
         if (text.Length < 5) return false;

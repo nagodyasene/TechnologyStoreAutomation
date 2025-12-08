@@ -48,8 +48,7 @@ public class ProductRepository : IProductRepository
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "{Operation} failed with non-transient error", operationName);
-                throw;
+                throw new InvalidOperationException($"Operation '{operationName}' failed with non-transient error", ex);
             }
         }
         
