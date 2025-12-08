@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using TechnologyStoreAutomation.backend.trendCalculator.data;
 
 namespace TechnologyStoreAutomation.ui;
@@ -10,6 +12,8 @@ namespace TechnologyStoreAutomation.ui;
 public partial class SalesEntryForm : Form
 {
     private readonly IProductRepository _repository;
+    private readonly ILogger<SalesEntryForm> _logger;
+    
     private ComboBox? _cmbProduct;
     private NumericUpDown? _numQuantity;
     private DateTimePicker? _dtpSaleDate;
@@ -17,10 +21,20 @@ public partial class SalesEntryForm : Form
     private Label? _lblTotal;
     private Button? _btnRecord;
     private Button? _btnCancel;
+    
+    #region Validation Constants
+    
+    private const int MinQuantity = 1;
+    private const int MaxQuantity = 1000;
+    private const int MaxFutureDays = 0; // Don't allow future dates
+    private const int MaxPastDays = 30;  // Allow up to 30 days in the past
+    
+    #endregion
 
     public SalesEntryForm(IProductRepository repository)
     {
-        _repository = repository;
+        _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+        _logger = AppLogger.CreateLogger<SalesEntryForm>();
         InitializeComponent();
         SetupUI();
     }
@@ -216,17 +230,18 @@ public partial class SalesEntryForm : Form
 
     private async void BtnRecord_Click(object? sender, EventArgs e)
     {
-        if (_cmbProduct?.SelectedItem is not Product product)
+        // Validate input
+        var validationErrors = ValidateInput();
+        if (validationErrors.Count > 0)
         {
-            MessageBox.Show("Please select a product.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            ShowValidationErrors(validationErrors);
             return;
         }
 
-        if (_numQuantity == null || _dtpSaleDate == null) return;
-
-        int quantity = (int)_numQuantity.Value;
+        var product = (Product)_cmbProduct!.SelectedItem!;
+        int quantity = (int)_numQuantity!.Value;
         
-        // Check if enough stock
+        // Check if enough stock (warning, not error)
         if (quantity > product.CurrentStock)
         {
             var result = MessageBox.Show(
@@ -238,12 +253,89 @@ public partial class SalesEntryForm : Form
             if (result != DialogResult.Yes) return;
         }
 
+        await RecordSaleAsync(product, quantity);
+    }
+
+    /// <summary>
+    /// Validates all form inputs and returns a list of validation errors
+    /// </summary>
+    private List<string> ValidateInput()
+    {
+        var errors = new List<string>();
+
+        // Product validation
+        if (_cmbProduct?.SelectedItem is not Product)
+        {
+            errors.Add("Please select a product.");
+        }
+
+        // Quantity validation
+        if (_numQuantity == null)
+        {
+            errors.Add("Quantity control not initialized.");
+        }
+        else if (_numQuantity.Value < MinQuantity)
+        {
+            errors.Add($"Quantity must be at least {MinQuantity}.");
+        }
+        else if (_numQuantity.Value > MaxQuantity)
+        {
+            errors.Add($"Quantity cannot exceed {MaxQuantity}.");
+        }
+
+        // Date validation
+        if (_dtpSaleDate == null)
+        {
+            errors.Add("Date control not initialized.");
+        }
+        else
+        {
+            var selectedDate = _dtpSaleDate.Value.Date;
+            var today = DateTime.Today;
+            
+            if (selectedDate > today.AddDays(MaxFutureDays))
+            {
+                errors.Add("Sale date cannot be in the future.");
+            }
+            else if (selectedDate < today.AddDays(-MaxPastDays))
+            {
+                errors.Add($"Sale date cannot be more than {MaxPastDays} days in the past.");
+            }
+        }
+
+        return errors;
+    }
+
+    /// <summary>
+    /// Displays validation errors to the user
+    /// </summary>
+    private void ShowValidationErrors(List<string> errors)
+    {
+        var message = string.Join(Environment.NewLine, errors.Select(e => $"• {e}"));
+        MessageBox.Show(
+            message,
+            "Validation Errors",
+            MessageBoxButtons.OK,
+            MessageBoxIcon.Warning);
+    }
+
+    /// <summary>
+    /// Records the sale to the database
+    /// </summary>
+    private async Task RecordSaleAsync(Product product, int quantity)
+    {
         try
         {
-            if (_btnRecord != null) _btnRecord.Enabled = false;
+            SetFormEnabled(false);
+            
+            _logger.LogInformation("Recording sale: Product={ProductId}, Quantity={Quantity}", 
+                product.Id, quantity);
 
             decimal totalAmount = product.UnitPrice * quantity;
-            await _repository.RecordSaleAsync(product.Id, quantity, totalAmount, _dtpSaleDate.Value);
+            await _repository.RecordSaleAsync(product.Id, quantity, totalAmount, _dtpSaleDate!.Value);
+
+            _logger.LogInformation("Sale recorded successfully: Product={ProductId}, Total={Total}", 
+                product.Id, totalAmount);
 
             MessageBox.Show("Sale recorded successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
             this.DialogResult = DialogResult.OK;
@@ -251,9 +343,22 @@ public partial class SalesEntryForm : Form
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, "Error recording sale for product {ProductId}", product.Id);
             MessageBox.Show($"Error recording sale: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            if (_btnRecord != null) _btnRecord.Enabled = true;
+            SetFormEnabled(true);
         }
+    }
+
+    /// <summary>
+    /// Enables or disables form controls during processing
+    /// </summary>
+    private void SetFormEnabled(bool enabled)
+    {
+        if (_btnRecord != null) _btnRecord.Enabled = enabled;
+        if (_btnCancel != null) _btnCancel.Enabled = enabled;
+        if (_cmbProduct != null) _cmbProduct.Enabled = enabled;
+        if (_numQuantity != null) _numQuantity.Enabled = enabled;
+        if (_dtpSaleDate != null) _dtpSaleDate.Enabled = enabled;
     }
 }
 

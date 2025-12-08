@@ -7,42 +7,40 @@ namespace TechnologyStoreAutomation
     public partial class MainForm : Form
     {
         private readonly IProductRepository _repository;
-        private Timer _refreshTimer;
+        private readonly HealthCheckService _healthCheckService;
+        private readonly UiSettings _uiSettings;
+        private readonly ApplicationSettings _appSettings;
+        private readonly Timer _refreshTimer;
         private DataGridView? _gridInventory;
         private Label? _lblStatus;
         private Button? _btnSimulate;
         private Button? _btnRecordSale;
+        private Button? _btnHealthCheck;
 
-        public MainForm()
+        /// <summary>
+        /// Creates a new MainForm with injected dependencies
+        /// </summary>
+        /// <param name="repository">Product repository for data access</param>
+        /// <param name="healthCheckService">Health check service for diagnostics</param>
+        /// <param name="uiSettings">UI configuration settings</param>
+        /// <param name="appSettings">Application settings</param>
+        public MainForm(
+            IProductRepository repository, 
+            HealthCheckService healthCheckService,
+            UiSettings uiSettings, 
+            ApplicationSettings appSettings)
         {
+            _repository = repository ?? throw new ArgumentNullException(nameof(repository));
+            _healthCheckService = healthCheckService ?? throw new ArgumentNullException(nameof(healthCheckService));
+            _uiSettings = uiSettings ?? throw new ArgumentNullException(nameof(uiSettings));
+            _appSettings = appSettings ?? throw new ArgumentNullException(nameof(appSettings));
+            
             InitializeComponent();
-
-            // Initialize Repository (read connection string from environment variables)
-            string connStr = BuildConnectionStringFromEnv();
-            if (string.IsNullOrWhiteSpace(connStr))
-            {
-                MessageBox.Show(
-                    "Database connection is not configured.\n\nPlease set one of the following environment variable options:\n" +
-                    "1) DB_CONNECTION_STRING (full libpq string),\n" +
-                    "2) DATABASE_URL (postgres://user:pass@host:port/dbname), or\n" +
-                    "3) DB_HOST / DB_NAME / DB_USER / DB_PASSWORD (and optional DB_PORT).\n\n" +
-                    "The application cannot continue without a configured database connection.",
-                    "Configuration required",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
-
-                // Fail fast - do not proceed with a hardcoded fallback
-                throw new InvalidOperationException(
-                    "Database connection string not configured via environment variables.");
-            }
-
-            _repository = new ProductRepository(connStr);
-
             SetupDynamicUi();
 
-            // FIX: Explicitly use System.Windows.Forms.Timer
+            // Initialize refresh timer from configuration
             _refreshTimer = new Timer();
-            _refreshTimer.Interval = 300000; // 5 mins
+            _refreshTimer.Interval = _uiSettings.RefreshIntervalMs;
             _refreshTimer.Tick += OnRefreshTimerTick;
             _refreshTimer.Start();
         }
@@ -58,7 +56,8 @@ namespace TechnologyStoreAutomation
             }
             catch (Exception ex)
             {
-                // Log or handle exception - async void exceptions would otherwise crash the app
+                // Log the exception and update status
+                GlobalExceptionHandler.ReportException(ex, "Dashboard Auto-Refresh");
                 if (_lblStatus != null) _lblStatus.Text = $"Refresh failed: {ex.Message}";
             }
         }
@@ -74,74 +73,28 @@ namespace TechnologyStoreAutomation
             }
             catch (Exception ex)
             {
+                GlobalExceptionHandler.ReportException(ex, "Manual Dashboard Refresh");
                 MessageBox.Show($"Refresh failed: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        // Build connection string from common environment variables (supports PG*/DB_* names, DATABASE_URL, or DB_CONNECTION_STRING)
-        private static string BuildConnectionStringFromEnv()
-        {
-            // 1) Full connection string provided directly
-            var direct = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
-            if (!string.IsNullOrWhiteSpace(direct)) return direct;
-
-            // 2) Heroku-style DATABASE_URL: postgres://user:pass@host:port/dbname
-            var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
-            if (!string.IsNullOrWhiteSpace(databaseUrl))
-            {
-                if (Uri.TryCreate(databaseUrl, UriKind.Absolute, out var uri) &&
-                    !string.IsNullOrWhiteSpace(uri.UserInfo))
-                {
-                    var userInfo = uri.UserInfo.Split(':');
-                    var user = Uri.UnescapeDataString(userInfo[0]);
-                    var pass = userInfo.Length > 1 ? Uri.UnescapeDataString(userInfo[1]) : string.Empty;
-                    var host = uri.Host;
-                    var port = uri.Port > 0 ? uri.Port.ToString() : "5432";
-                    var db = uri.AbsolutePath.TrimStart('/');
-
-                    if (!string.IsNullOrWhiteSpace(user) && !string.IsNullOrWhiteSpace(pass) &&
-                        !string.IsNullOrWhiteSpace(db))
-                    {
-                        return $"Host={host};Port={port};Database={db};Username={user};Password={pass};";
-                    }
-                }
-            }
-
-            // 3) Individual environment variables
-            var hostEnv = Environment.GetEnvironmentVariable("DB_HOST") ?? Environment.GetEnvironmentVariable("PGHOST");
-            var dbEnv = Environment.GetEnvironmentVariable("DB_NAME") ??
-                        Environment.GetEnvironmentVariable("PGDATABASE");
-            var userEnv = Environment.GetEnvironmentVariable("DB_USER") ?? Environment.GetEnvironmentVariable("PGUSER");
-            var passEnv = Environment.GetEnvironmentVariable("DB_PASSWORD") ??
-                          Environment.GetEnvironmentVariable("PGPASSWORD");
-            var portEnv = Environment.GetEnvironmentVariable("DB_PORT") ??
-                          Environment.GetEnvironmentVariable("PGPORT") ?? "5432";
-
-            if (string.IsNullOrWhiteSpace(hostEnv) || string.IsNullOrWhiteSpace(dbEnv) ||
-                string.IsNullOrWhiteSpace(userEnv) || string.IsNullOrWhiteSpace(passEnv))
-            {
-                return string.Empty;
-            }
-
-            return $"Host={hostEnv};Port={portEnv};Database={dbEnv};Username={userEnv};Password={passEnv};";
-        }
 
         private void SetupDynamicUi()
         {
-            this.Size = new Size(1200, 700);
-            this.Text = "TechTrend Automation Dashboard";
+            this.Size = new Size(_uiSettings.WindowWidth, _uiSettings.WindowHeight);
+            this.Text = _appSettings.Name;
 
             // Status Label
             _lblStatus = new Label();
             _lblStatus.Dock = DockStyle.Bottom;
-            _lblStatus.Height = 30;
+            _lblStatus.Height = _uiSettings.StatusBarHeight;
             _lblStatus.Text = "Ready";
             this.Controls.Add(_lblStatus);
 
             // Toolbar Panel
             var toolbar = new Panel();
             toolbar.Dock = DockStyle.Top;
-            toolbar.Height = 50;
+            toolbar.Height = _uiSettings.ToolbarHeight;
             toolbar.BackColor = Color.FromArgb(240, 240, 240);
             this.Controls.Add(toolbar);
 
@@ -175,6 +128,15 @@ namespace TechnologyStoreAutomation
             btnRefresh.FlatStyle = FlatStyle.Flat;
             btnRefresh.Click += OnRefreshButtonClick;
             toolbar.Controls.Add(btnRefresh);
+
+            // Health Check Button
+            _btnHealthCheck = new Button();
+            _btnHealthCheck.Text = "🏥 Health";
+            _btnHealthCheck.Location = new Point(460, 8);
+            _btnHealthCheck.Size = new Size(90, 35);
+            _btnHealthCheck.FlatStyle = FlatStyle.Flat;
+            _btnHealthCheck.Click += BtnHealthCheck_Click;
+            toolbar.Controls.Add(_btnHealthCheck);
 
             // Grid
             _gridInventory = new DataGridView();
@@ -238,7 +200,8 @@ namespace TechnologyStoreAutomation
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error loading data: {ex.Message} \n\nCheck your Connection String in MainForm.cs!",
+                GlobalExceptionHandler.ReportException(ex, "Load Dashboard Data");
+                MessageBox.Show($"Error loading data: {ex.Message}\n\nPlease check your database connection.",
                     "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -272,35 +235,101 @@ namespace TechnologyStoreAutomation
 
         private async void btnSimulateLaunch_Click(object? sender, EventArgs e)
         {
-            if (_gridInventory == null)
+            try
             {
-                MessageBox.Show("Grid inventory is not initialized.");
-                return;
-            }
+                if (_gridInventory == null)
+                {
+                    MessageBox.Show("Grid inventory is not initialized.");
+                    return;
+                }
 
-            var selectedProduct = _gridInventory.CurrentRow?.DataBoundItem as ProductDashboardDto;
-            if (selectedProduct == null)
-            {
-                MessageBox.Show("Please select a product row first.");
-                return;
-            }
+                var selectedProduct = _gridInventory.CurrentRow?.DataBoundItem as ProductDashboardDto;
+                if (selectedProduct == null)
+                {
+                    MessageBox.Show("Please select a product row first.");
+                    return;
+                }
 
-            if (MessageBox.Show($"Simulate new model launch for {selectedProduct.Name}?", "Confirm",
-                    MessageBoxButtons.YesNo) == DialogResult.Yes)
+                if (MessageBox.Show($"Simulate new model launch for {selectedProduct.Name}?", "Confirm",
+                        MessageBoxButtons.YesNo) == DialogResult.Yes)
+                {
+                    await _repository.UpdateProductPhaseAsync(selectedProduct.Id, "LEGACY",
+                        "Manual Simulation Triggered by User");
+                    await LoadDashboardData();
+                }
+            }
+            catch (Exception ex)
             {
-                await _repository.UpdateProductPhaseAsync(selectedProduct.Id, "LEGACY",
-                    "Manual Simulation Triggered by User");
-                await LoadDashboardData();
+                GlobalExceptionHandler.ReportException(ex, "Simulate Launch");
+                MessageBox.Show($"Failed to simulate launch: {ex.Message}", "Error", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private async void BtnRecordSale_Click(object? sender, EventArgs e)
         {
-            var salesForm = new SalesEntryForm(_repository);
-            if (salesForm.ShowDialog() == DialogResult.OK)
+            try
             {
-                // Refresh dashboard after recording sale
-                await LoadDashboardData();
+                var salesForm = new SalesEntryForm(_repository);
+                if (salesForm.ShowDialog() == DialogResult.OK)
+                {
+                    // Refresh dashboard after recording sale
+                    await LoadDashboardData();
+                }
+            }
+            catch (Exception ex)
+            {
+                GlobalExceptionHandler.ReportException(ex, "Record Sale");
+                MessageBox.Show($"Failed to record sale: {ex.Message}", "Error", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private async void BtnHealthCheck_Click(object? sender, EventArgs e)
+        {
+            try
+            {
+                if (_lblStatus != null) _lblStatus.Text = "Running health checks...";
+                if (_btnHealthCheck != null) _btnHealthCheck.Enabled = false;
+
+                var report = await _healthCheckService.CheckAllAsync();
+
+                // Determine icon based on overall status
+                var icon = report.OverallStatus switch
+                {
+                    HealthStatus.Healthy => MessageBoxIcon.Information,
+                    HealthStatus.Degraded => MessageBoxIcon.Warning,
+                    HealthStatus.Unhealthy => MessageBoxIcon.Error,
+                    _ => MessageBoxIcon.Question
+                };
+
+                MessageBox.Show(
+                    report.GetSummary(),
+                    $"Health Check - {report.OverallStatus}",
+                    MessageBoxButtons.OK,
+                    icon);
+
+                if (_lblStatus != null)
+                {
+                    var statusIcon = report.OverallStatus switch
+                    {
+                        HealthStatus.Healthy => "✅",
+                        HealthStatus.Degraded => "⚠️",
+                        HealthStatus.Unhealthy => "❌",
+                        _ => "❓"
+                    };
+                    _lblStatus.Text = $"Health: {statusIcon} {report.OverallStatus} | Last Updated: {DateTime.Now:HH:mm:ss}";
+                }
+            }
+            catch (Exception ex)
+            {
+                GlobalExceptionHandler.ReportException(ex, "Health Check");
+                MessageBox.Show($"Health check failed: {ex.Message}", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                if (_btnHealthCheck != null) _btnHealthCheck.Enabled = true;
             }
         }
     }
