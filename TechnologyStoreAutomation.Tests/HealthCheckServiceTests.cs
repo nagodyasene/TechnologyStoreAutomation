@@ -1,4 +1,3 @@
-
 namespace TechnologyStoreAutomation.Tests;
 
 /// <summary>

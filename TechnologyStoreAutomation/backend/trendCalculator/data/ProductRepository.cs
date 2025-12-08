@@ -30,7 +30,7 @@ public class ProductRepository : IProductRepository
     /// </summary>
     private async Task<T> ExecuteWithRetryAsync<T>(Func<Task<T>> operation, string operationName)
     {
-        Exception? lastException = null;
+        Exception lastException = new InvalidOperationException($"Operation '{operationName}' failed after {MaxRetries} attempts");
         
         for (int attempt = 1; attempt <= MaxRetries; attempt++)
         {
@@ -53,7 +53,7 @@ public class ProductRepository : IProductRepository
             }
         }
         
-        throw lastException ?? new InvalidOperationException($"{operationName} failed after {MaxRetries} attempts");
+        throw lastException;
     }
 
     /// <summary>

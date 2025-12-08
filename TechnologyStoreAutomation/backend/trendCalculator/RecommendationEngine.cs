@@ -8,6 +8,9 @@ public class RecommendationEngine : IRecommendationEngine
 {
     #region Constants for Business Rules
     
+    // Floating point comparison tolerance
+    private const double FloatingPointTolerance = 0.001;
+    
     // Stock level thresholds
     private const int CriticalRunwayDays = 3;
     private const int UrgentRunwayDays = 7;
@@ -106,7 +109,7 @@ public class RecommendationEngine : IRecommendationEngine
     /// </summary>
     public int CalculateReorderQuantity(TrendAnalysis analysis, int targetRunwayDays = 30)
     {
-        if (analysis.DailySalesAverage <= 0) return 0;
+        if (analysis.DailySalesAverage <= FloatingPointTolerance) return 0;
 
         // Calculate the quantity needed to reach the target runway
         double targetStock = analysis.DailySalesAverage * targetRunwayDays;
@@ -143,7 +146,7 @@ public class RecommendationEngine : IRecommendationEngine
             return true;
 
         // If the product is old (>1 year) and sales are low
-        if (ageInDays > LegacyAgeDays && analysis.DailySalesAverage < 1.0)
+        if (ageInDays > LegacyAgeDays && analysis.DailySalesAverage < (1.0 - FloatingPointTolerance))
             return true;
 
         // If the product is very old (>2 years) regardless of sales
@@ -164,7 +167,7 @@ public class RecommendationEngine : IRecommendationEngine
         if (currentPhase != "LEGACY") return false;
 
         // If no sales in the last 30 days and old stock
-        if (analysis.DailySalesAverage == 0 && ageInDays > ObsoleteNoSalesDays)
+        if (Math.Abs(analysis.DailySalesAverage) < FloatingPointTolerance && ageInDays > ObsoleteNoSalesDays)
             return true;
 
         // If extremely old (>3 years) as LEGACY
