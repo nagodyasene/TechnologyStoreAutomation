@@ -9,13 +9,44 @@ namespace TechnologyStoreAutomation.backend.visitorCountPrediction;
 /// Predicts store visitor counts based on sales velocity data.
 /// Uses historical sales as a proxy for foot traffic, assuming more visitors = more sales.
 /// </summary>
-public class VisitorCountPredictor
+public class VisitorCountPredictor : IVisitorCountPredictor
 {
     private readonly string _connectionString;
     private readonly ILogger<VisitorCountPredictor> _logger;
     
+    #region Configuration Constants
+    
     // Conversion rate assumption: ~30% of visitors make a purchase (industry average for tech retail)
     private const double DefaultConversionRate = 0.30;
+    
+    // Traffic level thresholds (z-score based)
+    private const double VeryLowThreshold = -1.5;
+    private const double LowThreshold = -0.5;
+    private const double HighThreshold = 0.5;
+    private const double VeryHighThreshold = 1.5;
+    
+    // Trend detection thresholds
+    private const double RisingTrendThreshold = 0.05;
+    private const double FallingTrendThreshold = -0.05;
+    
+    // Confidence decay rate per day
+    private const double ConfidenceDecayRate = 0.05;
+    private const double MinimumConfidence = 0.5;
+    
+    #endregion
+    
+    #region Special Day Multipliers
+    
+    private const double BlackFridayMultiplier = 2.5;
+    private const double CyberMondayMultiplier = 2.0;
+    private const double ChristmasRushMultiplier = 1.8;
+    private const double PostChristmasMultiplier = 1.5;
+    private const double NewYearSalesMultiplier = 1.3;
+    private const double AppleLaunchSeasonMultiplier = 1.4;
+    private const double SaturdayMultiplier = 1.2;
+    private const double SundayMultiplier = 1.1;
+    
+    #endregion
     
     public VisitorCountPredictor(string connectionString)
     {
@@ -103,7 +134,7 @@ public class VisitorCountPredictor
             predictedVisitors = ApplySpecialDayAdjustments(predictionDate, predictedVisitors);
             
             // Calculate confidence (decreases as we predict further out)
-            double confidence = Math.Max(0.5, 1.0 - (i * 0.05));
+            double confidence = Math.Max(MinimumConfidence, 1.0 - (i * ConfidenceDecayRate));
             
             var trafficLevel = ClassifyTrafficLevel(predictedVisitors, avgDailyVisitors, stdDev);
             
@@ -155,7 +186,7 @@ public class VisitorCountPredictor
             HasData = true,
             AverageDailyVisitors = (int)Math.Round(avgDaily),
             WeeklyTrendPercent = Math.Round(trend * 100, 1),
-            TrendDirection = trend > 0.05 ? "Rising" : trend < -0.05 ? "Falling" : "Stable",
+            TrendDirection = trend > RisingTrendThreshold ? "Rising" : trend < FallingTrendThreshold ? "Falling" : "Stable",
             PeakDate = peakDay.Date,
             PeakVisitors = peakDay.EstimatedVisitors,
             SlowestDate = slowestDay.Date,
@@ -194,10 +225,10 @@ public class VisitorCountPredictor
 
         return zScore switch
         {
-            < -1.5 => TrafficLevel.VeryLow,
-            < -0.5 => TrafficLevel.Low,
-            < 0.5 => TrafficLevel.Normal,
-            < 1.5 => TrafficLevel.High,
+            < VeryLowThreshold => TrafficLevel.VeryLow,
+            < LowThreshold => TrafficLevel.Low,
+            < HighThreshold => TrafficLevel.Normal,
+            < VeryHighThreshold => TrafficLevel.High,
             _ => TrafficLevel.VeryHigh
         };
     }
@@ -209,33 +240,33 @@ public class VisitorCountPredictor
     {
         // Black Friday (4th Friday of November)
         if (date.Month == 11 && date.DayOfWeek == DayOfWeek.Friday && date.Day >= 22 && date.Day <= 28)
-            return (int)(baseVisitors * 2.5);
+            return (int)(baseVisitors * BlackFridayMultiplier);
 
         // Cyber Monday
         if (date.Month == 11 && date.DayOfWeek == DayOfWeek.Monday && date.Day >= 25 && date.Day <= 30)
-            return (int)(baseVisitors * 2.0);
+            return (int)(baseVisitors * CyberMondayMultiplier);
 
         // Christmas Eve rush
         if (date.Month == 12 && date.Day >= 20 && date.Day <= 24)
-            return (int)(baseVisitors * 1.8);
+            return (int)(baseVisitors * ChristmasRushMultiplier);
 
         // Post-Christmas returns/gift cards
         if (date.Month == 12 && date.Day >= 26 && date.Day <= 31)
-            return (int)(baseVisitors * 1.5);
+            return (int)(baseVisitors * PostChristmasMultiplier);
 
         // New Year sales
         if (date.Month == 1 && date.Day <= 7)
-            return (int)(baseVisitors * 1.3);
+            return (int)(baseVisitors * NewYearSalesMultiplier);
 
         // Apple launch season (September)
         if (date.Month == 9 && date.Day >= 10 && date.Day <= 25)
-            return (int)(baseVisitors * 1.4);
+            return (int)(baseVisitors * AppleLaunchSeasonMultiplier);
 
         // Weekend boost
         if (date.DayOfWeek == DayOfWeek.Saturday)
-            return (int)(baseVisitors * 1.2);
+            return (int)(baseVisitors * SaturdayMultiplier);
         if (date.DayOfWeek == DayOfWeek.Sunday)
-            return (int)(baseVisitors * 1.1);
+            return (int)(baseVisitors * SundayMultiplier);
 
         return baseVisitors;
     }
