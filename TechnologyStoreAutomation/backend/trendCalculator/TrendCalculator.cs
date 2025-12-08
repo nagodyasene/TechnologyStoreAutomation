@@ -5,7 +5,7 @@ namespace TechnologyStoreAutomation.backend.trendCalculator;
 /// <summary>
 /// Core intelligence engine that analyzes sales trends and predicts inventory needs
 /// </summary>
-public class TrendCalculator
+public static class TrendCalculator
 {
     /// <summary>
     /// Analyzes a product's sales history and generates trend insights
@@ -82,7 +82,8 @@ public class TrendCalculator
             .Select(g => g.Sum(s => s.QuantitySold))
             .ToList();
         
-        if (dailyCounts.Any() && CalculateVariance(dailyCounts) > 50)
+        double variance = CalculateVariance(dailyCounts);
+        if (variance > 50)
             return TrendDirection.Volatile;
 
         if (changePercent > 15) return TrendDirection.Rising;

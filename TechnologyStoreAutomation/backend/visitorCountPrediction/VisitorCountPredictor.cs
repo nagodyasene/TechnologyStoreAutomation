@@ -200,7 +200,7 @@ public class VisitorCountPredictor : IVisitorCountPredictor
     /// <summary>
     /// Determines trend direction based on trend value
     /// </summary>
-    private string DetermineTrendDirection(double trend)
+    private static string DetermineTrendDirection(double trend)
     {
         if (trend > RisingTrendThreshold)
             return "Rising";
@@ -214,7 +214,7 @@ public class VisitorCountPredictor : IVisitorCountPredictor
     /// <summary>
     /// Calculates weekly trend as a percentage change
     /// </summary>
-    private double CalculateWeeklyTrend(List<DailyTraffic> data)
+    private static double CalculateWeeklyTrend(List<DailyTraffic> data)
     {
         if (data.Count < 14) return 0;
 
@@ -231,9 +231,11 @@ public class VisitorCountPredictor : IVisitorCountPredictor
     /// <summary>
     /// Classifies predicted traffic into levels for easy understanding
     /// </summary>
-    private TrafficLevel ClassifyTrafficLevel(int predicted, double average, double stdDev)
+    private static TrafficLevel ClassifyTrafficLevel(int predicted, double average, double stdDev)
     {
-        if (stdDev == 0) return TrafficLevel.Normal;
+        const double tolerance = 1e-10;
+        if (Math.Abs(stdDev) < tolerance) 
+            return TrafficLevel.Normal;
         
         double zScore = (predicted - average) / stdDev;
 
@@ -250,7 +252,7 @@ public class VisitorCountPredictor : IVisitorCountPredictor
     /// <summary>
     /// Adjusts predictions for known busy periods (holidays, product launches, etc.)
     /// </summary>
-    private int ApplySpecialDayAdjustments(DateTime date, int baseVisitors)
+    private static int ApplySpecialDayAdjustments(DateTime date, int baseVisitors)
     {
         // Black Friday (4th Friday of November)
         if (date.Month == 11 && date.DayOfWeek == DayOfWeek.Friday && date.Day >= 22 && date.Day <= 28)
@@ -288,7 +290,7 @@ public class VisitorCountPredictor : IVisitorCountPredictor
     /// <summary>
     /// Generates staffing recommendations based on predicted traffic
     /// </summary>
-    private string GenerateStaffingRecommendation(TrafficLevel level, DayOfWeek dayOfWeek)
+    private static string GenerateStaffingRecommendation(TrafficLevel level, DayOfWeek dayOfWeek)
     {
         var dayName = dayOfWeek.ToString();
         
@@ -306,7 +308,7 @@ public class VisitorCountPredictor : IVisitorCountPredictor
     /// <summary>
     /// Calculates standard deviation for a dataset
     /// </summary>
-    private double CalculateStandardDeviation(List<double> values)
+    private static double CalculateStandardDeviation(List<double> values)
     {
         if (values.Count <= 1) return 0;
         
