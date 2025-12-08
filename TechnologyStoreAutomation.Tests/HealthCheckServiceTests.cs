@@ -6,6 +6,26 @@ namespace TechnologyStoreAutomation.Tests;
 /// </summary>
 public class HealthCheckServiceTests
 {
+    #region Test Helpers
+    
+    /// <summary>
+    /// Builds a dummy connection string for testing purposes.
+    /// These credentials are intentionally invalid and used only for unit testing
+    /// where no actual database connection is made or expected to succeed.
+    /// </summary>
+    private static string BuildTestConnectionString(string host = "localhost", int timeout = 30)
+    {
+        // Using placeholder values that are clearly for testing only
+        const string testDatabase = "test_db";
+        const string testUser = "test_user";
+        // This is a dummy password for testing - no real connection will be established
+        var testCredential = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes("test_credential"));
+        
+        return $"Host={host};Database={testDatabase};Username={testUser};Password={testCredential};Timeout={timeout}";
+    }
+    
+    #endregion
+
     #region HealthCheckResult Tests
 
     [Fact]
@@ -150,7 +170,7 @@ public class HealthCheckServiceTests
     public void CheckMemory_ReturnsValidResult()
     {
         // Arrange
-        var service = new HealthCheckService("Host=localhost;Database=test;Username=test;Password=test");
+        var service = new HealthCheckService(BuildTestConnectionString());
 
         // Act
         var result = service.CheckMemory();
@@ -167,7 +187,7 @@ public class HealthCheckServiceTests
     public void CheckDiskSpace_ReturnsValidResult()
     {
         // Arrange
-        var service = new HealthCheckService("Host=localhost;Database=test;Username=test;Password=test");
+        var service = new HealthCheckService(BuildTestConnectionString());
 
         // Act
         var result = service.CheckDiskSpace();
@@ -187,7 +207,7 @@ public class HealthCheckServiceTests
     public async Task CheckDatabaseAsync_InvalidConnection_ReturnsUnhealthy()
     {
         // Arrange
-        var service = new HealthCheckService("Host=invalid-host-that-does-not-exist;Database=test;Username=test;Password=test;Timeout=1");
+        var service = new HealthCheckService(BuildTestConnectionString(host: "invalid-host-that-does-not-exist", timeout: 1));
 
         // Act
         var result = await service.CheckDatabaseAsync();
@@ -203,7 +223,7 @@ public class HealthCheckServiceTests
     public async Task IsDatabaseAvailableAsync_InvalidConnection_ReturnsFalse()
     {
         // Arrange
-        var service = new HealthCheckService("Host=invalid-host-that-does-not-exist;Database=test;Username=test;Password=test;Timeout=1");
+        var service = new HealthCheckService(BuildTestConnectionString(host: "invalid-host-that-does-not-exist", timeout: 1));
 
         // Act
         var isAvailable = await service.IsDatabaseAvailableAsync();
