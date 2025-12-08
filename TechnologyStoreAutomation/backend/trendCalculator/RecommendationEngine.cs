@@ -92,7 +92,7 @@ public class RecommendationEngine : IRecommendationEngine
     /// <summary>
     /// Gets recommendation based on stock runway
     /// </summary>
-    private string? GetStockLevelRecommendation(TrendAnalysis analysis)
+    private static string? GetStockLevelRecommendation(TrendAnalysis analysis)
     {
         if (analysis.RunwayDays <= CriticalRunwayDays)
             return "🚨 CRITICAL - Reorder IMMEDIATELY";
@@ -109,7 +109,7 @@ public class RecommendationEngine : IRecommendationEngine
     /// <summary>
     /// Gets recommendation based on trend analysis
     /// </summary>
-    private string? GetTrendRecommendation(TrendAnalysis analysis)
+    private static string? GetTrendRecommendation(TrendAnalysis analysis)
     {
         return analysis.Direction switch
         {
@@ -123,7 +123,7 @@ public class RecommendationEngine : IRecommendationEngine
     /// <summary>
     /// Gets recommendation for rising trend
     /// </summary>
-    private string GetRisingTrendRecommendation(TrendAnalysis analysis)
+    private static string GetRisingTrendRecommendation(TrendAnalysis analysis)
     {
         if (analysis.IsAccelerating)
             return "🚀 ACCELERATING - Increase stock levels";

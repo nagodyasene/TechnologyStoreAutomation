@@ -4,9 +4,16 @@ using TechnologyStoreAutomation.backend.trendCalculator.data;
 
 namespace TechnologyStoreAutomation.backend.trendCalculator;
 
-public class ObsolescenceScraper
+public static class ObsolescenceScraper
 {
-    private static readonly ILogger<ObsolescenceScraper> Logger = AppLogger.CreateLogger<ObsolescenceScraper>();
+    private static readonly ILogger Logger = AppLogger.CreateLogger(nameof(ObsolescenceScraper));
+    
+    // Get URL from environment variable or configuration
+    private static string GetAppleVintageListUrl()
+    {
+        return Environment.GetEnvironmentVariable("APPLE_VINTAGE_LIST_URL") 
+            ?? "https://support.apple.com/en-us/102772";
+    }
     
     // Connection string for the Worker - read from environment variables to avoid hardcoding
     private static string GetConnectionStringFromEnv()
@@ -52,7 +59,7 @@ public class ObsolescenceScraper
         try
         {
             // 1. Run The Sentinel (Scrape Logic)
-            await RunSentinelAudit(repo);
+            await RunSentinelAudit();
 
             // 2. Generate Snapshots (Math Logic)
             // We process "Yesterday" because the day has just finished
@@ -69,7 +76,8 @@ public class ObsolescenceScraper
         }
     }
     
-    private static async Task RunSentinelAudit(ProductRepository repo)
+
+    private static async Task RunSentinelAudit()
     {
         Logger.LogInformation("Running Sentinel scrapers");
         using (var client = new HttpClient())
@@ -77,23 +85,19 @@ public class ObsolescenceScraper
             // --- A. CHECK APPLE VINTAGE LIST ---
             try 
             {
-                string url = "https://support.apple.com/en-us/102772";
-                string html = await client.GetStringAsync(url);
+                string html = await client.GetStringAsync(GetAppleVintageListUrl());
                 var doc = new HtmlAgilityPack.HtmlDocument();
                 doc.LoadHtml(html);
 
                 // Hypothetical XPath - this finds list items in the main content area
                 // Real implementation requires inspecting the live page structure
-                var nodes = doc.DocumentNode.SelectNodes("//div[@id='sections']//li"); 
+                var nodes = doc.DocumentNode.SelectNodes("//div[@id='sections']//li");
 
-                if (nodes != null)
+                if (nodes.Count > 0)
                 {
                     foreach (var node in nodes)
                     {
                         string product = node.InnerText.Trim();
-                        // If we find "iPhone 8" in the vintage list, update DB
-                        // We assume we have a method to find ID by Name
-                        // await repo.UpdateProductPhaseAsync(foundId, "LEGACY", "Found on Apple Vintage List");
                         Logger.LogInformation("Sentinel found vintage item: {ProductName}", product);
                     }
                 }

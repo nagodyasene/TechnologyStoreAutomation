@@ -2,7 +2,7 @@ namespace TechnologyStoreAutomation.backend.trendCalculator;
 
 public class InventoryManager
 {
-    public string GetRecommendation(InventoryProduct product)
+    public static string GetRecommendation(InventoryProduct product)
     {
         // 1. Determine Phase
         product.CurrentPhase = CalculatePhase(product);
@@ -25,7 +25,7 @@ public class InventoryManager
         }
     }
 
-    private LifecyclePhase CalculatePhase(InventoryProduct p)
+    private static LifecyclePhase CalculatePhase(InventoryProduct p)
     {
         // Rule 1: Safety Check
         if (p.SupportEndDate.HasValue && p.SupportEndDate.Value < DateTime.Now)
@@ -50,22 +50,21 @@ public class InventoryManager
         return LifecyclePhase.Active;
     }
 
-    private int CalculateReorderPoint(double velocity)
+    private static int CalculateReorderPoint(double velocity)
     {
         // Standard Deviation logic would go here
         // Simple version: 60 days of stock
         return (int)(velocity * 60);
     }
 
-    private bool IsBlackoutPeriod(string productName)
+    private static bool IsBlackoutPeriod(string productName)
     {
         var today = DateTime.Now;
 
         // Example: Apple Blackout (Aug 1 - Sept 20)
-        if (productName.Contains("iPhone"))
+        if (productName.Contains("iPhone") && (today.Month == 8 || (today.Month == 9 && today.Day < 20)))
         {
-            if (today.Month == 8 || (today.Month == 9 && today.Day < 20))
-                return true;
+            return true;
         }
 
         return false;
