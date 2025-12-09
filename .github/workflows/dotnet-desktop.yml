@@ -79,12 +79,23 @@ jobs:
       uses: microsoft/setup-msbuild@v2
 
     # Restore NuGet packages for the solution using dotnet (less fragile than msbuild restore paths)
-    - name: Restore NuGet packages
-      run: dotnet restore ${{ env.Solution_Name }}
+    - name: Locate solution, restore packages and run tests
+      shell: pwsh
+      run: |
+        Write-Host "Searching for solution file in: $env:GITHUB_WORKSPACE"
+        $sln = Get-ChildItem -Path $env:GITHUB_WORKSPACE -Filter *.sln -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
+        if (-not $sln) {
+            Write-Error "No .sln file found under $env:GITHUB_WORKSPACE"
+            exit 1
+        }
+        Write-Host "Found solution: $($sln.FullName)"
 
-    # Execute all unit tests in the solution (build happens implicitly unless --no-build is used)
-    - name: Execute unit tests
-      run: dotnet test ${{ env.Solution_Name }} --configuration ${{ matrix.configuration }}
+        Write-Host "Restoring NuGet packages..."
+        dotnet restore "$($sln.FullName)"
+
+        Write-Host "Running tests (configuration: $env:MATRIX_CONFIGURATION)..."
+        # MATRIX_CONFIGURATION mapping: GitHub matrix value is available via matrix.configuration; expose it as env in step if needed
+        dotnet test "$($sln.FullName)" --configuration ${{ matrix.configuration }}
 
     # Decode the base 64 encoded pfx and save the Signing_Certificate
     - name: Decode the pfx
