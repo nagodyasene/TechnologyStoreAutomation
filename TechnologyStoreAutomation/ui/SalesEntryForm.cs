@@ -283,7 +283,7 @@ public partial class SalesEntryForm : Form
             errors.Add($"Quantity cannot exceed {MaxQuantity}.");
         }
 
-        // Date validation
+        // Date validation - only allow today's date
         if (_dtpSaleDate == null)
         {
             errors.Add("Date control not initialized.");
@@ -292,14 +292,10 @@ public partial class SalesEntryForm : Form
         {
             var selectedDate = _dtpSaleDate.Value.Date;
             var today = DateTime.Today;
-            
-            if (selectedDate > today.AddDays(MaxFutureDays))
+
+            if (selectedDate != today)
             {
-                errors.Add("Sale date cannot be in the future.");
-            }
-            else if (selectedDate < today.AddDays(-MaxPastDays))
-            {
-                errors.Add($"Sale date cannot be more than {MaxPastDays} days in the past.");
+                errors.Add("Sale date must be today's date. Recording past or future dates is not allowed.");
             }
         }
 

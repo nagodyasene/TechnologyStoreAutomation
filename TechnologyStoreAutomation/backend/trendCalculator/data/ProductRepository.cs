@@ -189,7 +189,7 @@ public class ProductRepository : IProductRepository
         {
             var sql = @"
                 SELECT id as Id, product_id as ProductId, quantity_sold as QuantitySold, 
-                       total_amount as TotalAmount, sale_date as SaleDate, created_at as CreatedAt, notes as Notes
+                       total_amount as TotalAmount, sale_date::timestamp as SaleDate, created_at as CreatedAt, notes as Notes
                 FROM sales_transactions
                 WHERE product_id = @ProductId 
                   AND sale_date >= CURRENT_DATE - @Days::INTEGER
@@ -243,7 +243,7 @@ public class ProductRepository : IProductRepository
             // 2. Fetch RECENT sales for ALL items (Explicit mapping here too)
             var salesSql = @"
             SELECT id as Id, product_id as ProductId, quantity_sold as QuantitySold, 
-                   total_amount as TotalAmount, sale_date as SaleDate
+                   total_amount as TotalAmount, sale_date::timestamp as SaleDate
             FROM sales_transactions 
             WHERE sale_date >= CURRENT_DATE - INTERVAL '30 days'";
             var allSales = await db.QueryAsync<SalesTransaction>(salesSql);
