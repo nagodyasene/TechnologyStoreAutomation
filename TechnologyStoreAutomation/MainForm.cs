@@ -93,12 +93,12 @@ namespace TechnologyStoreAutomation
             _lblStatus.Text = "Ready";
             this.Controls.Add(_lblStatus);
 
-            // Toolbar Panel
+            // Toolbar Panel (create now but add later so docking layout is correct)
             var toolbar = new Panel();
             toolbar.Dock = DockStyle.Top;
             toolbar.Height = _uiSettings.ToolbarHeight;
             toolbar.BackColor = Color.FromArgb(240, 240, 240);
-            this.Controls.Add(toolbar);
+            // DO NOT add to Controls yet - add after grid so docking/layout places header below toolbar
 
             // Record Sale Button
             _btnRecordSale = new Button();
@@ -150,24 +150,42 @@ namespace TechnologyStoreAutomation
             _gridInventory.RowHeadersVisible = false;
             _gridInventory.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(250, 250, 250);
 
-            // Define Columns
-            _gridInventory.Columns.Add(new DataGridViewTextBoxColumn
-                { HeaderText = "Product", DataPropertyName = "Name", Width = 250 });
-            _gridInventory.Columns.Add(new DataGridViewTextBoxColumn
-                { HeaderText = "Phase", DataPropertyName = "Phase", Width = 100 });
-            _gridInventory.Columns.Add(new DataGridViewTextBoxColumn
-                { HeaderText = "Stock", DataPropertyName = "CurrentStock", Width = 80 });
-            _gridInventory.Columns.Add(new DataGridViewTextBoxColumn
-                { HeaderText = "7-Day Sales", DataPropertyName = "SalesLast7Days", Width = 100 });
-            _gridInventory.Columns.Add(new DataGridViewTextBoxColumn
-                { HeaderText = "Runway (Days)", DataPropertyName = "RunwayDays", Width = 120 });
-            _gridInventory.Columns.Add(new DataGridViewTextBoxColumn
-                { HeaderText = "AI Recommendation", DataPropertyName = "Recommendation", Width = 300 });
+            // Make columns expand to fill available width and size headers
+            _gridInventory.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            _gridInventory.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
+            _gridInventory.AllowUserToResizeColumns = true;
+            _gridInventory.AllowUserToResizeRows = false;
 
+            // Ensure headers are visible and styled for readability
+            _gridInventory.ColumnHeadersVisible = true;
+            _gridInventory.EnableHeadersVisualStyles = false;
+            _gridInventory.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(230, 230, 230);
+            _gridInventory.ColumnHeadersDefaultCellStyle.ForeColor = Color.Black;
+            _gridInventory.ColumnHeadersDefaultCellStyle.Font = new Font(this.Font.FontFamily, 10f, FontStyle.Bold);
+
+            // Explicit header and row heights to ensure everything fits without font scaling
+            _gridInventory.ColumnHeadersHeight = 28; // header height in pixels
+            _gridInventory.RowTemplate.Height = 22;   // row height in pixels
+
+            // Define Columns (use FillWeight to control relative widths)
+            _gridInventory.Columns.Add(new DataGridViewTextBoxColumn
+                { HeaderText = "Product", DataPropertyName = "Name", FillWeight = 30 });
+            _gridInventory.Columns.Add(new DataGridViewTextBoxColumn
+                { HeaderText = "Phase", DataPropertyName = "Phase", FillWeight = 10 });
+            _gridInventory.Columns.Add(new DataGridViewTextBoxColumn
+                { HeaderText = "Stock", DataPropertyName = "CurrentStock", FillWeight = 8 });
+            _gridInventory.Columns.Add(new DataGridViewTextBoxColumn
+                { HeaderText = "7-Day Sales", DataPropertyName = "SalesLast7Days", FillWeight = 10 });
+            _gridInventory.Columns.Add(new DataGridViewTextBoxColumn
+                { HeaderText = "Runway (Days)", DataPropertyName = "RunwayDays", FillWeight = 10 });
+            _gridInventory.Columns.Add(new DataGridViewTextBoxColumn
+                { HeaderText = "AI Recommendation", DataPropertyName = "Recommendation", FillWeight = 32 });
+
+            // Add grid first, then toolbar so dock layout places the toolbar at the top and grid fills remaining area
             this.Controls.Add(_gridInventory);
+            this.Controls.Add(toolbar);
 
-            _gridInventory.BringToFront();
-            toolbar.BringToFront();
+            // No explicit BringToFront required; docking order now correct
         }
 
         protected override async void OnLoad(EventArgs e)
