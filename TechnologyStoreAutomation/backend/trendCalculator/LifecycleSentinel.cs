@@ -1,6 +1,5 @@
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using TechnologyStoreAutomation.backend.trendCalculator.data;
 
@@ -56,7 +55,7 @@ public class LifecycleSentinel
         {
             // Run manufacturer checks in parallel for speed
             var appleTask = CheckAppleVintageList();
-            var googleTask = CheckGooglePixelEOL();
+            var googleTask = CheckGooglePixelEol();
 
             await Task.WhenAll(appleTask, googleTask);
 
@@ -177,7 +176,7 @@ public class LifecycleSentinel
     /// Note: Google's page is JavaScript-rendered, so this uses a fallback approach
     /// with known EOL dates until a proper JS scraper is implemented
     /// </summary>
-    private async Task CheckGooglePixelEOL()
+    private async Task CheckGooglePixelEol()
     {
         try
         {
