@@ -3,14 +3,15 @@ using TechnologyStoreAutomation.backend.trendCalculator.data;
 namespace TechnologyStoreAutomation.backend.trendCalculator;
 
 /// <summary>
-/// Core intelligence engine that analyzes sales trends and predicts inventory needs
+/// Core intelligence engine that analyzes sales trends and predicts inventory needs.
+/// Implements ITrendCalculator for dependency injection and testing.
 /// </summary>
-public static class TrendCalculator
+public class TrendCalculatorService : ITrendCalculator
 {
     /// <summary>
     /// Analyzes a product's sales history and generates trend insights
     /// </summary>
-    public static TrendAnalysis AnalyzeProduct(Product product, IEnumerable<SalesTransaction>? salesHistory)
+    public TrendAnalysis AnalyzeProduct(Product product, IEnumerable<SalesTransaction>? salesHistory)
     {
         var salesList = salesHistory?.ToList() ?? new List<SalesTransaction>();
 
@@ -58,6 +59,15 @@ public static class TrendCalculator
             TrendStrength = Math.Round(trendStrength, 2),
             IsAccelerating = isAccelerating
         };
+    }
+
+    /// <summary>
+    /// Quick method to calculate just the runway days without full analysis
+    /// </summary>
+    public int CalculateRunwayDays(int currentStock, double dailySalesAverage)
+    {
+        if (dailySalesAverage <= 0) return 999;
+        return (int)Math.Ceiling(currentStock / dailySalesAverage);
     }
 
     /// <summary>
@@ -140,13 +150,28 @@ public static class TrendCalculator
         
         return sumOfSquares / values.Count;
     }
+}
+
+/// <summary>
+/// Static class with backward-compatible methods that delegate to instance methods.
+/// Marked as obsolete to encourage migration to dependency injection.
+/// </summary>
+[Obsolete("Use ITrendCalculator via dependency injection instead. This static class will be removed in a future version.")]
+public static class TrendCalculator
+{
+    private static readonly TrendCalculatorService Instance = new();
+
+    /// <summary>
+    /// Analyzes a product's sales history and generates trend insights
+    /// </summary>
+    [Obsolete("Use ITrendCalculator.AnalyzeProduct() via dependency injection instead.")]
+    public static TrendAnalysis AnalyzeProduct(Product product, IEnumerable<SalesTransaction>? salesHistory)
+        => Instance.AnalyzeProduct(product, salesHistory);
 
     /// <summary>
     /// Quick method to calculate just the runway days without full analysis
     /// </summary>
+    [Obsolete("Use ITrendCalculator.CalculateRunwayDays() via dependency injection instead.")]
     public static int CalculateRunwayDays(int currentStock, double dailySalesAverage)
-    {
-        if (dailySalesAverage <= 0) return 999;
-        return (int)Math.Ceiling(currentStock / dailySalesAverage);
-    }
+        => Instance.CalculateRunwayDays(currentStock, dailySalesAverage);
 }

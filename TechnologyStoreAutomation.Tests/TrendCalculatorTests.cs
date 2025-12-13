@@ -5,6 +5,8 @@ namespace TechnologyStoreAutomation.Tests;
 
 public class TrendCalculatorTests
 {
+    // Use the new instance-based service instead of obsolete static class
+    private readonly ITrendCalculator _calculator = new TrendCalculatorService();
     private static Product CreateTestProduct(int id = 1, string name = "Test Product", int stock = 100)
     {
         return new Product
@@ -41,7 +43,7 @@ public class TrendCalculatorTests
         var product = CreateTestProduct();
 
         // Act
-        var result = TrendCalculator.AnalyzeProduct(product, null);
+        var result = _calculator.AnalyzeProduct(product, null);
 
         // Assert
         Assert.Equal(TrendDirection.Stable, result.Direction);
@@ -58,7 +60,7 @@ public class TrendCalculatorTests
         var salesHistory = new List<SalesTransaction>();
 
         // Act
-        var result = TrendCalculator.AnalyzeProduct(product, salesHistory);
+        var result = _calculator.AnalyzeProduct(product, salesHistory);
 
         // Assert
         Assert.Equal(TrendDirection.Stable, result.Direction);
@@ -75,7 +77,7 @@ public class TrendCalculatorTests
         var salesHistory = CreateSalesHistory(new[] { 10, 10, 10, 10, 10, 10, 10 });
 
         // Act
-        var result = TrendCalculator.AnalyzeProduct(product, salesHistory);
+        var result = _calculator.AnalyzeProduct(product, salesHistory);
 
         // Assert
         Assert.Equal(10, result.DailySalesAverage);
@@ -90,7 +92,7 @@ public class TrendCalculatorTests
         var salesHistory = CreateSalesHistory(new[] { 10, 10, 10, 10, 10, 10, 10 });
 
         // Act
-        var result = TrendCalculator.AnalyzeProduct(product, salesHistory);
+        var result = _calculator.AnalyzeProduct(product, salesHistory);
 
         // Assert
         Assert.Equal(0, result.RunwayDays);
@@ -104,7 +106,7 @@ public class TrendCalculatorTests
         var salesHistory = CreateSalesHistory(new[] { 5 });
 
         // Act
-        var result = TrendCalculator.AnalyzeProduct(product, salesHistory);
+        var result = _calculator.AnalyzeProduct(product, salesHistory);
 
         // Assert
         Assert.Equal(42, result.ProductId);
@@ -120,7 +122,7 @@ public class TrendCalculatorTests
         var salesHistory = CreateSalesHistory(new[] { 1, 1, 1, 1, 1, 1, 1 }); // 1 per day
 
         // Act
-        var result = TrendCalculator.AnalyzeProduct(product, salesHistory);
+        var result = _calculator.AnalyzeProduct(product, salesHistory);
 
         // Assert
         Assert.True(result.RunwayDays >= 100); // Should be very high runway
@@ -136,7 +138,7 @@ public class TrendCalculatorTests
         var salesHistory = CreateSalesHistory(new[] { 10, 10, 10, 10, 10, 10, 10 });
 
         // Act
-        var result = TrendCalculator.AnalyzeProduct(product, salesHistory);
+        var result = _calculator.AnalyzeProduct(product, salesHistory);
 
         // Assert
         Assert.True(result.RunwayDays <= 0 || result.RunwayDays == 999);
@@ -150,7 +152,7 @@ public class TrendCalculatorTests
         var salesHistory = CreateSalesHistory(new[] { 70 }); // Only one day of data
 
         // Act
-        var result = TrendCalculator.AnalyzeProduct(product, salesHistory);
+        var result = _calculator.AnalyzeProduct(product, salesHistory);
 
         // Assert
         Assert.NotNull(result);
@@ -165,7 +167,7 @@ public class TrendCalculatorTests
         var salesHistory = CreateSalesHistory(new[] { 1000, 1000, 1000, 1000, 1000, 1000, 1000 }); // 1000/day
 
         // Act
-        var result = TrendCalculator.AnalyzeProduct(product, salesHistory);
+        var result = _calculator.AnalyzeProduct(product, salesHistory);
 
         // Assert
         Assert.True(result.RunwayDays <= 1); // Should run out almost immediately
@@ -180,7 +182,7 @@ public class TrendCalculatorTests
         var salesHistory = CreateSalesHistory(new[] { 1, 2, 3, 4, 5, 6, 7 });
 
         // Act
-        var result = TrendCalculator.AnalyzeProduct(product, salesHistory);
+        var result = _calculator.AnalyzeProduct(product, salesHistory);
 
         // Assert
         Assert.Equal(4.0, result.DailySalesAverage);
@@ -194,7 +196,7 @@ public class TrendCalculatorTests
         var salesHistory = CreateSalesHistory(new[] { 0, 0, 0, 0, 0, 0, 0 });
 
         // Act
-        var result = TrendCalculator.AnalyzeProduct(product, salesHistory);
+        var result = _calculator.AnalyzeProduct(product, salesHistory);
 
         // Assert
         Assert.Equal(999, result.RunwayDays); // Max runway when no sales
@@ -219,7 +221,7 @@ public class TrendCalculatorTests
         };
 
         // Act
-        var result = TrendCalculator.AnalyzeProduct(product, oldSalesHistory);
+        var result = _calculator.AnalyzeProduct(product, oldSalesHistory);
 
         // Assert
         Assert.NotNull(result);
@@ -235,7 +237,7 @@ public class TrendCalculatorTests
         var salesHistory = CreateSalesHistory(new[] { 0, 100, 0, 100, 0, 100, 0 });
 
         // Act
-        var result = TrendCalculator.AnalyzeProduct(product, salesHistory);
+        var result = _calculator.AnalyzeProduct(product, salesHistory);
 
         // Assert
         // Should either be Volatile or have a trend detected
@@ -249,7 +251,7 @@ public class TrendCalculatorTests
         var product = CreateTestProduct(stock: 100);
         // Previous week: 1,2,3,4,5,6,7 (avg ~4), Recent week: 20,21,22,23,24,25,26 (avg ~23)
         var transactions = new List<SalesTransaction>();
-        
+
         // Previous week (lower sales)
         for (int i = 14; i > 7; i--)
         {
@@ -262,7 +264,7 @@ public class TrendCalculatorTests
                 SaleDate = DateTime.Today.AddDays(-i)
             });
         }
-        
+
         // Recent week (much higher sales - more than 15% increase)
         for (int i = 7; i >= 1; i--)
         {
@@ -277,7 +279,7 @@ public class TrendCalculatorTests
         }
 
         // Act
-        var result = TrendCalculator.AnalyzeProduct(product, transactions);
+        var result = _calculator.AnalyzeProduct(product, transactions);
 
         // Assert
         Assert.Equal(TrendDirection.Rising, result.Direction);
@@ -289,7 +291,7 @@ public class TrendCalculatorTests
         // Arrange - Clear downward trend
         var product = CreateTestProduct(stock: 100);
         var transactions = new List<SalesTransaction>();
-        
+
         // Previous week (higher sales)
         for (int i = 14; i > 7; i--)
         {
@@ -302,7 +304,7 @@ public class TrendCalculatorTests
                 SaleDate = DateTime.Today.AddDays(-i)
             });
         }
-        
+
         // Recent week (much lower sales - more than 15% decrease)
         for (int i = 7; i >= 1; i--)
         {
@@ -317,7 +319,7 @@ public class TrendCalculatorTests
         }
 
         // Act
-        var result = TrendCalculator.AnalyzeProduct(product, transactions);
+        var result = _calculator.AnalyzeProduct(product, transactions);
 
         // Assert
         Assert.Equal(TrendDirection.Falling, result.Direction);
@@ -329,7 +331,7 @@ public class TrendCalculatorTests
         // Arrange - 365 days of sales data
         var product = CreateTestProduct(stock: 1000);
         var transactions = new List<SalesTransaction>();
-        
+
         for (int i = 365; i >= 1; i--)
         {
             transactions.Add(new SalesTransaction
@@ -343,7 +345,7 @@ public class TrendCalculatorTests
         }
 
         // Act
-        var result = TrendCalculator.AnalyzeProduct(product, transactions);
+        var result = _calculator.AnalyzeProduct(product, transactions);
 
         // Assert
         Assert.NotNull(result);
