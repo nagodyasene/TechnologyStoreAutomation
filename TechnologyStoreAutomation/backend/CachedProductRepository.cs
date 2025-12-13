@@ -15,12 +15,15 @@ public class CachedProductRepository : IProductRepository
     private readonly CachingSettings _settings;
     private readonly ILogger<CachedProductRepository> _logger;
 
+    // Track active sales history cache keys for efficient invalidation
+    private readonly HashSet<string> _activeSalesHistoryKeys = new();
+
     #region Cache Keys
-    
+
     private const string DashboardDataKey = "dashboard_data";
     private const string AllProductsKey = "all_products";
     private const string SalesHistoryKeyPrefix = "sales_history_";
-    
+
     #endregion
 
     public CachedProductRepository(
@@ -48,14 +51,14 @@ public class CachedProductRepository : IProductRepository
 
         _logger.LogDebug("Dashboard data cache miss - fetching from database");
         var data = (await _innerRepository.GetDashboardDataAsync()).ToList();
-        
+
         var cacheOptions = new MemoryCacheEntryOptions()
             .SetAbsoluteExpiration(TimeSpan.FromSeconds(_settings.DashboardDataExpirationSeconds))
             .SetSize(1);
-        
+
         _cache.Set(DashboardDataKey, data, cacheOptions);
         _logger.LogDebug("Dashboard data cached for {Seconds} seconds", _settings.DashboardDataExpirationSeconds);
-        
+
         return data;
     }
 
@@ -72,14 +75,14 @@ public class CachedProductRepository : IProductRepository
 
         _logger.LogDebug("Product list cache miss - fetching from database");
         var products = (await _innerRepository.GetAllProductsAsync()).ToList();
-        
+
         var cacheOptions = new MemoryCacheEntryOptions()
             .SetAbsoluteExpiration(TimeSpan.FromSeconds(_settings.ProductListExpirationSeconds))
             .SetSize(1);
-        
+
         _cache.Set(AllProductsKey, products, cacheOptions);
         _logger.LogDebug("Product list cached for {Seconds} seconds", _settings.ProductListExpirationSeconds);
-        
+
         return products;
     }
 
@@ -89,7 +92,7 @@ public class CachedProductRepository : IProductRepository
     public async Task<IEnumerable<SalesTransaction>> GetSalesHistoryAsync(int productId, int days = 30)
     {
         var cacheKey = $"{SalesHistoryKeyPrefix}{productId}_{days}";
-        
+
         if (_cache.TryGetValue(cacheKey, out IEnumerable<SalesTransaction>? cachedHistory) && cachedHistory != null)
         {
             _logger.LogDebug("Sales history for product {ProductId} retrieved from cache", productId);
@@ -98,13 +101,19 @@ public class CachedProductRepository : IProductRepository
 
         _logger.LogDebug("Sales history cache miss for product {ProductId} - fetching from database", productId);
         var history = (await _innerRepository.GetSalesHistoryAsync(productId, days)).ToList();
-        
+
         var cacheOptions = new MemoryCacheEntryOptions()
             .SetAbsoluteExpiration(TimeSpan.FromSeconds(_settings.SalesHistoryExpirationSeconds))
             .SetSize(1);
-        
+
         _cache.Set(cacheKey, history, cacheOptions);
-        
+
+        // Track this cache key for efficient invalidation
+        lock (_activeSalesHistoryKeys)
+        {
+            _activeSalesHistoryKeys.Add(cacheKey);
+        }
+
         return history;
     }
 
@@ -114,10 +123,10 @@ public class CachedProductRepository : IProductRepository
     public async Task<int> RecordSaleAsync(int productId, int quantitySold, decimal totalAmount, DateTime? saleDate = null)
     {
         var result = await _innerRepository.RecordSaleAsync(productId, quantitySold, totalAmount, saleDate);
-        
+
         // Invalidate caches that depend on sales data
         InvalidateSalesCaches(productId);
-        
+
         _logger.LogDebug("Sale recorded and caches invalidated for product {ProductId}", productId);
         return result;
     }
@@ -128,10 +137,10 @@ public class CachedProductRepository : IProductRepository
     public async Task UpdateProductPhaseAsync(int productId, string newPhase, string reason)
     {
         await _innerRepository.UpdateProductPhaseAsync(productId, newPhase, reason);
-        
+
         // Invalidate product-related caches
         InvalidateProductCaches();
-        
+
         _logger.LogDebug("Product phase updated and caches invalidated for product {ProductId}", productId);
     }
 
@@ -141,10 +150,10 @@ public class CachedProductRepository : IProductRepository
     public async Task GenerateDailySnapshotAsync(DateTime dateToProcess)
     {
         await _innerRepository.GenerateDailySnapshotAsync(dateToProcess);
-        
+
         // Invalidate dashboard cache after snapshot generation
         InvalidateDashboardCache();
-        
+
         _logger.LogDebug("Daily snapshot generated and dashboard cache invalidated");
     }
 
@@ -157,11 +166,22 @@ public class CachedProductRepository : IProductRepository
     {
         _cache.Remove(DashboardDataKey);
         _cache.Remove(AllProductsKey);
-        
-        // Remove sales history for specific product (all day variants)
-        for (int days = 1; days <= 90; days++)
+
+        // Remove only tracked sales history keys for this product (efficient invalidation)
+        lock (_activeSalesHistoryKeys)
         {
-            _cache.Remove($"{SalesHistoryKeyPrefix}{productId}_{days}");
+            var keysToRemove = _activeSalesHistoryKeys
+                .Where(k => k.StartsWith($"{SalesHistoryKeyPrefix}{productId}_"))
+                .ToList();
+
+            foreach (var key in keysToRemove)
+            {
+                _cache.Remove(key);
+                _activeSalesHistoryKeys.Remove(key);
+            }
+
+            _logger.LogDebug("Invalidated {Count} sales history cache entries for product {ProductId}",
+                keysToRemove.Count, productId);
         }
     }
 

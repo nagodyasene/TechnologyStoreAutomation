@@ -1,6 +1,5 @@
 using Hangfire;
 using Hangfire.PostgreSql;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using TechnologyStoreAutomation.backend.trendCalculator;
 using TechnologyStoreAutomation.backend.trendCalculator.data;
@@ -14,14 +13,14 @@ public class BackgroundJobService : IBackgroundJobService
 {
     private readonly string _connectionString;
     private readonly IProductRepository _repository;
-    private readonly IConfiguration _configuration;
+    private readonly ILifecycleSentinel _lifecycleSentinel;
     private readonly ILogger<BackgroundJobService> _logger;
 
-    public BackgroundJobService(string connectionString, IProductRepository repository, IConfiguration configuration)
+    public BackgroundJobService(string connectionString, IProductRepository repository, ILifecycleSentinel lifecycleSentinel)
     {
         _connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-        _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+        _lifecycleSentinel = lifecycleSentinel ?? throw new ArgumentNullException(nameof(lifecycleSentinel));
         _logger = AppLogger.CreateLogger<BackgroundJobService>();
     }
 
@@ -114,8 +113,7 @@ public class BackgroundJobService : IBackgroundJobService
         {
             _logger.LogInformation("Starting lifecycle audit");
 
-            var sentinel = new LifecycleSentinel(_repository, _configuration);
-            await sentinel.RunDailyAuditAsync();
+            await _lifecycleSentinel.RunDailyAuditAsync();
 
             _logger.LogInformation("Lifecycle audit completed successfully");
         }

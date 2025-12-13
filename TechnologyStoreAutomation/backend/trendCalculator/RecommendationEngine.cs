@@ -251,12 +251,14 @@ public class RecommendationEngine : IRecommendationEngine
     /// <summary>
     /// Static method for backward compatibility
     /// </summary>
+    [Obsolete("Use IRecommendationEngine.GenerateRecommendation() via dependency injection instead.")]
     public static string GetRecommendation(TrendAnalysis analysis, string lifecyclePhase) 
         => Instance.GenerateRecommendation(analysis, lifecyclePhase);
     
     /// <summary>
     /// Static method for backward compatibility
     /// </summary>
+    [Obsolete("Use IRecommendationEngine.CalculateReorderQuantity() via dependency injection instead.")]
     public static int GetReorderQuantity(TrendAnalysis analysis, int targetRunwayDays = 30) 
         => Instance.CalculateReorderQuantity(analysis, targetRunwayDays);
     

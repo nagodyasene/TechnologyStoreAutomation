@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using TechnologyStoreAutomation.backend;
+using TechnologyStoreAutomation.ui;
 
 namespace TechnologyStoreAutomation
 {
@@ -68,7 +69,15 @@ namespace TechnologyStoreAutomation
             // Start the Windows Forms application
             ApplicationConfiguration.Initialize();
             
-            // Resolve MainForm from DI container
+            // Show login form first
+            var loginForm = serviceProvider.GetRequiredService<LoginForm>();
+            if (loginForm.ShowDialog() != DialogResult.OK)
+            {
+                // User cancelled login or closed the form
+                return;
+            }
+
+            // Resolve MainForm from DI container (user is now authenticated)
             var mainForm = serviceProvider.GetRequiredService<MainForm>();
             Application.Run(mainForm);
         }

@@ -1,3 +1,4 @@
+using TechnologyStoreAutomation.backend.auth;
 using TechnologyStoreAutomation.backend.trendCalculator.data;
 using TechnologyStoreAutomation.ui;
 using Timer = System.Windows.Forms.Timer;
@@ -7,15 +8,18 @@ namespace TechnologyStoreAutomation
     public partial class MainForm : Form
     {
         private readonly IProductRepository _repository;
-        private readonly HealthCheckService _healthCheckService;
+        private readonly IHealthCheckService _healthCheckService;
+        private readonly IAuthenticationService _authService;
         private readonly UiSettings _uiSettings;
         private readonly ApplicationSettings _appSettings;
         private readonly Timer _refreshTimer;
         private DataGridView? _gridInventory;
         private Label? _lblStatus;
+        private Label? _lblUser;
         private Button? _btnSimulate;
         private Button? _btnRecordSale;
         private Button? _btnHealthCheck;
+        private Button? _btnLogout;
 
         private const string ErrorTitle = "Error";
 
@@ -27,16 +31,18 @@ namespace TechnologyStoreAutomation
         /// <param name="uiSettings">UI configuration settings</param>
         /// <param name="appSettings">Application settings</param>
         public MainForm(
-            IProductRepository repository, 
-            HealthCheckService healthCheckService,
-            UiSettings uiSettings, 
+            IProductRepository repository,
+            IHealthCheckService healthCheckService,
+            IAuthenticationService authService,
+            UiSettings uiSettings,
             ApplicationSettings appSettings)
         {
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
             _healthCheckService = healthCheckService ?? throw new ArgumentNullException(nameof(healthCheckService));
+            _authService = authService ?? throw new ArgumentNullException(nameof(authService));
             _uiSettings = uiSettings ?? throw new ArgumentNullException(nameof(uiSettings));
             _appSettings = appSettings ?? throw new ArgumentNullException(nameof(appSettings));
-            
+
             InitializeComponent();
             SetupDynamicUi();
 
@@ -140,6 +146,30 @@ namespace TechnologyStoreAutomation
             _btnHealthCheck.Click += BtnHealthCheck_Click;
             toolbar.Controls.Add(_btnHealthCheck);
 
+            // Logout Button (right-aligned)
+            _btnLogout = new Button();
+            _btnLogout.Text = "🚪 Logout";
+            _btnLogout.Location = new Point(560, 8);
+            _btnLogout.Size = new Size(90, 35);
+            _btnLogout.FlatStyle = FlatStyle.Flat;
+            _btnLogout.BackColor = Color.FromArgb(244, 67, 54);
+            _btnLogout.ForeColor = Color.White;
+            _btnLogout.FlatAppearance.BorderSize = 0;
+            _btnLogout.Click += BtnLogout_Click;
+            toolbar.Controls.Add(_btnLogout);
+
+            // User Info Label (right side of toolbar)
+            _lblUser = new Label();
+            _lblUser.Location = new Point(660, 15);
+            _lblUser.Size = new Size(300, 20);
+            _lblUser.TextAlign = ContentAlignment.MiddleRight;
+            if (_authService.CurrentUser != null)
+            {
+                var roleIcon = _authService.IsAdmin ? "👑" : "👤";
+                _lblUser.Text = $"{roleIcon} {_authService.CurrentUser.FullName} ({_authService.CurrentUser.Role})";
+            }
+            toolbar.Controls.Add(_lblUser);
+
             // Grid
             _gridInventory = new DataGridView();
             _gridInventory.Dock = DockStyle.Fill;
@@ -169,17 +199,17 @@ namespace TechnologyStoreAutomation
 
             // Define Columns (use FillWeight to control relative widths)
             _gridInventory.Columns.Add(new DataGridViewTextBoxColumn
-                { HeaderText = "Product", DataPropertyName = "Name", FillWeight = 30 });
+            { HeaderText = "Product", DataPropertyName = "Name", FillWeight = 30 });
             _gridInventory.Columns.Add(new DataGridViewTextBoxColumn
-                { HeaderText = "Phase", DataPropertyName = "Phase", FillWeight = 10 });
+            { HeaderText = "Phase", DataPropertyName = "Phase", FillWeight = 10 });
             _gridInventory.Columns.Add(new DataGridViewTextBoxColumn
-                { HeaderText = "Stock", DataPropertyName = "CurrentStock", FillWeight = 8 });
+            { HeaderText = "Stock", DataPropertyName = "CurrentStock", FillWeight = 8 });
             _gridInventory.Columns.Add(new DataGridViewTextBoxColumn
-                { HeaderText = "7-Day Sales", DataPropertyName = "SalesLast7Days", FillWeight = 10 });
+            { HeaderText = "7-Day Sales", DataPropertyName = "SalesLast7Days", FillWeight = 10 });
             _gridInventory.Columns.Add(new DataGridViewTextBoxColumn
-                { HeaderText = "Runway (Days)", DataPropertyName = "RunwayDays", FillWeight = 10 });
+            { HeaderText = "Runway (Days)", DataPropertyName = "RunwayDays", FillWeight = 10 });
             _gridInventory.Columns.Add(new DataGridViewTextBoxColumn
-                { HeaderText = "AI Recommendation", DataPropertyName = "Recommendation", FillWeight = 32 });
+            { HeaderText = "AI Recommendation", DataPropertyName = "Recommendation", FillWeight = 32 });
 
             // Add grid first, then toolbar so dock layout places the toolbar at the top and grid fills remaining area
             this.Controls.Add(_gridInventory);
@@ -281,7 +311,7 @@ namespace TechnologyStoreAutomation
             catch (Exception ex)
             {
                 GlobalExceptionHandler.ReportException(ex, "Simulate Launch");
-                MessageBox.Show($"Failed to simulate launch: {ex.Message}", ErrorTitle, 
+                MessageBox.Show($"Failed to simulate launch: {ex.Message}", ErrorTitle,
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -300,7 +330,7 @@ namespace TechnologyStoreAutomation
             catch (Exception ex)
             {
                 GlobalExceptionHandler.ReportException(ex, "Record Sale");
-                MessageBox.Show($"Failed to record sale: {ex.Message}", ErrorTitle, 
+                MessageBox.Show($"Failed to record sale: {ex.Message}", ErrorTitle,
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -350,6 +380,22 @@ namespace TechnologyStoreAutomation
             finally
             {
                 if (_btnHealthCheck != null) _btnHealthCheck.Enabled = true;
+            }
+        }
+
+        private void BtnLogout_Click(object? sender, EventArgs e)
+        {
+            var result = MessageBox.Show(
+                "Are you sure you want to logout?",
+                "Confirm Logout",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+
+            if (result == DialogResult.Yes)
+            {
+                _authService.Logout();
+                this.DialogResult = DialogResult.Abort; // Signal to restart login
+                this.Close();
             }
         }
     }

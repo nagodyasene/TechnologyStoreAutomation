@@ -15,7 +15,7 @@ public enum LifecyclePhase
 /// <summary>
 /// Monitors manufacturer websites to automatically detect when products become vintage/obsolete
 /// </summary>
-public class LifecycleSentinel
+public class LifecycleSentinel : ILifecycleSentinel
 {
     private readonly HttpClient _httpClient;
     private readonly IProductRepository _repository;
@@ -34,7 +34,7 @@ public class LifecycleSentinel
         // Read URLs from configuration
         _urlAppleVintage = configuration["Manufacturers:Apple:VintageListUrl"]
             ?? throw new InvalidOperationException("Manufacturers:Apple:VintageListUrl configuration is required");
-        
+
         // Note: Google Pixel EOL URL is configured but not currently used
         // (using hardcoded EOL dates instead until JS-rendered page scraping is implemented)
 
@@ -130,7 +130,7 @@ public class LifecycleSentinel
             if ((inVintageSection || inObsoleteSection) && IsProductName(text))
             {
                 await ProcessAppleProduct(text, inObsoleteSection);
-                
+
                 if (inVintageSection) vintageCount++;
                 else obsoleteCount++;
             }
@@ -320,7 +320,7 @@ public class LifecycleSentinel
     private static string NormalizeProductName(string name)
     {
         var timeout = TimeSpan.FromMilliseconds(100);
-        
+
         // Remove common prefixes/suffixes
         name = Regex.Replace(name, @"\b(Apple|Google|Samsung|Sony)\b", "", RegexOptions.IgnoreCase, timeout);
 
@@ -343,7 +343,7 @@ public class LifecycleSentinel
     private static string ExtractModelIdentifier(string name)
     {
         var timeout = TimeSpan.FromMilliseconds(100);
-        
+
         // Match patterns like "iPhone 12", "Pixel 6 Pro", "MacBook Air (2020)"
         var patterns = new[]
         {

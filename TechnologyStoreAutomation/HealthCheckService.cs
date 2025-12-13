@@ -41,7 +41,7 @@ public class HealthReport
     public List<HealthCheckResult> Results { get; set; } = new();
 
     public bool IsHealthy => OverallStatus == HealthStatus.Healthy;
-    
+
     /// <summary>
     /// Gets a formatted summary string
     /// </summary>
@@ -62,12 +62,12 @@ public class HealthReport
                 HealthStatus.Unhealthy => "❌",
                 _ => "❓"
             };
-            
+
             sb.AppendLine($"{statusIcon} {result.Name}: {result.Status} ({result.Duration.TotalMilliseconds:F0}ms)");
-            
+
             if (!string.IsNullOrEmpty(result.Description))
                 sb.AppendLine($"   {result.Description}");
-            
+
             if (result.Exception != null)
                 sb.AppendLine($"   Error: {result.Exception.Message}");
         }
@@ -79,11 +79,11 @@ public class HealthReport
 /// <summary>
 /// Service for performing health checks on application dependencies
 /// </summary>
-public class HealthCheckService
+public class HealthCheckService : IHealthCheckService
 {
     private readonly string _connectionString;
     private readonly ILogger<HealthCheckService> _logger;
-    
+
     // Thresholds for health status
     private const int DatabaseResponseTimeHealthyMs = 100;
     private const int DatabaseResponseTimeDegradedMs = 500;
@@ -135,7 +135,7 @@ public class HealthCheckService
             Results = results
         };
 
-        _logger.LogInformation("Health checks completed: {Status} in {Duration}ms", 
+        _logger.LogInformation("Health checks completed: {Status} in {Duration}ms",
             overallStatus, overallStopwatch.ElapsedMilliseconds);
 
         return report;
@@ -190,7 +190,7 @@ public class HealthCheckService
             result.Status = HealthStatus.Unhealthy;
             result.Description = "Database connection failed";
             result.Exception = ex;
-            
+
             _logger.LogError(ex, "Database health check failed");
         }
 
@@ -238,7 +238,7 @@ public class HealthCheckService
             result.Status = HealthStatus.Unhealthy;
             result.Description = "Connection pool exhausted or unavailable";
             result.Exception = ex;
-            
+
             _logger.LogError(ex, "Connection pool health check failed");
         }
 
