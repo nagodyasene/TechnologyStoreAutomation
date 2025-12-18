@@ -1,8 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TechnologyStoreAutomation", "TechnologyStoreAutomation\TechnologyStoreAutomation.csproj", "{E9A7D3EC-6BB4-4D3C-9C66-123456789ABC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TechnologyStore.Desktop", "TechnologyStore.Desktop\TechnologyStore.Desktop.csproj", "{E9A7D3EC-6BB4-4D3C-9C66-123456789ABC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TechnologyStoreAutomation.Tests", "TechnologyStoreAutomation.Tests\TechnologyStoreAutomation.Tests.csproj", "{0FBF5FA9-23E5-498F-A1F0-53F876DDF0C6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TechnologyStore.Desktop.Tests", "TechnologyStore.Desktop.Tests\TechnologyStore.Desktop.Tests.csproj", "{0FBF5FA9-23E5-498F-A1F0-53F876DDF0C6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
