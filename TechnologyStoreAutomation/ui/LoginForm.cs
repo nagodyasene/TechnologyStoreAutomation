@@ -100,13 +100,13 @@ public partial class LoginForm : Form
 
         yPos += 40;
 
-        // Remember Me Checkbox (optional feature)
+        // Remember Me Checkbox
         _chkRememberMe = new CheckBox
         {
             Text = "Remember me",
             Location = new Point(controlLeft, yPos),
             Width = 150,
-            Visible = false // Hidden for now - can enable later
+            Visible = true
         };
         this.Controls.Add(_chkRememberMe);
 
@@ -198,6 +198,12 @@ public partial class LoginForm : Form
 
             if (result.Success)
             {
+                // Save 'Remember Me' preference
+                if (_chkRememberMe != null)
+                {
+                    UserPreferences.Save(username, _chkRememberMe.Checked);
+                }
+
                 this.DialogResult = DialogResult.OK;
                 this.Close();
             }
@@ -246,11 +252,24 @@ public partial class LoginForm : Form
             _btnLogin.Text = enabled ? "Login" : "Logging in...";
         }
         if (_btnCancel != null) _btnCancel.Enabled = enabled;
+        if (_chkRememberMe != null) _chkRememberMe.Enabled = enabled;
     }
 
     protected override void OnLoad(EventArgs e)
     {
         base.OnLoad(e);
-        _txtUsername?.Focus();
+
+        // Load 'Remember Me' preference
+        var prefs = UserPreferences.Load();
+        if (prefs.RememberMe && !string.IsNullOrEmpty(prefs.Username))
+        {
+            if (_txtUsername != null) _txtUsername.Text = prefs.Username;
+            if (_chkRememberMe != null) _chkRememberMe.Checked = true;
+            _txtPassword?.Focus();
+        }
+        else
+        {
+            _txtUsername?.Focus();
+        }
     }
 }

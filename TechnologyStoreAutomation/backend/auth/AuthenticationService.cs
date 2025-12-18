@@ -53,8 +53,7 @@ public class AuthenticationService : IAuthenticationService
                 return AuthResult.Failed("This account has been deactivated.");
             }
 
-            var passwordHash = HashPassword(password);
-            if (user.PasswordHash != passwordHash)
+            if (!VerifyPassword(password, user.PasswordHash))
             {
                 _logger.LogWarning("Login failed: Invalid password for user - {Username}", username);
                 return AuthResult.Failed("Invalid username or password.");
@@ -86,16 +85,50 @@ public class AuthenticationService : IAuthenticationService
     }
 
     /// <summary>
-    /// Hashes a password using SHA256
+    /// Hashes a password using PBKDF2 with a random salt
+    /// Format: salt:hash
     /// </summary>
     public static string HashPassword(string password)
     {
         if (string.IsNullOrEmpty(password))
             return string.Empty;
 
-        using var sha256 = SHA256.Create();
-        var bytes = Encoding.UTF8.GetBytes(password);
-        var hash = sha256.ComputeHash(bytes);
-        return Convert.ToHexString(hash).ToLowerInvariant();
+        // Generate a random salt
+        byte[] salt = RandomNumberGenerator.GetBytes(16);
+
+        // Hash the password using PBKDF2
+        using var pbkdf2 = new Rfc2898DeriveBytes(password, salt, 100000, HashAlgorithmName.SHA256);
+        byte[] hash = pbkdf2.GetBytes(32);
+
+        // Combine salt and hash
+        return $"{Convert.ToHexString(salt)}:{Convert.ToHexString(hash)}";
+    }
+
+    /// <summary>
+    /// Verifies a password against a stored hash (salt:hash)
+    /// </summary>
+    public static bool VerifyPassword(string password, string storedHash)
+    {
+        if (string.IsNullOrEmpty(password) || string.IsNullOrEmpty(storedHash))
+            return false;
+
+        try
+        {
+            var parts = storedHash.Split(':');
+            if (parts.Length != 2)
+                return false;
+
+            byte[] salt = Convert.FromHexString(parts[0]);
+            byte[] storedPasswordHash = Convert.FromHexString(parts[1]);
+
+            using var pbkdf2 = new Rfc2898DeriveBytes(password, salt, 100000, HashAlgorithmName.SHA256);
+            byte[] computedHash = pbkdf2.GetBytes(32);
+
+            return CryptographicOperations.FixedTimeEquals(storedPasswordHash, computedHash);
+        }
+        catch
+        {
+            return false;
+        }
     }
 }

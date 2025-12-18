@@ -4,6 +4,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using TechnologyStoreAutomation.backend;
 using TechnologyStoreAutomation.backend.auth;
+using TechnologyStoreAutomation.backend.leave;
+using TechnologyStoreAutomation.backend.reporting;
 using TechnologyStoreAutomation.backend.trendCalculator;
 using TechnologyStoreAutomation.backend.trendCalculator.data;
 using TechnologyStoreAutomation.backend.visitorCountPrediction;
@@ -144,6 +146,20 @@ public static class ServiceConfiguration
             return new UserRepository(settings.ConnectionString);
         });
         services.AddSingleton<IAuthenticationService, AuthenticationService>();
+
+        // Register leave management services
+        services.AddSingleton<ILeaveRepository>(sp =>
+        {
+            var settings = sp.GetRequiredService<DatabaseSettings>();
+            return new LeaveRepository(settings.ConnectionString);
+        });
+
+        // Register sales reporting service
+        services.AddSingleton<ISalesReportService>(sp =>
+        {
+            var settings = sp.GetRequiredService<DatabaseSettings>();
+            return new SalesReportService(settings.ConnectionString);
+        });
 
         // Register forms (transient - new instance each time)
         services.AddTransient<LoginForm>();

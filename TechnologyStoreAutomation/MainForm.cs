@@ -1,4 +1,6 @@
 using TechnologyStoreAutomation.backend.auth;
+using TechnologyStoreAutomation.backend.leave;
+using TechnologyStoreAutomation.backend.reporting;
 using TechnologyStoreAutomation.backend.trendCalculator.data;
 using TechnologyStoreAutomation.ui;
 using Timer = System.Windows.Forms.Timer;
@@ -10,6 +12,8 @@ namespace TechnologyStoreAutomation
         private readonly IProductRepository _repository;
         private readonly IHealthCheckService _healthCheckService;
         private readonly IAuthenticationService _authService;
+        private readonly ILeaveRepository _leaveRepository;
+        private readonly ISalesReportService _salesReportService;
         private readonly UiSettings _uiSettings;
         private readonly ApplicationSettings _appSettings;
         private readonly Timer _refreshTimer;
@@ -20,6 +24,9 @@ namespace TechnologyStoreAutomation
         private Button? _btnRecordSale;
         private Button? _btnHealthCheck;
         private Button? _btnLogout;
+        private Button? _btnLeaveRequest;
+        private Button? _btnLeaveApproval;
+        private Button? _btnReports;
 
         private const string ErrorTitle = "Error";
 
@@ -34,12 +41,16 @@ namespace TechnologyStoreAutomation
             IProductRepository repository,
             IHealthCheckService healthCheckService,
             IAuthenticationService authService,
+            ILeaveRepository leaveRepository,
+            ISalesReportService salesReportService,
             UiSettings uiSettings,
             ApplicationSettings appSettings)
         {
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
             _healthCheckService = healthCheckService ?? throw new ArgumentNullException(nameof(healthCheckService));
             _authService = authService ?? throw new ArgumentNullException(nameof(authService));
+            _leaveRepository = leaveRepository ?? throw new ArgumentNullException(nameof(leaveRepository));
+            _salesReportService = salesReportService ?? throw new ArgumentNullException(nameof(salesReportService));
             _uiSettings = uiSettings ?? throw new ArgumentNullException(nameof(uiSettings));
             _appSettings = appSettings ?? throw new ArgumentNullException(nameof(appSettings));
 
@@ -158,9 +169,48 @@ namespace TechnologyStoreAutomation
             _btnLogout.Click += BtnLogout_Click;
             toolbar.Controls.Add(_btnLogout);
 
+            // Leave Request Button (visible to all)
+            _btnLeaveRequest = new Button();
+            _btnLeaveRequest.Text = "📅 Leave";
+            _btnLeaveRequest.Location = new Point(660, 8);
+            _btnLeaveRequest.Size = new Size(80, 35);
+            _btnLeaveRequest.FlatStyle = FlatStyle.Flat;
+            _btnLeaveRequest.BackColor = Color.FromArgb(156, 39, 176);
+            _btnLeaveRequest.ForeColor = Color.White;
+            _btnLeaveRequest.FlatAppearance.BorderSize = 0;
+            _btnLeaveRequest.Click += BtnLeaveRequest_Click;
+            toolbar.Controls.Add(_btnLeaveRequest);
+
+            // Leave Approval Button (admin only)
+            if (_authService.IsAdmin)
+            {
+                _btnLeaveApproval = new Button();
+                _btnLeaveApproval.Text = "✅ Approvals";
+                _btnLeaveApproval.Location = new Point(750, 8);
+                _btnLeaveApproval.Size = new Size(100, 35);
+                _btnLeaveApproval.FlatStyle = FlatStyle.Flat;
+                _btnLeaveApproval.BackColor = Color.FromArgb(255, 152, 0);
+                _btnLeaveApproval.ForeColor = Color.White;
+                _btnLeaveApproval.FlatAppearance.BorderSize = 0;
+                _btnLeaveApproval.Click += BtnLeaveApproval_Click;
+                toolbar.Controls.Add(_btnLeaveApproval);
+            }
+
+            // Reports Button
+            _btnReports = new Button();
+            _btnReports.Text = "📊 Reports";
+            _btnReports.Location = new Point(_authService.IsAdmin ? 860 : 750, 8);
+            _btnReports.Size = new Size(90, 35);
+            _btnReports.FlatStyle = FlatStyle.Flat;
+            _btnReports.BackColor = Color.FromArgb(96, 125, 139);
+            _btnReports.ForeColor = Color.White;
+            _btnReports.FlatAppearance.BorderSize = 0;
+            _btnReports.Click += BtnReports_Click;
+            toolbar.Controls.Add(_btnReports);
+
             // User Info Label (right side of toolbar)
             _lblUser = new Label();
-            _lblUser.Location = new Point(660, 15);
+            _lblUser.Location = new Point(860, 15);
             _lblUser.Size = new Size(300, 20);
             _lblUser.TextAlign = ContentAlignment.MiddleRight;
             if (_authService.CurrentUser != null)
@@ -396,6 +446,73 @@ namespace TechnologyStoreAutomation
                 _authService.Logout();
                 this.DialogResult = DialogResult.Abort; // Signal to restart login
                 this.Close();
+            }
+        }
+
+        private async void BtnLeaveRequest_Click(object? sender, EventArgs e)
+        {
+            try
+            {
+                if (_authService.CurrentUser == null)
+                {
+                    MessageBox.Show("You must be logged in.", ErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // Get employee record for current user
+                var employee = await _leaveRepository.GetEmployeeByUserIdAsync(_authService.CurrentUser.Id);
+                if (employee == null)
+                {
+                    MessageBox.Show("No employee record found for your account.\nPlease contact an administrator.",
+                        "Employee Not Found", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                var leaveForm = new LeaveRequestForm(_leaveRepository, _authService, employee);
+                leaveForm.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                GlobalExceptionHandler.ReportException(ex, "Leave Request");
+                MessageBox.Show($"Error opening leave request form: {ex.Message}", ErrorTitle,
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void BtnLeaveApproval_Click(object? sender, EventArgs e)
+        {
+            try
+            {
+                if (!_authService.IsAdmin)
+                {
+                    MessageBox.Show("Only administrators can access this feature.", "Access Denied",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                var approvalForm = new LeaveApprovalForm(_leaveRepository, _authService);
+                approvalForm.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                GlobalExceptionHandler.ReportException(ex, "Leave Approval");
+                MessageBox.Show($"Error opening leave approval form: {ex.Message}", ErrorTitle,
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void BtnReports_Click(object? sender, EventArgs e)
+        {
+            try
+            {
+                var reportForm = new SalesReportForm(_salesReportService, _authService);
+                reportForm.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                GlobalExceptionHandler.ReportException(ex, "Sales Reports");
+                MessageBox.Show($"Error opening sales reports: {ex.Message}", ErrorTitle,
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }
