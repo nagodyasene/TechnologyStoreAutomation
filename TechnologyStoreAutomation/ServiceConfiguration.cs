@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using TechnologyStoreAutomation.backend;
 using TechnologyStoreAutomation.backend.auth;
+using TechnologyStoreAutomation.backend.email;
 using TechnologyStoreAutomation.backend.leave;
 using TechnologyStoreAutomation.backend.reporting;
 using TechnologyStoreAutomation.backend.trendCalculator;
@@ -67,6 +68,7 @@ public static class ServiceConfiguration
         services.AddSingleton(appSettings.BusinessRules);
         services.AddSingleton(appSettings.VisitorPrediction);
         services.AddSingleton(appSettings.Application);
+        services.AddSingleton(appSettings.Email);
 
         // Register logging from configuration
         services.AddLogging(builder =>
@@ -92,7 +94,9 @@ public static class ServiceConfiguration
         services.AddSingleton<ProductRepository>(sp =>
         {
             var settings = sp.GetRequiredService<DatabaseSettings>();
-            return new ProductRepository(settings.ConnectionString);
+            var trendCalculator = sp.GetRequiredService<ITrendCalculator>();
+            var recommendationEngine = sp.GetRequiredService<IRecommendationEngine>();
+            return new ProductRepository(settings.ConnectionString, trendCalculator, recommendationEngine);
         });
 
         // Register cached repository as IProductRepository (decorator pattern)
@@ -161,6 +165,11 @@ public static class ServiceConfiguration
             return new SalesReportService(settings.ConnectionString);
         });
 
+        // Register email service
+        services.AddSingleton<IEmailService, GmailEmailService>();
+        // Register aggregated dependencies for MainForm
+        services.AddTransient<MainFormDependencies>();
+
         // Register forms (transient - new instance each time)
         services.AddTransient<LoginForm>();
         services.AddTransient<MainForm>();
@@ -171,7 +180,7 @@ public static class ServiceConfiguration
     /// <summary>
     /// Validates that required configuration is present
     /// </summary>
-    /// <returns>True if configuration is valid</returns>
+    /// <returns>True if the configuration is valid</returns>
     public static bool ValidateConfiguration()
     {
         var connectionString = DatabaseConfig.BuildConnectionStringFromEnv();
@@ -191,5 +200,3 @@ public static class ServiceConfiguration
                "The application cannot continue without a configured database connection.";
     }
 }
-
-

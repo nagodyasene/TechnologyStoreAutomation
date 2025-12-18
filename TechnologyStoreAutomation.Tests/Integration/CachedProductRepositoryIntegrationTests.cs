@@ -2,6 +2,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Moq;
 using TechnologyStoreAutomation.backend;
+using TechnologyStoreAutomation.backend.trendCalculator;
 using TechnologyStoreAutomation.backend.trendCalculator.data;
 
 namespace TechnologyStoreAutomation.Tests.Integration;
@@ -14,9 +15,9 @@ namespace TechnologyStoreAutomation.Tests.Integration;
 public class CachedProductRepositoryIntegrationTests : IAsyncLifetime
 {
     #region Constants
-    
+
     private const string ObsoletePhase = "OBSOLETE";
-    
+
     #endregion
 
     #region Fields
@@ -34,8 +35,32 @@ public class CachedProductRepositoryIntegrationTests : IAsyncLifetime
     public async Task InitializeAsync()
     {
         await _fixture.ResetDatabaseAsync();
-        
-        _innerRepository = new ProductRepository(_fixture.ConnectionString);
+
+        var mockTrendCalculator = new Mock<ITrendCalculator>();
+        mockTrendCalculator.Setup(x => x.AnalyzeProduct(It.IsAny<Product>(), It.IsAny<IEnumerable<SalesTransaction>>()))
+            .Returns((Product p, IEnumerable<SalesTransaction> s) =>
+            {
+                var sales = s?.ToList() ?? new List<SalesTransaction>();
+                var salesLast7Days = sales.Where(x => x.SaleDate >= DateTime.Today.AddDays(-7)).Sum(x => x.QuantitySold);
+                var dailyAvg = salesLast7Days / 7.0;
+                var runway = dailyAvg > 0 ? (int)(p.CurrentStock / dailyAvg) : 999;
+                return new TrendAnalysis
+                {
+                    DailySalesAverage = dailyAvg,
+                    RunwayDays = runway,
+                    Direction = TrendDirection.Stable,
+                    TrendStrength = 0.0
+                };
+            });
+
+        var mockRecommendationEngine = new Mock<IRecommendationEngine>();
+        mockRecommendationEngine.Setup(x => x.GenerateRecommendation(It.IsAny<TrendAnalysis>(), It.IsAny<string>()))
+            .Returns("Test Recommendation");
+
+        _innerRepository = new ProductRepository(
+            _fixture.ConnectionString,
+            mockTrendCalculator.Object,
+            mockRecommendationEngine.Object);
         _cache = new MemoryCache(new MemoryCacheOptions { SizeLimit = 100 });
         var cachingSettings = new CachingSettings
         {
@@ -44,12 +69,12 @@ public class CachedProductRepositoryIntegrationTests : IAsyncLifetime
             SalesHistoryExpirationSeconds = 30,
             SizeLimit = 100
         };
-        
+
         var logger = new Mock<ILogger<CachedProductRepository>>();
         _cachedRepository = new CachedProductRepository(
-            _innerRepository, 
-            _cache, 
-            cachingSettings, 
+            _innerRepository,
+            _cache,
+            cachingSettings,
             logger.Object);
     }
 
@@ -71,10 +96,10 @@ public class CachedProductRepositoryIntegrationTests : IAsyncLifetime
 
         // Act - First call should hit database
         var firstCall = (await _cachedRepository.GetAllProductsAsync()).ToList();
-        
+
         // Modify database directly (bypass cache)
         await _innerRepository.UpdateProductPhaseAsync(firstCall[0].Id, ObsoletePhase, "Direct update");
-        
+
         // The second call should return cached data (not see the update)
         var secondCall = (await _cachedRepository.GetAllProductsAsync()).ToList();
 
@@ -130,7 +155,7 @@ public class CachedProductRepositoryIntegrationTests : IAsyncLifetime
     {
         // Arrange
         await _fixture.SeedTestDataAsync();
-        
+
         // Populate cache
         var initialProducts = (await _cachedRepository.GetAllProductsAsync()).ToList();
         var product = initialProducts.First(p => p.LifecyclePhase == "ACTIVE");
@@ -208,11 +233,11 @@ public class CachedProductRepositoryIntegrationTests : IAsyncLifetime
     {
         // Arrange
         await _fixture.SeedTestDataAsync();
-        
+
         // Act - Multiple operations through cached repository
         var products = (await _cachedRepository.GetAllProductsAsync()).ToList();
         var product = products[0];
-        
+
         // Record multiple sales
         for (int i = 0; i < 5; i++)
         {

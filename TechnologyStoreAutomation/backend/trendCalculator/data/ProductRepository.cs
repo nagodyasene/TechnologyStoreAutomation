@@ -9,17 +9,24 @@ public class ProductRepository : IProductRepository
 {
     private readonly string _connectionString;
     private readonly ILogger<ProductRepository> _logger;
-    
+    private readonly ITrendCalculator _trendCalculator;
+    private readonly IRecommendationEngine _recommendationEngine;
+
     // Retry configuration
     private const int MaxRetries = 3;
     private static readonly TimeSpan RetryDelay = TimeSpan.FromSeconds(1);
 
-    public ProductRepository(string connectionString)
+    public ProductRepository(
+        string connectionString,
+        ITrendCalculator trendCalculator,
+        IRecommendationEngine recommendationEngine)
     {
         if (string.IsNullOrWhiteSpace(connectionString))
             throw new ArgumentNullException(nameof(connectionString), "Connection string cannot be null or empty");
-            
+
         _connectionString = connectionString;
+        _trendCalculator = trendCalculator ?? throw new ArgumentNullException(nameof(trendCalculator));
+        _recommendationEngine = recommendationEngine ?? throw new ArgumentNullException(nameof(recommendationEngine));
         _logger = AppLogger.CreateLogger<ProductRepository>();
     }
 
@@ -31,7 +38,7 @@ public class ProductRepository : IProductRepository
     private async Task<T> ExecuteWithRetryAsync<T>(Func<Task<T>> operation, string operationName)
     {
         Exception lastException = new InvalidOperationException($"Operation '{operationName}' failed after {MaxRetries} attempts");
-        
+
         for (int attempt = 1; attempt <= MaxRetries; attempt++)
         {
             try
@@ -41,7 +48,7 @@ public class ProductRepository : IProductRepository
             catch (NpgsqlException ex) when (IsTransientError(ex) && attempt < MaxRetries)
             {
                 lastException = ex;
-                _logger.LogWarning(ex, 
+                _logger.LogWarning(ex,
                     "{Operation} failed (attempt {Attempt}/{MaxRetries}). Retrying in {Delay}ms...",
                     operationName, attempt, MaxRetries, RetryDelay.TotalMilliseconds);
                 await Task.Delay(RetryDelay * attempt).ConfigureAwait(false);
@@ -51,7 +58,7 @@ public class ProductRepository : IProductRepository
                 throw new InvalidOperationException($"Operation '{operationName}' failed with non-transient error", ex);
             }
         }
-        
+
         throw lastException;
     }
 
@@ -78,7 +85,7 @@ public class ProductRepository : IProductRepository
             using (var db = CreateConnection())
             {
                 _logger.LogInformation("Generating daily snapshot for {Date}", dateToProcess.ToShortDateString());
-                
+
                 var sql = @"
                     INSERT INTO daily_summaries (summary_date, product_id, closing_stock, total_sold)
                     SELECT 
@@ -93,7 +100,7 @@ public class ProductRepository : IProductRepository
                     SET closing_stock = EXCLUDED.closing_stock, total_sold = EXCLUDED.total_sold;";
 
                 await db.ExecuteAsync(sql, new { Date = dateToProcess }).ConfigureAwait(false);
-                
+
                 _logger.LogInformation("Daily snapshot generated successfully for {Date}", dateToProcess.ToShortDateString());
                 return true;
             }
@@ -107,14 +114,14 @@ public class ProductRepository : IProductRepository
     {
         if (string.IsNullOrWhiteSpace(newPhase))
             throw new ArgumentNullException(nameof(newPhase), "New phase cannot be null or empty");
-            
+
         await ExecuteWithRetryAsync(async () =>
         {
             using (var db = CreateConnection())
             {
-                _logger.LogInformation("Updating product {ProductId} to phase {Phase}. Reason: {Reason}", 
+                _logger.LogInformation("Updating product {ProductId} to phase {Phase}. Reason: {Reason}",
                     productId, newPhase, reason);
-                    
+
                 var sql = @"
                     UPDATE products 
                     SET lifecycle_phase = @Phase::lifecycle_phase_type, 
@@ -194,7 +201,7 @@ public class ProductRepository : IProductRepository
                 WHERE product_id = @ProductId 
                   AND sale_date >= CURRENT_DATE - @Days::INTEGER
                 ORDER BY sale_date DESC;";
-            
+
             return await db.QueryAsync<SalesTransaction>(sql, new { ProductId = productId, Days = days });
         }
     }
@@ -216,7 +223,7 @@ public class ProductRepository : IProductRepository
                            created_at as CreatedAt, last_updated as LastUpdated
                     FROM products
                     ORDER BY name;";
-            
+
                 return await db.QueryAsync<Product>(sql).ConfigureAwait(false);
             }
         }, nameof(GetAllProductsAsync)).ConfigureAwait(false);
@@ -261,13 +268,14 @@ public class ProductRepository : IProductRepository
                     : new List<SalesTransaction>();
 
                 // The Logic Engine does the work
-                var analysis = TrendCalculator.AnalyzeProduct(product, history);
-                var rec = RecommendationEngine.GetRecommendation(analysis, product.LifecyclePhase);
+                var analysis = _trendCalculator.AnalyzeProduct(product, history);
+                var rec = _recommendationEngine.GenerateRecommendation(analysis, product.LifecyclePhase);
 
                 dashboardData.Add(new ProductDashboardDto
                 {
                     Id = product.Id,
                     Name = product.Name,
+                    Category = product.Category,
                     Phase = product.LifecyclePhase,
                     Recommendation = rec,
                     CurrentStock = product.CurrentStock,

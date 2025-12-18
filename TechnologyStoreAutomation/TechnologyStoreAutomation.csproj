@@ -6,9 +6,11 @@
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UseAppHost>true</UseAppHost>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.1.66" />
+    <PackageReference Include="Google.Apis.Gmail.v1" Version="1.73.0.3987" />
     <PackageReference Include="Hangfire.Core" Version="1.8.22" />
     <PackageReference Include="Hangfire.PostgreSql" Version="1.20.13" />
     <PackageReference Include="HtmlAgilityPack" Version="1.12.4" /><PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="10.0.1" />
@@ -30,6 +32,8 @@
     <None Update="appsettings.Development.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="credentials.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>
-

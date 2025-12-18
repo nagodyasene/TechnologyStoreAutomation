@@ -6,6 +6,7 @@ public class ProductDashboardDto
     public int Id { get; init; }
 
     public required string Name { get; init; }
+    public string? Category { get; init; }
     public required string Phase { get; init; } // Active, legacy or obsolete
     public required string Recommendation { get; init; }
 
@@ -13,7 +14,4 @@ public class ProductDashboardDto
     public int SalesLast7Days { get; init; }
     public int RunwayDays { get; init; }
     public DateTime LastUpdated { get; init; } = DateTime.UtcNow;
-
-    
-    
 }

@@ -1,3 +1,5 @@
+using Moq;
+using TechnologyStoreAutomation.backend.trendCalculator;
 using TechnologyStoreAutomation.backend.trendCalculator.data;
 
 namespace TechnologyStoreAutomation.Tests.Integration;
@@ -10,9 +12,9 @@ namespace TechnologyStoreAutomation.Tests.Integration;
 public class ProductRepositoryIntegrationTests : IAsyncLifetime
 {
     #region Constants
-    
+
     private const string TestIphoneSku = "TEST-IP15PRO";
-    
+
     #endregion
 
     private readonly PostgreSqlFixture _fixture;
@@ -26,7 +28,32 @@ public class ProductRepositoryIntegrationTests : IAsyncLifetime
     public async Task InitializeAsync()
     {
         await _fixture.ResetDatabaseAsync();
-        _repository = new ProductRepository(_fixture.ConnectionString);
+
+        var mockTrendCalculator = new Mock<ITrendCalculator>();
+        mockTrendCalculator.Setup(x => x.AnalyzeProduct(It.IsAny<Product>(), It.IsAny<IEnumerable<SalesTransaction>>()))
+            .Returns((Product p, IEnumerable<SalesTransaction> s) =>
+            {
+                var sales = s?.ToList() ?? new List<SalesTransaction>();
+                var salesLast7Days = sales.Where(x => x.SaleDate >= DateTime.Today.AddDays(-7)).Sum(x => x.QuantitySold);
+                var dailyAvg = salesLast7Days / 7.0;
+                var runway = dailyAvg > 0 ? (int)(p.CurrentStock / dailyAvg) : 999;
+                return new TrendAnalysis
+                {
+                    DailySalesAverage = dailyAvg,
+                    RunwayDays = runway,
+                    Direction = TrendDirection.Stable,
+                    TrendStrength = 0.0
+                };
+            });
+
+        var mockRecommendationEngine = new Mock<IRecommendationEngine>();
+        mockRecommendationEngine.Setup(x => x.GenerateRecommendation(It.IsAny<TrendAnalysis>(), It.IsAny<string>()))
+            .Returns("Test Recommendation");
+
+        _repository = new ProductRepository(
+            _fixture.ConnectionString,
+            mockTrendCalculator.Object,
+            mockRecommendationEngine.Object);
     }
 
     public Task DisposeAsync() => Task.CompletedTask;
@@ -324,7 +351,7 @@ public class ProductRepositoryIntegrationTests : IAsyncLifetime
 
         // Act
         await _repository.GenerateDailySnapshotAsync(yesterday);
-        
+
         // Verify by calling it again - should not fail due to ON CONFLICT
         await _repository.GenerateDailySnapshotAsync(yesterday);
 
@@ -358,7 +385,7 @@ public class ProductRepositoryIntegrationTests : IAsyncLifetime
         // Assert
         products = (await _repository.GetAllProductsAsync()).ToList();
         var updatedProduct = products.First(p => p.Id == product.Id);
-        
+
         Assert.Equal(initialStock - salesCount, updatedProduct.CurrentStock);
     }
 

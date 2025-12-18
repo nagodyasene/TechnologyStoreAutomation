@@ -14,6 +14,7 @@ namespace TechnologyStoreAutomation
         private readonly IAuthenticationService _authService;
         private readonly ILeaveRepository _leaveRepository;
         private readonly ISalesReportService _salesReportService;
+        private readonly EmailSettings _emailSettings;
         private readonly UiSettings _uiSettings;
         private readonly ApplicationSettings _appSettings;
         private readonly Timer _refreshTimer;
@@ -27,32 +28,26 @@ namespace TechnologyStoreAutomation
         private Button? _btnLeaveRequest;
         private Button? _btnLeaveApproval;
         private Button? _btnReports;
+        private Button? _btnSettings;
 
         private const string ErrorTitle = "Error";
 
         /// <summary>
         /// Creates a new MainForm with injected dependencies
         /// </summary>
-        /// <param name="repository">Product repository for data access</param>
-        /// <param name="healthCheckService">Health check service for diagnostics</param>
-        /// <param name="uiSettings">UI configuration settings</param>
-        /// <param name="appSettings">Application settings</param>
-        public MainForm(
-            IProductRepository repository,
-            IHealthCheckService healthCheckService,
-            IAuthenticationService authService,
-            ILeaveRepository leaveRepository,
-            ISalesReportService salesReportService,
-            UiSettings uiSettings,
-            ApplicationSettings appSettings)
+        /// <param name="deps">Aggregated dependencies for MainForm</param>
+        public MainForm(MainFormDependencies deps)
         {
-            _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-            _healthCheckService = healthCheckService ?? throw new ArgumentNullException(nameof(healthCheckService));
-            _authService = authService ?? throw new ArgumentNullException(nameof(authService));
-            _leaveRepository = leaveRepository ?? throw new ArgumentNullException(nameof(leaveRepository));
-            _salesReportService = salesReportService ?? throw new ArgumentNullException(nameof(salesReportService));
-            _uiSettings = uiSettings ?? throw new ArgumentNullException(nameof(uiSettings));
-            _appSettings = appSettings ?? throw new ArgumentNullException(nameof(appSettings));
+            if (deps == null) throw new ArgumentNullException(nameof(deps));
+
+            _repository = deps.Repository;
+            _healthCheckService = deps.HealthCheckService;
+            _authService = deps.AuthService;
+            _leaveRepository = deps.LeaveRepository;
+            _salesReportService = deps.SalesReportService;
+            _emailSettings = deps.EmailSettings;
+            _uiSettings = deps.UiSettings;
+            _appSettings = deps.AppSettings;
 
             InitializeComponent();
             SetupDynamicUi();
@@ -208,9 +203,21 @@ namespace TechnologyStoreAutomation
             _btnReports.Click += BtnReports_Click;
             toolbar.Controls.Add(_btnReports);
 
+            // Settings Button
+            _btnSettings = new Button();
+            _btnSettings.Text = "⚙️ Settings";
+            _btnSettings.Location = new Point(_authService.IsAdmin ? 960 : 850, 8);
+            _btnSettings.Size = new Size(90, 35);
+            _btnSettings.FlatStyle = FlatStyle.Flat;
+            _btnSettings.BackColor = Color.FromArgb(117, 117, 117);
+            _btnSettings.ForeColor = Color.White;
+            _btnSettings.FlatAppearance.BorderSize = 0;
+            _btnSettings.Click += BtnSettings_Click;
+            toolbar.Controls.Add(_btnSettings);
+
             // User Info Label (right side of toolbar)
             _lblUser = new Label();
-            _lblUser.Location = new Point(860, 15);
+            _lblUser.Location = new Point(1060, 15);
             _lblUser.Size = new Size(300, 20);
             _lblUser.TextAlign = ContentAlignment.MiddleRight;
             if (_authService.CurrentUser != null)
@@ -249,17 +256,19 @@ namespace TechnologyStoreAutomation
 
             // Define Columns (use FillWeight to control relative widths)
             _gridInventory.Columns.Add(new DataGridViewTextBoxColumn
-            { HeaderText = "Product", DataPropertyName = "Name", FillWeight = 30 });
+            { HeaderText = "Product", DataPropertyName = "Name", FillWeight = 25 });
             _gridInventory.Columns.Add(new DataGridViewTextBoxColumn
-            { HeaderText = "Phase", DataPropertyName = "Phase", FillWeight = 10 });
+            { HeaderText = "Category", DataPropertyName = "Category", FillWeight = 12 });
+            _gridInventory.Columns.Add(new DataGridViewTextBoxColumn
+            { HeaderText = "Phase", DataPropertyName = "Phase", FillWeight = 8 });
             _gridInventory.Columns.Add(new DataGridViewTextBoxColumn
             { HeaderText = "Stock", DataPropertyName = "CurrentStock", FillWeight = 8 });
             _gridInventory.Columns.Add(new DataGridViewTextBoxColumn
-            { HeaderText = "7-Day Sales", DataPropertyName = "SalesLast7Days", FillWeight = 10 });
+            { HeaderText = "7-Day Sales", DataPropertyName = "SalesLast7Days", FillWeight = 9 });
             _gridInventory.Columns.Add(new DataGridViewTextBoxColumn
             { HeaderText = "Runway (Days)", DataPropertyName = "RunwayDays", FillWeight = 10 });
             _gridInventory.Columns.Add(new DataGridViewTextBoxColumn
-            { HeaderText = "AI Recommendation", DataPropertyName = "Recommendation", FillWeight = 32 });
+            { HeaderText = "AI Recommendation", DataPropertyName = "Recommendation", FillWeight = 28 });
 
             // Add grid first, then toolbar so dock layout places the toolbar at the top and grid fills remaining area
             this.Controls.Add(_gridInventory);
@@ -512,6 +521,21 @@ namespace TechnologyStoreAutomation
             {
                 GlobalExceptionHandler.ReportException(ex, "Sales Reports");
                 MessageBox.Show($"Error opening sales reports: {ex.Message}", ErrorTitle,
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void BtnSettings_Click(object? sender, EventArgs e)
+        {
+            try
+            {
+                var settingsForm = new SettingsForm(_emailSettings);
+                settingsForm.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                GlobalExceptionHandler.ReportException(ex, "Settings");
+                MessageBox.Show($"Error opening settings: {ex.Message}", ErrorTitle,
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }

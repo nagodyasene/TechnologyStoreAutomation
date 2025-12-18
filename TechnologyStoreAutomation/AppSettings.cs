@@ -12,6 +12,7 @@ public class AppSettings
     public BackgroundJobSettings BackgroundJobs { get; set; } = new();
     public BusinessRuleSettings BusinessRules { get; set; } = new();
     public VisitorPredictionSettings VisitorPrediction { get; set; } = new();
+    public EmailSettings Email { get; set; } = new();
 }
 
 /// <summary>
@@ -44,17 +45,17 @@ public class DatabaseSettings
     /// Connection string (populated from environment variables)
     /// </summary>
     public string ConnectionString { get; set; } = string.Empty;
-    
+
     /// <summary>
     /// Number of retry attempts for transient failures
     /// </summary>
     public int RetryCount { get; set; } = 3;
-    
+
     /// <summary>
     /// Delay between retries in milliseconds
     /// </summary>
     public int RetryDelayMs { get; set; } = 1000;
-    
+
     /// <summary>
     /// Command timeout in seconds
     /// </summary>
@@ -82,10 +83,10 @@ public class BusinessRuleSettings
     public int UrgentRunwayDays { get; set; } = 7;
     public int ReorderRunwayDays { get; set; } = 14;
     public int AdequateRunwayDays { get; set; } = 30;
-    
+
     // Trend thresholds
     public double StrongTrendThreshold { get; set; } = 0.3;
-    
+
     // Lifecycle thresholds
     public int LegacyAgeDays { get; set; } = 365;
     public int ObsoleteAgeDays { get; set; } = 1095;
@@ -110,20 +111,45 @@ public class CachingSettings
     /// Dashboard data cache expiration in seconds
     /// </summary>
     public int DashboardDataExpirationSeconds { get; set; } = 60;
-    
+
     /// <summary>
     /// Product list cache expiration in seconds
     /// </summary>
     public int ProductListExpirationSeconds { get; set; } = 120;
-    
+
     /// <summary>
     /// Sales history cache expiration in seconds
     /// </summary>
     public int SalesHistoryExpirationSeconds { get; set; } = 30;
-    
+
     /// <summary>
     /// Maximum number of items in the cache
     /// </summary>
     public int SizeLimit { get; set; } = 1024;
 }
 
+/// <summary>
+/// Email configuration settings for Gmail API integration
+/// </summary>
+public class EmailSettings
+{
+    /// <summary>
+    /// When true, emails are logged instead of being sent (for development/testing)
+    /// </summary>
+    public bool TestMode { get; set; } = true;
+
+    /// <summary>
+    /// Email address used as the sender for outgoing emails
+    /// </summary>
+    public string SenderEmail { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Path to the Gmail API OAuth credentials file (credentials.json)
+    /// </summary>
+    public string GmailCredentialsPath { get; set; } = "credentials.json";
+
+    /// <summary>
+    /// Path where the OAuth token will be stored after first authorization
+    /// </summary>
+    public string TokenStorePath { get; set; } = "token";
+}
