@@ -151,7 +151,7 @@ public class UserRepository : IUserRepository
     /// <summary>
     /// Internal DTO for mapping database results with enum handling
     /// </summary>
-    private class UserDto
+    private sealed class UserDto
     {
         public int Id { get; set; }
         public string Username { get; set; } = string.Empty;

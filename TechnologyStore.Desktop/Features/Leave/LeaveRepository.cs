@@ -193,12 +193,7 @@ public class LeaveRepository : ILeaveRepository
         if (request == null)
             throw new InvalidOperationException("Leave request not found");
 
-        // 2. Check employee balance
-        var employee = await GetEmployeeByUserIdAsync(request.EmployeeId); // Note: GetEmployeeByUserIdAsync takes userId not employeeId, wait.
-                                                                           // Actually GetEmployeeByUserIdAsync queries by user_id. 'employee_id' in LeaveRequest relates to 'employees.id'.
-                                                                           // I need a method to get employee by ID, or fix the usage.
-                                                                           // Looking at GetByIdAsync, it joins employees e.
-                                                                           // Let's create a helper or just query the balance directly here.
+        // 2. Check employee balance directly (query by employees.id not user_id)
 
         const string checkBalanceSql = "SELECT remaining_leave_days FROM employees WHERE id = @Id";
         var remainingDays = await ExecuteWithRetryAsync(async connection =>
@@ -314,7 +309,7 @@ public class LeaveRepository : ILeaveRepository
     /// <summary>
     /// Internal DTO for mapping database results with enum handling
     /// </summary>
-    private class LeaveRequestDto
+    private sealed class LeaveRequestDto
     {
         public int Id { get; set; }
         public int EmployeeId { get; set; }

@@ -355,7 +355,7 @@ public partial class CheckoutForm : Form
         try
         {
             var notes = _txtNotes?.Text?.Trim();
-            DateTime? pickupDate = _chkSpecifyDate?.Checked == true ? _dtpPickupDate?.Value : null;
+            DateTime? pickupDate = _chkSpecifyDate?.Checked ?? false ? _dtpPickupDate?.Value : null;
 
             var cartItems = _cartService.GetItems().ToList();
             var result = await _orderService.PlaceOrderAsync(customer.Id, cartItems, notes, pickupDate);
@@ -496,7 +496,7 @@ public partial class CheckoutForm : Form
         if (_txtGuestPhone != null) _txtGuestPhone.Enabled = enabled;
         if (_txtNotes != null) _txtNotes.Enabled = enabled;
         if (_chkSpecifyDate != null) _chkSpecifyDate.Enabled = enabled;
-        if (_dtpPickupDate != null && _chkSpecifyDate?.Checked == true) _dtpPickupDate.Enabled = enabled;
+        if (_dtpPickupDate != null && (_chkSpecifyDate?.Checked ?? false)) _dtpPickupDate.Enabled = enabled;
         if (_btnPlaceOrder != null)
         {
             _btnPlaceOrder.Enabled = enabled;

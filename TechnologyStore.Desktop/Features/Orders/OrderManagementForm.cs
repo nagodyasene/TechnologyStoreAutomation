@@ -10,6 +10,7 @@ namespace TechnologyStore.Desktop.Features.Orders;
 /// </summary>
 public partial class OrderManagementForm : Form
 {
+    private const string StatusColumnName = "Status";
     private readonly IOrderRepository _orderRepository;
 
     private DataGridView? _gridOrders;
@@ -168,7 +169,7 @@ public partial class OrderManagementForm : Form
         _gridOrders.Columns.Add(new DataGridViewTextBoxColumn { Name = "Id", Visible = false });
         _gridOrders.Columns.Add(new DataGridViewTextBoxColumn { Name = "OrderNumber", HeaderText = "Order #", FillWeight = 80 });
         _gridOrders.Columns.Add(new DataGridViewTextBoxColumn { Name = "CustomerName", HeaderText = "Customer", FillWeight = 100 });
-        _gridOrders.Columns.Add(new DataGridViewTextBoxColumn { Name = "Status", HeaderText = "Status", FillWeight = 80 });
+        _gridOrders.Columns.Add(new DataGridViewTextBoxColumn { Name = StatusColumnName, HeaderText = StatusColumnName, FillWeight = 80 });
         _gridOrders.Columns.Add(new DataGridViewTextBoxColumn { Name = "ItemCount", HeaderText = "Items", FillWeight = 40 });
         _gridOrders.Columns.Add(new DataGridViewTextBoxColumn { Name = "Total", HeaderText = "Total", FillWeight = 60 });
         _gridOrders.Columns.Add(new DataGridViewTextBoxColumn { Name = "PickupDate", HeaderText = "Pickup Date", FillWeight = 80 });
@@ -453,10 +454,10 @@ public partial class OrderManagementForm : Form
     {
         if (_gridOrders == null || e.RowIndex < 0) return;
 
-        var statusCell = _gridOrders.Rows[e.RowIndex].Cells["Status"];
+        var statusCell = _gridOrders.Rows[e.RowIndex].Cells[StatusColumnName];
         var status = statusCell?.Value?.ToString();
 
-        if (_gridOrders.Columns[e.ColumnIndex].Name == "Status")
+        if (_gridOrders.Columns[e.ColumnIndex].Name == StatusColumnName)
         {
             switch (status)
             {

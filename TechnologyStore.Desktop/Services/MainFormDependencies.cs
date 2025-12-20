@@ -11,6 +11,29 @@ using IPurchaseOrderService = TechnologyStore.Shared.Interfaces.IPurchaseOrderSe
 namespace TechnologyStore.Desktop
 {
     /// <summary>
+    /// Aggregates repository dependencies to reduce parameter count.
+    /// </summary>
+    public class RepositoryDependencies
+    {
+        public IProductRepository ProductRepository { get; }
+        public ILeaveRepository LeaveRepository { get; }
+        public IOrderRepository OrderRepository { get; }
+        public ISupplierRepository SupplierRepository { get; }
+
+        public RepositoryDependencies(
+            IProductRepository productRepository,
+            ILeaveRepository leaveRepository,
+            IOrderRepository orderRepository,
+            ISupplierRepository supplierRepository)
+        {
+            ProductRepository = productRepository ?? throw new ArgumentNullException(nameof(productRepository));
+            LeaveRepository = leaveRepository ?? throw new ArgumentNullException(nameof(leaveRepository));
+            OrderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
+            SupplierRepository = supplierRepository ?? throw new ArgumentNullException(nameof(supplierRepository));
+        }
+    }
+
+    /// <summary>
     /// Aggregates dependencies required by <see cref="MainForm"/> into a single object.
     /// This reduces the constructor parameter count and keeps DI usage simple.
     /// </summary>
@@ -29,23 +52,22 @@ namespace TechnologyStore.Desktop
         public ApplicationSettings AppSettings { get; }
 
         public MainFormDependencies(
-            IProductRepository repository,
+            RepositoryDependencies repositories,
             IHealthCheckService healthCheckService,
             IAuthenticationService authService,
-            ILeaveRepository leaveRepository,
             ISalesReportService salesReportService,
-            IOrderRepository orderRepository,
-            ISupplierRepository supplierRepository,
             IPurchaseOrderService purchaseOrderService,
             AppSettings rootSettings)
         {
-            Repository = repository ?? throw new ArgumentNullException(nameof(repository));
+            if (repositories == null) throw new ArgumentNullException(nameof(repositories));
+            Repository = repositories.ProductRepository;
+            LeaveRepository = repositories.LeaveRepository;
+            OrderRepository = repositories.OrderRepository;
+            SupplierRepository = repositories.SupplierRepository;
+
             HealthCheckService = healthCheckService ?? throw new ArgumentNullException(nameof(healthCheckService));
             AuthService = authService ?? throw new ArgumentNullException(nameof(authService));
-            LeaveRepository = leaveRepository ?? throw new ArgumentNullException(nameof(leaveRepository));
             SalesReportService = salesReportService ?? throw new ArgumentNullException(nameof(salesReportService));
-            OrderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
-            SupplierRepository = supplierRepository ?? throw new ArgumentNullException(nameof(supplierRepository));
             PurchaseOrderService = purchaseOrderService ?? throw new ArgumentNullException(nameof(purchaseOrderService));
 
             if (rootSettings == null) throw new ArgumentNullException(nameof(rootSettings));

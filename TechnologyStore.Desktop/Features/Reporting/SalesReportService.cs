@@ -179,7 +179,7 @@ public class SalesReportService : ISalesReportService
         return sb.ToString();
     }
 
-    private class SalesSummaryDto
+    private sealed class SalesSummaryDto
     {
         public long TotalTransactions { get; set; }
         public long TotalUnitsSold { get; set; }

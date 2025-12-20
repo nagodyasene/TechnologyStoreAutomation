@@ -12,6 +12,7 @@ namespace TechnologyStore.Desktop.UI.Forms;
 /// </summary>
 public partial class SalesReportForm : Form
 {
+    private const string CustomRangeOption = "Custom Range";
     private readonly ISalesReportService _reportService;
     private readonly IAuthenticationService _authService;
     private readonly ILogger<SalesReportForm> _logger;
@@ -73,7 +74,7 @@ public partial class SalesReportForm : Form
             Width = 150,
             DropDownStyle = ComboBoxStyle.DropDownList
         };
-        _cmbReportType.Items.AddRange(new object[] { "Daily", "Weekly", "Monthly", "Custom Range" });
+        _cmbReportType.Items.AddRange(new object[] { "Daily", "Weekly", "Monthly", CustomRangeOption });
         _cmbReportType.SelectedIndex = 0;
         _cmbReportType.SelectedIndexChanged += CmbReportType_SelectedIndexChanged;
         this.Controls.Add(_cmbReportType);
@@ -198,7 +199,7 @@ public partial class SalesReportForm : Form
         // Enable end date only for custom range
         if (_dtpEndDate != null && _cmbReportType != null)
         {
-            _dtpEndDate.Enabled = _cmbReportType.SelectedItem?.ToString() == "Custom Range";
+            _dtpEndDate.Enabled = _cmbReportType.SelectedItem?.ToString() == CustomRangeOption;
         }
     }
 
@@ -218,7 +219,7 @@ public partial class SalesReportForm : Form
                 "Daily" => await _reportService.GetDailyReportAsync(_dtpStartDate.Value.Date),
                 "Weekly" => await _reportService.GetWeeklyReportAsync(_dtpStartDate.Value.Date),
                 "Monthly" => await _reportService.GetMonthlyReportAsync(_dtpStartDate.Value.Year, _dtpStartDate.Value.Month),
-                "Custom Range" => await _reportService.GetCustomRangeReportAsync(_dtpStartDate.Value.Date, _dtpEndDate.Value.Date),
+                CustomRangeOption => await _reportService.GetCustomRangeReportAsync(_dtpStartDate.Value.Date, _dtpEndDate.Value.Date),
                 _ => await _reportService.GetDailyReportAsync(_dtpStartDate.Value.Date)
             };
 
@@ -302,7 +303,7 @@ public partial class SalesReportForm : Form
     {
         if (_cmbReportType != null) _cmbReportType.Enabled = enabled;
         if (_dtpStartDate != null) _dtpStartDate.Enabled = enabled;
-        if (_dtpEndDate != null && _cmbReportType?.SelectedItem?.ToString() == "Custom Range")
+        if (_dtpEndDate != null && _cmbReportType?.SelectedItem?.ToString() == CustomRangeOption)
             _dtpEndDate.Enabled = enabled;
         if (_btnGenerate != null)
         {

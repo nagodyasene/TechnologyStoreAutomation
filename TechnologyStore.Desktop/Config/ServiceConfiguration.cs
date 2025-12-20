@@ -216,6 +216,7 @@ public static class ServiceConfiguration
         // Register email service
         services.AddSingleton<IEmailService, GmailEmailService>();
         // Register aggregated dependencies for MainForm
+        services.AddTransient<RepositoryDependencies>();
         services.AddTransient<MainFormDependencies>();
 
         // Register forms (transient - new instance each time)
