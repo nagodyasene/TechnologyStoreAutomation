@@ -3,13 +3,17 @@ using TechnologyStore.Desktop.Services;
 using TechnologyStore.Desktop.Features.Auth;
 using TechnologyStore.Desktop.Features.Leave;
 using TechnologyStore.Desktop.Features.Reporting;
-using TechnologyStore.Desktop.Features.Reporting;
 using TechnologyStore.Desktop.Features.Products.Data;
 using TechnologyStore.Desktop.Features.TimeTracking;
+using TechnologyStore.Desktop.Features.Payroll;
 using TechnologyStore.Shared.Interfaces;
 using IOrderRepository = TechnologyStore.Shared.Interfaces.IOrderRepository;
 using ISupplierRepository = TechnologyStore.Shared.Interfaces.ISupplierRepository;
 using IPurchaseOrderService = TechnologyStore.Shared.Interfaces.IPurchaseOrderService;
+// Resolve ambiguities favoring Desktop versions
+using IProductRepository = TechnologyStore.Desktop.Features.Products.Data.IProductRepository;
+using IAuthenticationService = TechnologyStore.Desktop.Features.Auth.IAuthenticationService;
+using IUserRepository = TechnologyStore.Desktop.Features.Auth.IUserRepository;
 
 namespace TechnologyStore.Desktop
 {
@@ -83,12 +87,14 @@ namespace TechnologyStore.Desktop
         public ITimeTrackingService TimeTrackingService { get; set; }
         public IWorkShiftRepository WorkShiftRepository { get; set; }
         public IUserRepository UserRepository { get; set; }
+        public IPayrollService PayrollService { get; set; }
 
-        public void ConfigureTimeTracking(ITimeTrackingService timeTrackingService, IWorkShiftRepository workShiftRepository, IUserRepository userRepository)
+        public void ConfigureTimeTracking(ITimeTrackingService timeTrackingService, IWorkShiftRepository workShiftRepository, IUserRepository userRepository, IPayrollService payrollService)
         {
             TimeTrackingService = timeTrackingService;
             WorkShiftRepository = workShiftRepository;
             UserRepository = userRepository;
+            PayrollService = payrollService;
         }
     }
 }

@@ -7,6 +7,12 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using TechnologyStore.Desktop.Services;
 using TechnologyStore.Shared.Models;
+using TechnologyStore.Desktop.Features.Auth; // For IAuthenticationService
+using TechnologyStore.Shared.Interfaces; // For IPayrollService (if defined there) or ensure IPayrollService is visible
+
+// IPayrollService is in TechnologyStore.Desktop.Features.Payroll namespace
+using TechnologyStore.Desktop.Features.Payroll;
+using IAuthenticationService = TechnologyStore.Desktop.Features.Auth.IAuthenticationService;
 
 namespace TechnologyStore.Desktop.Features.Payroll.Forms
 {

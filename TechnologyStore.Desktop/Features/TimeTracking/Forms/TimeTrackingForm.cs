@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using TechnologyStore.Desktop.Features.Auth;
+using Timer = System.Windows.Forms.Timer;
 
 namespace TechnologyStore.Desktop.Features.TimeTracking.Forms;
 
@@ -11,7 +12,7 @@ public class TimeTrackingForm : Form
 {
     private readonly ITimeTrackingService _timeTrackingService;
     private readonly AuthenticationService _authService;
-    
+
     private Label _lblStatus;
     private Label _lblTimer;
     private Button _btnClockIn;
@@ -49,7 +50,7 @@ public class TimeTrackingForm : Form
 
         // --- SECTION 1: Status & Timer ---
         var statusPanel = new Panel { Dock = DockStyle.Fill };
-        
+
         _lblStatus = new Label
         {
             Text = "Status: Loading...",
@@ -103,7 +104,7 @@ public class TimeTrackingForm : Form
             ReadOnly = true,
             AllowUserToAddRows = false
         };
-        
+
         historyGroup.Controls.Add(_gridHistory);
         mainLayout.Controls.Add(historyGroup, 0, 2);
 
@@ -155,7 +156,7 @@ public class TimeTrackingForm : Form
     {
         var userId = _authService.CurrentUser!.Id;
         var status = await _timeTrackingService.GetCurrentStatusAsync(userId);
-        
+
         UpdateButtonsState(status?.EventType);
         await UpdateTimerAsync();
     }
@@ -208,7 +209,7 @@ public class TimeTrackingForm : Form
         var userId = _authService.CurrentUser!.Id;
         var history = await _timeTrackingService.GetUserHistoryAsync(userId, DateTime.Today.AddDays(-7), DateTime.Now);
 
-        _gridHistory.DataSource = history.Select(h => new 
+        _gridHistory.DataSource = history.Select(h => new
         {
             h.Timestamp,
             Event = h.EventType.ToString(),
@@ -220,7 +221,7 @@ public class TimeTrackingForm : Form
     private async Task UpdateTimerAsync()
     {
         if (_authService.CurrentUser == null) return;
-        
+
         var hours = await _timeTrackingService.CalculateDailyHoursAsync(_authService.CurrentUser.Id, DateTime.Today);
         _lblTimer.Text = $"Daily Hours: {hours:hh\\:mm\\:ss}";
     }

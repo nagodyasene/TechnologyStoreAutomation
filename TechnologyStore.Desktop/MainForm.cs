@@ -8,13 +8,18 @@ using TechnologyStore.Desktop.Features.Purchasing;
 using TechnologyStore.Desktop.Features.Products.Data;
 using TechnologyStore.Desktop.Features.TimeTracking;
 using TechnologyStore.Desktop.Features.TimeTracking.Forms;
-using TechnologyStore.Desktop.Features.Payroll.Forms; // Add this
+using TechnologyStore.Desktop.Features.Payroll.Forms;
+using TechnologyStore.Desktop.Features.Payroll;
 using TechnologyStore.Shared.Interfaces;
 using TechnologyStore.Desktop.UI.Forms;
 using IOrderRepository = TechnologyStore.Shared.Interfaces.IOrderRepository;
 using ISupplierRepository = TechnologyStore.Shared.Interfaces.ISupplierRepository;
 using IPurchaseOrderService = TechnologyStore.Shared.Interfaces.IPurchaseOrderService;
 using Timer = System.Windows.Forms.Timer;
+// Resolve ambiguities favoring Desktop versions
+using IProductRepository = TechnologyStore.Desktop.Features.Products.Data.IProductRepository;
+using IAuthenticationService = TechnologyStore.Desktop.Features.Auth.IAuthenticationService;
+using IUserRepository = TechnologyStore.Desktop.Features.Auth.IUserRepository;
 
 namespace TechnologyStore.Desktop
 {
@@ -34,6 +39,7 @@ namespace TechnologyStore.Desktop
         private readonly ITimeTrackingService _timeTrackingService;
         private readonly IWorkShiftRepository _workShiftRepository;
         private readonly IUserRepository _userRepository;
+        private readonly IPayrollService _payrollService;
         private readonly Timer _refreshTimer;
         private DataGridView? _gridInventory;
         private Label? _lblStatus;
@@ -75,6 +81,7 @@ namespace TechnologyStore.Desktop
             _timeTrackingService = deps.TimeTrackingService;
             _workShiftRepository = deps.WorkShiftRepository;
             _userRepository = deps.UserRepository;
+            _payrollService = deps.PayrollService;
 
             InitializeComponent();
             SetupDynamicUi();

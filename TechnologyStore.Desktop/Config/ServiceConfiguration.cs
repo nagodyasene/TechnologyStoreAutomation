@@ -11,6 +11,7 @@ using TechnologyStore.Desktop.Features.Products;
 using TechnologyStore.Desktop.Features.Products.Data;
 using TechnologyStore.Desktop.Features.VisitorPrediction;
 using TechnologyStore.Desktop.Features.TimeTracking;
+using TechnologyStore.Desktop.Features.Payroll;
 using TechnologyStore.Desktop.UI.Forms;
 
 namespace TechnologyStore.Desktop.Config;

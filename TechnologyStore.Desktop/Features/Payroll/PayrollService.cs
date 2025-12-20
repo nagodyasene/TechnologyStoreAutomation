@@ -127,7 +127,7 @@ namespace TechnologyStore.Desktop.Features.Payroll
         // Helper class for the join
         private sealed class EmployeeDto : Employee
         {
-            public string FullName { get; set; } = "";
+            public new string FullName { get; set; } = "";
         }
     }
 }

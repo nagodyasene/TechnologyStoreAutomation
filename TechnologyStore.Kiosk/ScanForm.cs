@@ -7,6 +7,7 @@ using System.Threading;
 using AForge.Video;
 using AForge.Video.DirectShow;
 using ZXing;
+using ZXing.Windows.Compatibility;
 using System.Media;
 using Microsoft.Extensions.DependencyInjection;
 using TechnologyStore.Shared.Models;
@@ -199,7 +200,7 @@ namespace TechnologyStore.Kiosk
             catch { }
         }
 
-        private async void AddProductToCart(string sku)
+        private async Task AddProductToCart(string sku)
         {
             if (string.IsNullOrWhiteSpace(sku)) return;
 

@@ -5,6 +5,7 @@ using System.Windows.Forms;
 using TechnologyStore.Desktop.Features.Auth;
 using TechnologyStore.Shared.Interfaces;
 using TechnologyStore.Shared.Models;
+using IUserRepository = TechnologyStore.Desktop.Features.Auth.IUserRepository;
 
 namespace TechnologyStore.Desktop.Features.TimeTracking.Forms;
 
@@ -52,7 +53,7 @@ public class ShiftManagementForm : Form
             Dock = DockStyle.Fill,
             Padding = new Padding(10)
         };
-        
+
         var inputPanel = new FlowLayoutPanel { Dock = DockStyle.Fill, FlowDirection = FlowDirection.TopDown, AutoSize = true };
 
         inputPanel.Controls.Add(new Label { Text = "Employee:", AutoSize = true, Margin = new Padding(0, 10, 0, 0) });
@@ -100,7 +101,7 @@ public class ShiftManagementForm : Form
             ReadOnly = true,
             AllowUserToAddRows = false
         };
-        
+
         gridGroup.Controls.Add(_gridShifts);
         mainLayout.Controls.Add(gridGroup, 1, 0);
 
@@ -132,7 +133,7 @@ public class ShiftManagementForm : Form
         var endOfWeek = startOfWeek.AddDays(7);
 
         var shifts = await _shiftRepository.GetAllAsync(startOfWeek, endOfWeek);
-        
+
         _gridShifts.DataSource = shifts.Select(s => new
         {
             s.EmployeeName,
@@ -153,14 +154,14 @@ public class ShiftManagementForm : Form
 
         var userId = (int)_cbEmployees.SelectedValue;
         var date = _dtpDate.Value.Date;
-        
+
         var start = date.Add(_dtpStartTime.Value.TimeOfDay);
         var end = date.Add(_dtpEndTime.Value.TimeOfDay);
 
         if (end <= start)
         {
-             MessageBox.Show("End time must be after start time.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-             return;
+            MessageBox.Show("End time must be after start time.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return;
         }
 
         var shift = new WorkShift
