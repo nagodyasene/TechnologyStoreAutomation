@@ -23,7 +23,6 @@ public class PurchaseOrdersForm : Form
     private Button _btnSend = null!;
     private Button _btnReceive = null!;
     private Button _btnCancel = null!;
-    private Button _btnRefresh = null!;
     private Button _btnViewDetails = null!;
     private Label _lblStatus = null!;
 
@@ -143,9 +142,9 @@ public class PurchaseOrdersForm : Form
         _btnViewDetails.Click += BtnViewDetails_Click;
         buttonPanel.Controls.Add(_btnViewDetails);
 
-        _btnRefresh = CreateButton("🔄 Refresh", Color.FromArgb(149, 165, 166));
-        _btnRefresh.Click += async (s, e) => await LoadOrdersAsync();
-        buttonPanel.Controls.Add(_btnRefresh);
+        var btnRefresh = CreateButton("🔄 Refresh", Color.FromArgb(149, 165, 166));
+        btnRefresh.Click += async (s, e) => await LoadOrdersAsync();
+        buttonPanel.Controls.Add(btnRefresh);
 
         _lblStatus = new Label
         {

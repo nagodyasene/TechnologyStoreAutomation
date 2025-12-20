@@ -288,8 +288,13 @@ public class PurchaseOrderService : IPurchaseOrderService
             if (order.Status != PurchaseOrderStatus.Sent)
                 return PurchaseOrderResult.Failed($"Cannot mark as received. Order is in '{order.Status}' status.");
 
-            // TODO: Update product stock levels when order is received
-            // This would involve incrementing CurrentStock for each item in the order
+            // Update product stock levels for each item in the order
+            foreach (var item in order.Items)
+            {
+                await _productRepository.ReleaseStockAsync(item.ProductId, item.Quantity);
+                _logger.LogDebug("Incremented stock for product {ProductId} by {Quantity} from PO {OrderNumber}",
+                    item.ProductId, item.Quantity, order.OrderNumber);
+            }
 
             var success = await _purchaseOrderRepository.MarkAsReceivedAsync(orderId);
             if (!success)
@@ -298,7 +303,8 @@ public class PurchaseOrderService : IPurchaseOrderService
             order.Status = PurchaseOrderStatus.Received;
             order.ReceivedAt = DateTime.UtcNow;
 
-            _logger.LogInformation("Marked PO {OrderNumber} as received", order.OrderNumber);
+            _logger.LogInformation("Marked PO {OrderNumber} as received, updated stock for {ItemCount} products",
+                order.OrderNumber, order.Items.Count);
             return PurchaseOrderResult.Succeeded(order);
         }
         catch (Exception ex)
@@ -307,6 +313,7 @@ public class PurchaseOrderService : IPurchaseOrderService
             return PurchaseOrderResult.Failed("An error occurred.");
         }
     }
+
 
     /// <inheritdoc />
     public async Task<PurchaseOrderResult> CancelAsync(int orderId)

@@ -16,10 +16,6 @@ public class SupplierManagementForm : Form
 
     // UI Components
     private DataGridView _gridSuppliers = null!;
-    private Button _btnAdd = null!;
-    private Button _btnEdit = null!;
-    private Button _btnDelete = null!;
-    private Button _btnRefresh = null!;
     private Label _lblStatus = null!;
 
     private readonly BindingList<Supplier> _suppliers = new();
@@ -90,21 +86,21 @@ public class SupplierManagementForm : Form
             Padding = new Padding(0, 10, 0, 0)
         };
 
-        _btnAdd = CreateButton("➕ Add Supplier", Color.FromArgb(46, 204, 113));
-        _btnAdd.Click += BtnAdd_Click;
-        buttonPanel.Controls.Add(_btnAdd);
+        var btnAdd = CreateButton("➕ Add Supplier", Color.FromArgb(46, 204, 113));
+        btnAdd.Click += BtnAdd_Click;
+        buttonPanel.Controls.Add(btnAdd);
 
-        _btnEdit = CreateButton("✏️ Edit", Color.FromArgb(52, 152, 219));
-        _btnEdit.Click += BtnEdit_Click;
-        buttonPanel.Controls.Add(_btnEdit);
+        var btnEdit = CreateButton("✏️ Edit", Color.FromArgb(52, 152, 219));
+        btnEdit.Click += BtnEdit_Click;
+        buttonPanel.Controls.Add(btnEdit);
 
-        _btnDelete = CreateButton("🗑️ Delete", Color.FromArgb(231, 76, 60));
-        _btnDelete.Click += BtnDelete_Click;
-        buttonPanel.Controls.Add(_btnDelete);
+        var btnDelete = CreateButton("🗑️ Delete", Color.FromArgb(231, 76, 60));
+        btnDelete.Click += BtnDelete_Click;
+        buttonPanel.Controls.Add(btnDelete);
 
-        _btnRefresh = CreateButton("🔄 Refresh", Color.FromArgb(149, 165, 166));
-        _btnRefresh.Click += async (s, e) => await LoadSuppliersAsync();
-        buttonPanel.Controls.Add(_btnRefresh);
+        var btnRefresh = CreateButton("🔄 Refresh", Color.FromArgb(149, 165, 166));
+        btnRefresh.Click += async (s, e) => await LoadSuppliersAsync();
+        buttonPanel.Controls.Add(btnRefresh);
 
         _lblStatus = new Label
         {

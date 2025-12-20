@@ -7,30 +7,30 @@ namespace TechnologyStore.Desktop.Features.Products;
 public class RecommendationEngine : IRecommendationEngine
 {
     #region Constants for Business Rules
-    
+
     // Floating point comparison tolerance
     private const double FloatingPointTolerance = 0.001;
-    
+
     // Stock level thresholds
     private const int CriticalRunwayDays = 3;
     private const int UrgentRunwayDays = 7;
     private const int ReorderRunwayDays = 14;
     private const int AdequateRunwayDays = 30;
-    
+
     // Trend strength thresholds
     private const double StrongTrendThreshold = 0.3;
-    
+
     // Reorder quantity adjustments
     private const double RisingTrendMultiplier = 1.2;
     private const double FallingTrendMultiplier = 0.8;
     private const double AcceleratingMultiplier = 1.3;
-    
+
     // Lifecycle thresholds
     private const int LegacyAgeDays = 365;
     private const int VeryOldAgeDays = 730;
     private const int ObsoleteAgeDays = 1095;
     private const int ObsoleteNoSalesDays = 90;
-    
+
     // Discount percentages
     private const int ObsoleteBulkDiscount = 40;
     private const int ObsoleteMediumDiscount = 30;
@@ -38,7 +38,7 @@ public class RecommendationEngine : IRecommendationEngine
     private const int LegacySlowMovingDiscount = 20;
     private const int LegacyMediumDiscount = 15;
     private const int LegacyFastMovingDiscount = 10;
-    
+
     #endregion
 
     /// <summary>
@@ -48,22 +48,22 @@ public class RecommendationEngine : IRecommendationEngine
     {
         // Priority 1: Lifecycle phase overrides
         var lifecycleRecommendation = GetLifecycleRecommendation(analysis, lifecyclePhase);
-        if (lifecycleRecommendation != null) 
+        if (lifecycleRecommendation != null)
             return lifecycleRecommendation;
 
         // Priority 2: Critical stock alerts
         var stockRecommendation = GetStockLevelRecommendation(analysis);
-        if (stockRecommendation != null) 
+        if (stockRecommendation != null)
             return stockRecommendation;
 
         // Priority 3: Trend-based recommendations
         var trendRecommendation = GetTrendRecommendation(analysis);
-        if (trendRecommendation != null) 
+        if (trendRecommendation != null)
             return trendRecommendation;
 
         // Default: All good
-        return analysis.RunwayDays > AdequateRunwayDays 
-            ? "✅ Normal - Stock adequate" 
+        return analysis.RunwayDays > AdequateRunwayDays
+            ? "✅ Normal - Stock adequate"
             : "✅ Normal";
     }
 
@@ -127,10 +127,10 @@ public class RecommendationEngine : IRecommendationEngine
     {
         if (analysis.IsAccelerating)
             return "🚀 ACCELERATING - Increase stock levels";
-        
+
         if (analysis.TrendStrength > StrongTrendThreshold)
             return "📈 TRENDING UP - Monitor for restock";
-        
+
         return "✅ Normal - Slight increase";
     }
 
@@ -141,7 +141,7 @@ public class RecommendationEngine : IRecommendationEngine
     {
         if (analysis.TrendStrength < -StrongTrendThreshold)
             return "📉 DECLINING - Reduce orders";
-        
+
         return "⚠️ Slight decline - Watch closely";
     }
 
@@ -240,28 +240,4 @@ public class RecommendationEngine : IRecommendationEngine
 
         return 0; // No discount for ACTIVE
     }
-    
-    #region Static Methods (for backward compatibility)
-    
-    /// <summary>
-    /// Static instance for backward compatibility with existing code
-    /// </summary>
-    private static readonly RecommendationEngine Instance = new();
-    
-    /// <summary>
-    /// Static method for backward compatibility
-    /// </summary>
-    [Obsolete("Use IRecommendationEngine.GenerateRecommendation() via dependency injection instead.")]
-    public static string GetRecommendation(TrendAnalysis analysis, string lifecyclePhase) 
-        => Instance.GenerateRecommendation(analysis, lifecyclePhase);
-    
-    /// <summary>
-    /// Static method for backward compatibility
-    /// </summary>
-    [Obsolete("Use IRecommendationEngine.CalculateReorderQuantity() via dependency injection instead.")]
-    public static int GetReorderQuantity(TrendAnalysis analysis, int targetRunwayDays = 30) 
-        => Instance.CalculateReorderQuantity(analysis, targetRunwayDays);
-    
-    #endregion
 }
-
