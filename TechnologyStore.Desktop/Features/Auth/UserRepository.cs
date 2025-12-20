@@ -49,7 +49,7 @@ public class UserRepository : IUserRepository
             }
         }
 
-        throw lastException ?? new InvalidOperationException("Database operation failed");
+        throw lastException!;
     }
 
     /// <summary>

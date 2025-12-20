@@ -51,7 +51,7 @@ public class SalesReportService : ISalesReportService
             }
         }
 
-        throw lastException ?? new InvalidOperationException("Database operation failed");
+        throw lastException!;
     }
 
     private static bool IsTransientError(NpgsqlException ex)
@@ -75,7 +75,7 @@ public class SalesReportService : ISalesReportService
 
     public async Task<SalesReportDto> GetMonthlyReportAsync(int year, int month)
     {
-        var start = new DateTime(year, month, 1);
+        var start = new DateTime(year, month, 1, 0, 0, 0, DateTimeKind.Local);
         var end = start.AddMonths(1).AddDays(-1);
         var report = await GetCustomRangeReportAsync(start, end);
         report.ReportType = "Monthly";
@@ -125,8 +125,8 @@ public class SalesReportService : ISalesReportService
             var totalRevenue = summary.TotalRevenue;
             foreach (var item in breakdownList)
             {
-                item.PercentageOfTotal = totalRevenue > 0 
-                    ? Math.Round((item.Revenue / totalRevenue) * 100, 2) 
+                item.PercentageOfTotal = totalRevenue > 0
+                    ? Math.Round((item.Revenue / totalRevenue) * 100, 2)
                     : 0;
             }
 
@@ -140,8 +140,8 @@ public class SalesReportService : ISalesReportService
                 TotalTransactions = (int)summary.TotalTransactions,
                 TotalUnitsSold = (int)summary.TotalUnitsSold,
                 TotalRevenue = totalRevenue,
-                AverageSaleAmount = summary.TotalTransactions > 0 
-                    ? Math.Round(totalRevenue / summary.TotalTransactions, 2) 
+                AverageSaleAmount = summary.TotalTransactions > 0
+                    ? Math.Round(totalRevenue / summary.TotalTransactions, 2)
                     : 0,
                 ProductBreakdown = breakdownList
             };

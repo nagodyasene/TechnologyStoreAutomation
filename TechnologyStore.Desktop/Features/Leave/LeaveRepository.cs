@@ -49,7 +49,7 @@ public class LeaveRepository : ILeaveRepository
             }
         }
 
-        throw lastException ?? new InvalidOperationException("Database operation failed");
+        throw lastException!;
     }
 
     private static bool IsTransientError(NpgsqlException ex)

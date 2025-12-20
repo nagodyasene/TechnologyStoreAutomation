@@ -53,8 +53,9 @@ public class GmailEmailService : IEmailService
             using (var stream = new FileStream(credentialsPath, FileMode.Open, FileAccess.Read))
             {
                 // The token is stored in the specified folder
+                var secrets = await GoogleClientSecrets.FromStreamAsync(stream);
                 credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
-                    GoogleClientSecrets.FromStream(stream).Secrets,
+                    secrets.Secrets,
                     Scopes,
                     "user",
                     CancellationToken.None,

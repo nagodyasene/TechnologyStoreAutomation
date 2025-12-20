@@ -30,7 +30,7 @@ public class SupplierManagementForm : Form
         _logger = AppLogger.CreateLogger<SupplierManagementForm>();
 
         InitializeComponent();
-        await LoadSuppliersAsync();
+        _ = LoadSuppliersAsync(); // Fire-and-forget (constructor cannot await)
     }
 
     private void InitializeComponent()
@@ -155,16 +155,16 @@ public class SupplierManagementForm : Form
         }
     }
 
-    private void BtnAdd_Click(object? sender, EventArgs e)
+    private async void BtnAdd_Click(object? sender, EventArgs e)
     {
         using var dialog = new SupplierEditDialog(null);
         if (dialog.ShowDialog(this) == DialogResult.OK && dialog.Supplier != null)
         {
-            SaveSupplierAsync(dialog.Supplier, isNew: true);
+            await SaveSupplierAsync(dialog.Supplier, isNew: true);
         }
     }
 
-    private void BtnEdit_Click(object? sender, EventArgs e)
+    private async void BtnEdit_Click(object? sender, EventArgs e)
     {
         if (_gridSuppliers.CurrentRow?.DataBoundItem is not Supplier selected)
         {
@@ -175,11 +175,11 @@ public class SupplierManagementForm : Form
         using var dialog = new SupplierEditDialog(selected);
         if (dialog.ShowDialog(this) == DialogResult.OK && dialog.Supplier != null)
         {
-            SaveSupplierAsync(dialog.Supplier, isNew: false);
+            await SaveSupplierAsync(dialog.Supplier, isNew: false);
         }
     }
 
-    private async void SaveSupplierAsync(Supplier supplier, bool isNew)
+    private async Task SaveSupplierAsync(Supplier supplier, bool isNew)
     {
         try
         {

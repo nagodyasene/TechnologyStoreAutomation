@@ -133,8 +133,8 @@ public class PurchaseOrderService : IPurchaseOrderService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error generating purchase orders for low-stock products");
-            throw;
+            // Don't log and rethrow (S2139) - let caller handle
+            throw new InvalidOperationException("Error generating purchase orders for low-stock products", ex);
         }
 
         return generatedOrders;
