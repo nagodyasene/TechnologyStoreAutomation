@@ -6,6 +6,9 @@ using TechnologyStore.Desktop.Features.Reporting;
 using TechnologyStore.Desktop.Features.Orders;
 using TechnologyStore.Desktop.Features.Purchasing;
 using TechnologyStore.Desktop.Features.Products.Data;
+using TechnologyStore.Desktop.Features.TimeTracking;
+using TechnologyStore.Desktop.Features.TimeTracking.Forms;
+using TechnologyStore.Shared.Interfaces;
 using TechnologyStore.Desktop.UI.Forms;
 using IOrderRepository = TechnologyStore.Shared.Interfaces.IOrderRepository;
 using ISupplierRepository = TechnologyStore.Shared.Interfaces.ISupplierRepository;
@@ -27,6 +30,9 @@ namespace TechnologyStore.Desktop
         private readonly EmailSettings _emailSettings;
         private readonly UiSettings _uiSettings;
         private readonly ApplicationSettings _appSettings;
+        private readonly ITimeTrackingService _timeTrackingService;
+        private readonly IWorkShiftRepository _workShiftRepository;
+        private readonly IUserRepository _userRepository;
         private readonly Timer _refreshTimer;
         private DataGridView? _gridInventory;
         private Label? _lblStatus;
@@ -64,6 +70,10 @@ namespace TechnologyStore.Desktop
             _emailSettings = deps.EmailSettings;
             _uiSettings = deps.UiSettings;
             _appSettings = deps.AppSettings;
+
+            _timeTrackingService = deps.TimeTrackingService;
+            _workShiftRepository = deps.WorkShiftRepository;
+            _userRepository = deps.UserRepository;
 
             InitializeComponent();
             SetupDynamicUi();
@@ -268,6 +278,33 @@ namespace TechnologyStore.Desktop
             _btnSettings.FlatAppearance.BorderSize = 0;
             _btnSettings.Click += BtnSettings_Click;
             toolbar.Controls.Add(_btnSettings);
+
+            // Time Clock Button (visible to all)
+            var btnTimeClock = new Button();
+            btnTimeClock.Text = "⏱️ Time Clock";
+            btnTimeClock.Location = new Point(1360, 8);
+            btnTimeClock.Size = new Size(110, 35);
+            btnTimeClock.FlatStyle = FlatStyle.Flat;
+            btnTimeClock.BackColor = Color.FromArgb(0, 188, 212); // Cyan
+            btnTimeClock.ForeColor = Color.White;
+            btnTimeClock.FlatAppearance.BorderSize = 0;
+            btnTimeClock.Click += BtnTimeClock_Click;
+            toolbar.Controls.Add(btnTimeClock);
+
+            // Shift Management (Admin Only)
+            if (_authService.IsAdmin)
+            {
+                var btnShifts = new Button();
+                btnShifts.Text = "📅 Shifts";
+                btnShifts.Location = new Point(1480, 8);
+                btnShifts.Size = new Size(90, 35);
+                btnShifts.FlatStyle = FlatStyle.Flat;
+                btnShifts.BackColor = Color.FromArgb(63, 81, 181); // Indigo
+                btnShifts.ForeColor = Color.White;
+                btnShifts.FlatAppearance.BorderSize = 0;
+                btnShifts.Click += BtnShiftManagement_Click;
+                toolbar.Controls.Add(btnShifts);
+            }
 
             // User Info Label (right side of toolbar)
             _lblUser = new Label();
@@ -606,6 +643,35 @@ namespace TechnologyStore.Desktop
                 GlobalExceptionHandler.ReportException(ex, "Settings");
                 MessageBox.Show($"Error opening settings: {ex.Message}", ErrorTitle,
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void BtnTimeClock_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                var form = new TimeTrackingForm(_timeTrackingService, (AuthenticationService)_authService);
+                form.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                GlobalExceptionHandler.ReportException(ex, "Time Tracking");
+                MessageBox.Show($"Error opening time clock: {ex.Message}", ErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void BtnShiftManagement_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (!_authService.IsAdmin) return;
+                var form = new ShiftManagementForm(_workShiftRepository, _userRepository, (AuthenticationService)_authService);
+                form.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                GlobalExceptionHandler.ReportException(ex, "Shift Management");
+                MessageBox.Show($"Error opening shift management: {ex.Message}", ErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

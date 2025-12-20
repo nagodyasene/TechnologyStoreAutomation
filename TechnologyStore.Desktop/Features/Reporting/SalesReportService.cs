@@ -181,8 +181,8 @@ public class SalesReportService : ISalesReportService
 
     private sealed class SalesSummaryDto
     {
-        public long TotalTransactions { get; set; }
-        public long TotalUnitsSold { get; set; }
-        public decimal TotalRevenue { get; set; }
+        public long TotalTransactions { get; }
+        public long TotalUnitsSold { get; }
+        public decimal TotalRevenue { get; }
     }
 }

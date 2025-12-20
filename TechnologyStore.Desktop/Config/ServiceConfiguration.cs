@@ -10,6 +10,7 @@ using TechnologyStore.Desktop.Features.Reporting;
 using TechnologyStore.Desktop.Features.Products;
 using TechnologyStore.Desktop.Features.Products.Data;
 using TechnologyStore.Desktop.Features.VisitorPrediction;
+using TechnologyStore.Desktop.Features.TimeTracking;
 using TechnologyStore.Desktop.UI.Forms;
 
 namespace TechnologyStore.Desktop.Config;
@@ -166,6 +167,19 @@ public static class ServiceConfiguration
             return new SalesReportService(settings.ConnectionString);
         });
 
+        // Register time tracking services
+        services.AddSingleton<ITimeTrackingRepository>(sp =>
+        {
+            var settings = sp.GetRequiredService<DatabaseSettings>();
+            return new TimeTrackingRepository(settings.ConnectionString);
+        });
+        services.AddSingleton<IWorkShiftRepository>(sp =>
+        {
+            var settings = sp.GetRequiredService<DatabaseSettings>();
+            return new WorkShiftRepository(settings.ConnectionString);
+        });
+        services.AddSingleton<ITimeTrackingService, TimeTrackingService>();
+
         // Register order repository (for order management)
         services.AddSingleton<TechnologyStore.Shared.Interfaces.IOrderRepository>(sp =>
         {
@@ -217,7 +231,17 @@ public static class ServiceConfiguration
         services.AddSingleton<IEmailService, GmailEmailService>();
         // Register aggregated dependencies for MainForm
         services.AddTransient<RepositoryDependencies>();
-        services.AddTransient<MainFormDependencies>();
+        services.AddTransient<MainFormDependencies>(sp =>
+        {
+            var deps = ActivatorUtilities.CreateInstance<MainFormDependencies>(sp);
+            // Manually inject TimeTracking deps since we added them as properties to avoid breaking signature
+            deps.ConfigureTimeTracking(
+                sp.GetRequiredService<ITimeTrackingService>(),
+                sp.GetRequiredService<IWorkShiftRepository>(),
+                sp.GetRequiredService<IUserRepository>()
+            );
+            return deps;
+        });
 
         // Register forms (transient - new instance each time)
         services.AddTransient<LoginForm>();

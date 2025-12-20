@@ -3,7 +3,10 @@ using TechnologyStore.Desktop.Services;
 using TechnologyStore.Desktop.Features.Auth;
 using TechnologyStore.Desktop.Features.Leave;
 using TechnologyStore.Desktop.Features.Reporting;
+using TechnologyStore.Desktop.Features.Reporting;
 using TechnologyStore.Desktop.Features.Products.Data;
+using TechnologyStore.Desktop.Features.TimeTracking;
+using TechnologyStore.Shared.Interfaces;
 using IOrderRepository = TechnologyStore.Shared.Interfaces.IOrderRepository;
 using ISupplierRepository = TechnologyStore.Shared.Interfaces.ISupplierRepository;
 using IPurchaseOrderService = TechnologyStore.Shared.Interfaces.IPurchaseOrderService;
@@ -74,6 +77,18 @@ namespace TechnologyStore.Desktop
             EmailSettings = rootSettings.Email;
             UiSettings = rootSettings.Ui;
             AppSettings = rootSettings.Application;
+        }
+
+        // Time Tracking Dependencies (injected via property or constructor - adding via ctor)
+        public ITimeTrackingService TimeTrackingService { get; set; }
+        public IWorkShiftRepository WorkShiftRepository { get; set; }
+        public IUserRepository UserRepository { get; set; }
+
+        public void ConfigureTimeTracking(ITimeTrackingService timeTrackingService, IWorkShiftRepository workShiftRepository, IUserRepository userRepository)
+        {
+            TimeTrackingService = timeTrackingService;
+            WorkShiftRepository = workShiftRepository;
+            UserRepository = userRepository;
         }
     }
 }
