@@ -32,16 +32,16 @@ public class TrendCalculatorService : ITrendCalculator
 
         // Sort by date ascending
         var sortedSales = salesList.OrderBy(s => s.SaleDate).ToList();
-        
+
         // Calculate 7-day moving average
         var last7Days = sortedSales.Where(s => s.SaleDate >= DateTime.Today.AddDays(-7)).ToList();
-        double dailyAverage = last7Days.Any() 
-            ? last7Days.Sum(s => s.QuantitySold) / 7.0 
+        double dailyAverage = last7Days.Any()
+            ? last7Days.Sum(s => s.QuantitySold) / 7.0
             : 0;
 
         // Calculate runway days (how long until stock runs out)
-        int runwayDays = dailyAverage > 0 
-            ? (int)Math.Ceiling(product.CurrentStock / dailyAverage) 
+        int runwayDays = dailyAverage > 0
+            ? (int)Math.Ceiling(product.CurrentStock / dailyAverage)
             : 999;
 
         // Determine trend direction by comparing recent vs older sales
@@ -65,7 +65,7 @@ public class TrendCalculatorService : ITrendCalculator
     /// <summary>
     /// Quick method to calculate just the runway days without full analysis
     /// </summary>
-    public int CalculateRunwayDays(int currentStock, double dailySalesAverage)
+    public static int CalculateRunwayDays(int currentStock, double dailySalesAverage)
     {
         if (dailySalesAverage <= 0) return 999;
         return (int)Math.Ceiling(currentStock / dailySalesAverage);
@@ -80,7 +80,7 @@ public class TrendCalculatorService : ITrendCalculator
 
         var recentWeek = sales.Where(s => s.SaleDate >= DateTime.Today.AddDays(-7))
             .Sum(s => s.QuantitySold);
-        
+
         var previousWeek = sales.Where(s => s.SaleDate >= DateTime.Today.AddDays(-14) && s.SaleDate < DateTime.Today.AddDays(-7))
             .Sum(s => s.QuantitySold);
 
@@ -92,14 +92,14 @@ public class TrendCalculatorService : ITrendCalculator
         var dailyCounts = sales.GroupBy(s => s.SaleDate)
             .Select(g => g.Sum(s => s.QuantitySold))
             .ToList();
-        
+
         double variance = CalculateVariance(dailyCounts);
         if (variance > 50)
             return TrendDirection.Volatile;
 
         if (changePercent > 15) return TrendDirection.Rising;
         if (changePercent < -15) return TrendDirection.Falling;
-        
+
         return TrendDirection.Stable;
     }
 
@@ -112,14 +112,14 @@ public class TrendCalculatorService : ITrendCalculator
 
         var recentWeek = sales.Where(s => s.SaleDate >= DateTime.Today.AddDays(-7))
             .Sum(s => s.QuantitySold);
-        
+
         var previousWeek = sales.Where(s => s.SaleDate >= DateTime.Today.AddDays(-14) && s.SaleDate < DateTime.Today.AddDays(-7))
             .Sum(s => s.QuantitySold);
 
         if (previousWeek == 0) return recentWeek > 0 ? 1.0 : 0;
 
         double changeRatio = (double)(recentWeek - previousWeek) / previousWeek;
-        
+
         // Clamp between -1 and 1
         return Math.Max(-1.0, Math.Min(1.0, changeRatio));
     }
@@ -148,7 +148,7 @@ public class TrendCalculatorService : ITrendCalculator
 
         double average = values.Average();
         double sumOfSquares = values.Sum(v => Math.Pow(v - average, 2));
-        
+
         return sumOfSquares / values.Count;
     }
 }

@@ -13,7 +13,7 @@ public class SupplierManagementForm : Form
 {
     private readonly ISupplierRepository _supplierRepository;
     private readonly ILogger<SupplierManagementForm> _logger;
-    
+
     // UI Components
     private DataGridView _gridSuppliers = null!;
     private Button _btnAdd = null!;
@@ -21,14 +21,14 @@ public class SupplierManagementForm : Form
     private Button _btnDelete = null!;
     private Button _btnRefresh = null!;
     private Label _lblStatus = null!;
-    
-    private BindingList<Supplier> _suppliers = new();
+
+    private readonly BindingList<Supplier> _suppliers = new();
 
     public SupplierManagementForm(ISupplierRepository supplierRepository)
     {
         _supplierRepository = supplierRepository ?? throw new ArgumentNullException(nameof(supplierRepository));
         _logger = AppLogger.CreateLogger<SupplierManagementForm>();
-        
+
         InitializeComponent();
         LoadSuppliersAsync();
     }
@@ -138,13 +138,13 @@ public class SupplierManagementForm : Form
         {
             _lblStatus.Text = "Loading...";
             var suppliers = await _supplierRepository.GetAllAsync(activeOnly: false);
-            
+
             _suppliers.Clear();
             foreach (var supplier in suppliers)
             {
                 _suppliers.Add(supplier);
             }
-            
+
             _lblStatus.Text = $"{_suppliers.Count} suppliers";
         }
         catch (Exception ex)
@@ -231,11 +231,6 @@ public class SupplierManagementForm : Form
             }
         }
     }
-
-    private async void LoadSuppliersAsync(object? sender = null, EventArgs? e = null)
-    {
-        await LoadSuppliersAsync();
-    }
 }
 
 /// <summary>
@@ -280,7 +275,7 @@ internal class SupplierEditDialog : Form
         layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
 
         int row = 0;
-        
+
         layout.Controls.Add(new Label { Text = "Name *", AutoSize = true }, 0, row);
         _txtName = new TextBox { Dock = DockStyle.Fill };
         layout.Controls.Add(_txtName, 1, row++);

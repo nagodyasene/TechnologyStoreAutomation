@@ -21,7 +21,7 @@ internal static class Program
         {
             var logger = AppLogger.CreateLogger("Program");
             logger.LogCritical(ex, "Fatal error during application startup");
-            
+
             MessageBox.Show(
                 $"A fatal error occurred during startup:\n\n{ex.Message}\n\nThe application will now close.",
                 "Fatal Error",
@@ -51,12 +51,11 @@ internal static class Program
 
         // Start the Windows Forms application
         ApplicationConfiguration.Initialize();
-        
+
         // Show login form first
-        var authService = serviceProvider.GetRequiredService<ICustomerAuthService>();
         var loginForm = serviceProvider.GetRequiredService<CustomerLoginForm>();
         
-        if (loginForm.ShowDialog() != DialogResult.OK)
+if (loginForm.ShowDialog() != DialogResult.OK)
         {
             // User cancelled login or closed the form
             return;
@@ -80,7 +79,7 @@ internal static class Program
             envPath = Path.Combine(AppContext.BaseDirectory, "..", ".env");
         }
         
-        if (!File.Exists(envPath))
+if (!File.Exists(envPath))
         {
             envPath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".env");
         }
@@ -99,14 +98,14 @@ internal static class Program
                     var key = trimmedLine.Substring(0, equalsIndex).Trim();
                     var value = trimmedLine.Substring(equalsIndex + 1).Trim();
                     
-                    // Remove quotes if present
+// Remove quotes if present
                     if ((value.StartsWith('"') && value.EndsWith('"')) ||
                         (value.StartsWith('\'') && value.EndsWith('\'')))
                     {
                         value = value.Substring(1, value.Length - 2);
                     }
                     
-                    Environment.SetEnvironmentVariable(key, value);
+Environment.SetEnvironmentVariable(key, value);
                 }
             }
         }

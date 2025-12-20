@@ -12,7 +12,7 @@ namespace TechnologyStore.Customer.Forms;
 public partial class CustomerLoginForm : Form
 {
     private readonly ICustomerAuthService _authService;
-    
+
     private TextBox? _txtEmail;
     private TextBox? _txtPassword;
     private Button? _btnLogin;

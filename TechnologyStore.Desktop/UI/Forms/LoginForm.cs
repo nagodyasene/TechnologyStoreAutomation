@@ -10,7 +10,7 @@ namespace TechnologyStore.Desktop.UI.Forms;
 public partial class LoginForm : Form
 {
     private readonly IAuthenticationService _authService;
-    
+
     private TextBox? _txtUsername;
     private TextBox? _txtPassword;
     private Button? _btnLogin;

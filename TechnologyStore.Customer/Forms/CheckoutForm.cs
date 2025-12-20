@@ -19,7 +19,6 @@ public partial class CheckoutForm : Form
     private readonly IOrderService _orderService;
     private readonly IEmailService _emailService;
     private readonly InvoiceGenerator _invoiceGenerator;
-    private readonly ICustomerRepository _customerRepository;
 
     // Guest info fields
     private TextBox? _txtGuestEmail;
@@ -47,7 +46,6 @@ public partial class CheckoutForm : Form
         _orderService = orderService;
         _emailService = emailService;
         _invoiceGenerator = invoiceGenerator;
-        _customerRepository = customerRepository;
 
         InitializeComponent();
         SetupUI();
@@ -108,7 +106,6 @@ public partial class CheckoutForm : Form
         };
         this.Controls.Add(summaryPanel);
 
-        var items = _cartService.GetItems();
         var itemsText = $"{_cartService.UniqueItemCount} item(s), {_cartService.ItemCount} unit(s)";
 
         var lblItems = new Label
@@ -441,7 +438,7 @@ public partial class CheckoutForm : Form
         }
     }
 
-    private bool IsValidEmail(string email)
+    private static bool IsValidEmail(string email)
     {
         try
         {

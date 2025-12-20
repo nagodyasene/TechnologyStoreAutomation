@@ -12,7 +12,7 @@ namespace TechnologyStore.Customer.Forms;
 public partial class RegistrationForm : Form
 {
     private readonly ICustomerAuthService _authService;
-    
+
     private TextBox? _txtEmail;
     private TextBox? _txtPassword;
     private TextBox? _txtConfirmPassword;
@@ -66,16 +66,16 @@ public partial class RegistrationForm : Form
 
         // Full Name
         AddField("Full Name *", ref yPos, centerX, out _txtFullName, false);
-        
+
         // Email
         AddField("Email Address *", ref yPos, centerX, out _txtEmail, false);
-        
+
         // Phone
         AddField("Phone (optional)", ref yPos, centerX, out _txtPhone, false);
-        
+
         // Password
         AddField("Password *", ref yPos, centerX, out _txtPassword, true);
-        
+
         // Confirm Password
         AddField("Confirm Password *", ref yPos, centerX, out _txtConfirmPassword, true);
 
@@ -166,12 +166,12 @@ public partial class RegistrationForm : Form
             Height = 28,
             Font = new Font(DefaultFontFamily, 10)
         };
-        
+
         if (isPassword)
         {
             textBox.PasswordChar = '●';
         }
-        
+
         this.Controls.Add(textBox);
 
         yPos += 40;
@@ -244,7 +244,7 @@ public partial class RegistrationForm : Form
                     "Welcome!",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Information);
-                
+
                 this.DialogResult = DialogResult.OK;
                 this.Close();
             }
@@ -263,7 +263,7 @@ public partial class RegistrationForm : Form
         }
     }
 
-    private bool IsValidEmail(string email)
+    private static bool IsValidEmail(string email)
     {
         try
         {

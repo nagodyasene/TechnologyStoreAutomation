@@ -43,7 +43,6 @@ public partial class OrderConfirmationForm : Form
     private void SetupUI()
     {
         int yPos = 30;
-        int centerX = this.ClientSize.Width / 2;
 
         // Success icon
         var lblIcon = new Label

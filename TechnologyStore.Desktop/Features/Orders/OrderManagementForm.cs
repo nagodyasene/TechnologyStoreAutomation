@@ -435,7 +435,7 @@ public partial class OrderManagementForm : Form
         }
     }
 
-    private bool IsValidStatusTransition(string currentStatus, string newStatus)
+    private static bool IsValidStatusTransition(string currentStatus, string newStatus)
     {
         // Define valid transitions
         return currentStatus switch
