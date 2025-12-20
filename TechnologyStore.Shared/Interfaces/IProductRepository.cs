@@ -38,6 +38,11 @@ public interface IProductRepository
     Task<IEnumerable<ProductDashboardDto>> GetDashboardDataAsync();
     
     /// <summary>
+    /// Get all products with full details
+    /// </summary>
+    Task<IEnumerable<Product>> GetAllAsync();
+    
+    /// <summary>
     /// Get a product by ID
     /// </summary>
     Task<Product?> GetByIdAsync(int productId);

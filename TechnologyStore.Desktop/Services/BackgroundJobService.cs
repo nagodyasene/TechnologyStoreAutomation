@@ -3,6 +3,7 @@ using Hangfire.PostgreSql;
 using Microsoft.Extensions.Logging;
 using TechnologyStore.Desktop.Features.Products;
 using TechnologyStore.Desktop.Features.Products.Data;
+using TechnologyStore.Shared.Interfaces;
 
 namespace TechnologyStore.Desktop.Services;
 
@@ -12,15 +13,21 @@ namespace TechnologyStore.Desktop.Services;
 public class BackgroundJobService : IBackgroundJobService
 {
     private readonly string _connectionString;
-    private readonly IProductRepository _repository;
+    private readonly Features.Products.Data.IProductRepository _repository;
     private readonly ILifecycleSentinel _lifecycleSentinel;
+    private readonly IPurchaseOrderService? _purchaseOrderService;
     private readonly ILogger<BackgroundJobService> _logger;
 
-    public BackgroundJobService(string connectionString, IProductRepository repository, ILifecycleSentinel lifecycleSentinel)
+    public BackgroundJobService(
+        string connectionString,
+        Features.Products.Data.IProductRepository repository,
+        ILifecycleSentinel lifecycleSentinel,
+        IPurchaseOrderService? purchaseOrderService = null)
     {
         _connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
         _lifecycleSentinel = lifecycleSentinel ?? throw new ArgumentNullException(nameof(lifecycleSentinel));
+        _purchaseOrderService = purchaseOrderService;
         _logger = AppLogger.CreateLogger<BackgroundJobService>();
     }
 
@@ -77,7 +84,16 @@ public class BackgroundJobService : IBackgroundJobService
             () => CleanupOldHangfireJobs(),
             Cron.Weekly(DayOfWeek.Sunday, 3));
 
-        _logger.LogInformation("Scheduled recurring jobs: Daily snapshot at 1:00 AM, Lifecycle audit at 2:00 AM, Weekly cleanup Sunday at 3:00 AM");
+        // Job 4: Check for low stock and generate purchase orders at 3 AM daily
+        if (_purchaseOrderService != null)
+        {
+            RecurringJob.AddOrUpdate(
+                "low-stock-po-generation",
+                () => GenerateLowStockPurchaseOrders(),
+                Cron.Daily(3)); // 3:00 AM
+        }
+
+        _logger.LogInformation("Scheduled recurring jobs: Daily snapshot at 1:00 AM, Lifecycle audit at 2:00 AM, Low-stock PO at 3:00 AM, Weekly cleanup Sunday at 3:00 AM");
     }
 
     /// <summary>
@@ -170,6 +186,7 @@ public class BackgroundJobService : IBackgroundJobService
             "snapshot" => BackgroundJob.Enqueue(() => GenerateDailySnapshot()),
             "lifecycle" => BackgroundJob.Enqueue(() => RunLifecycleAudit()),
             "cleanup" => BackgroundJob.Enqueue(() => CleanupOldHangfireJobs()),
+            "lowstock" or "purchaseorders" => BackgroundJob.Enqueue(() => GenerateLowStockPurchaseOrders()),
             _ => throw new ArgumentException($"Unknown job type: {jobType}")
         };
 
@@ -189,5 +206,41 @@ public class BackgroundJobService : IBackgroundJobService
             return "Job not found";
 
         return $"State: {jobDetails.History.FirstOrDefault()?.StateName ?? "Unknown"}";
+    }
+
+    /// <summary>
+    /// Scans for low-stock products and generates purchase orders
+    /// Background job method - must be public for Hangfire
+    /// </summary>
+    [Queue("default")]
+    public async Task GenerateLowStockPurchaseOrders()
+    {
+        if (_purchaseOrderService == null)
+        {
+            _logger.LogWarning("PurchaseOrderService not configured, skipping low-stock PO generation");
+            return;
+        }
+
+        try
+        {
+            _logger.LogInformation("Starting low-stock purchase order generation");
+
+            var generatedOrders = await _purchaseOrderService.GeneratePurchaseOrdersForLowStockAsync();
+            var orderCount = generatedOrders.Count();
+
+            if (orderCount > 0)
+            {
+                _logger.LogInformation("Generated {Count} purchase orders for low-stock products", orderCount);
+            }
+            else
+            {
+                _logger.LogInformation("No low-stock products requiring purchase orders");
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to generate low-stock purchase orders");
+            throw new InvalidOperationException("Failed to generate low-stock purchase orders", ex);
+        }
     }
 }

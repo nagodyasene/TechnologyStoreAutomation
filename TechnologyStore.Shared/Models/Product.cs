@@ -31,6 +31,11 @@ public class Product
     
     public int? SuccessorProductId { get; set; }
     
+    /// <summary>
+    /// Optional supplier for this product (for automated purchase orders)
+    /// </summary>
+    public int? SupplierId { get; set; }
+    
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     
     public DateTime LastUpdated { get; set; } = DateTime.UtcNow;

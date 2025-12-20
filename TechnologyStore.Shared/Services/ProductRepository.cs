@@ -189,6 +189,11 @@ public class ProductRepository : IProductRepository
 
     public async Task<IEnumerable<Product>> GetAllProductsAsync()
     {
+        return await GetAllAsync();
+    }
+
+    public async Task<IEnumerable<Product>> GetAllAsync()
+    {
         return await ExecuteWithRetryAsync(async () =>
         {
             using (var db = CreateConnection())
@@ -198,13 +203,14 @@ public class ProductRepository : IProductRepository
                            unit_price as UnitPrice, current_stock as CurrentStock, 
                            lifecycle_phase::text as LifecyclePhase, 
                            successor_product_id as SuccessorProductId,
+                           supplier_id as SupplierId,
                            created_at as CreatedAt, last_updated as LastUpdated
                     FROM products
                     ORDER BY name;";
 
                 return await db.QueryAsync<Product>(sql).ConfigureAwait(false);
             }
-        }, nameof(GetAllProductsAsync)).ConfigureAwait(false);
+        }, nameof(GetAllAsync)).ConfigureAwait(false);
     }
 
     public async Task<IEnumerable<ProductDashboardDto>> GetDashboardDataAsync()

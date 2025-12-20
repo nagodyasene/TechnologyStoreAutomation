@@ -133,7 +133,8 @@ public static class ServiceConfiguration
             var settings = sp.GetRequiredService<DatabaseSettings>();
             var repository = sp.GetRequiredService<IProductRepository>();
             var lifecycleSentinel = sp.GetRequiredService<ILifecycleSentinel>();
-            return new BackgroundJobService(settings.ConnectionString, repository, lifecycleSentinel);
+            // Note: IPurchaseOrderService is registered later, so we defer resolution
+            return new BackgroundJobService(settings.ConnectionString, repository, lifecycleSentinel, null);
         });
 
         // Register health check service
@@ -170,6 +171,46 @@ public static class ServiceConfiguration
         {
             var settings = sp.GetRequiredService<DatabaseSettings>();
             return new TechnologyStore.Shared.Services.OrderRepository(settings.ConnectionString);
+        });
+
+        // Register purchasing services
+        services.AddSingleton<TechnologyStore.Shared.Interfaces.ISupplierRepository>(sp =>
+        {
+            var settings = sp.GetRequiredService<DatabaseSettings>();
+            return new TechnologyStore.Shared.Services.SupplierRepository(settings.ConnectionString);
+        });
+
+        services.AddSingleton<TechnologyStore.Shared.Interfaces.IPurchaseOrderRepository>(sp =>
+        {
+            var settings = sp.GetRequiredService<DatabaseSettings>();
+            return new TechnologyStore.Shared.Services.PurchaseOrderRepository(settings.ConnectionString);
+        });
+
+        services.AddSingleton<TechnologyStore.Shared.Interfaces.IPurchaseOrderService>(sp =>
+        {
+            var poRepo = sp.GetRequiredService<TechnologyStore.Shared.Interfaces.IPurchaseOrderRepository>();
+            var supplierRepo = sp.GetRequiredService<TechnologyStore.Shared.Interfaces.ISupplierRepository>();
+            // Create Shared versions of dependencies
+            var dbSettings = sp.GetRequiredService<DatabaseSettings>();
+            // Create Shared TrendCalculator and RecommendationEngine
+            var sharedTrendCalc = new TechnologyStore.Shared.Services.TrendCalculatorService();
+            var sharedRecEngine = new TechnologyStore.Shared.Services.RecommendationEngine();
+            var sharedProductRepo = new TechnologyStore.Shared.Services.ProductRepository(
+                dbSettings.ConnectionString, sharedTrendCalc, sharedRecEngine);
+            // Wrap Desktop email service as Shared.IEmailService  
+            var desktopEmailService = sp.GetRequiredService<IEmailService>();
+            var sharedEmailService = new SharedEmailServiceWrapper(desktopEmailService);
+            // Use Shared.BusinessRuleSettings
+            var desktopRules = sp.GetRequiredService<BusinessRuleSettings>();
+            var businessRules = new TechnologyStore.Shared.Config.BusinessRuleSettings
+            {
+                CriticalRunwayDays = desktopRules.CriticalRunwayDays,
+                UrgentRunwayDays = desktopRules.UrgentRunwayDays,
+                ReorderRunwayDays = desktopRules.ReorderRunwayDays,
+                AdequateRunwayDays = desktopRules.AdequateRunwayDays
+            };
+            return new TechnologyStore.Shared.Services.PurchaseOrderService(
+                poRepo, supplierRepo, sharedProductRepo, sharedEmailService, businessRules);
         });
 
         // Register email service

@@ -4,9 +4,12 @@ using TechnologyStore.Desktop.Features.Auth;
 using TechnologyStore.Desktop.Features.Leave;
 using TechnologyStore.Desktop.Features.Reporting;
 using TechnologyStore.Desktop.Features.Orders;
+using TechnologyStore.Desktop.Features.Purchasing;
 using TechnologyStore.Desktop.Features.Products.Data;
 using TechnologyStore.Desktop.UI.Forms;
 using IOrderRepository = TechnologyStore.Shared.Interfaces.IOrderRepository;
+using ISupplierRepository = TechnologyStore.Shared.Interfaces.ISupplierRepository;
+using IPurchaseOrderService = TechnologyStore.Shared.Interfaces.IPurchaseOrderService;
 using Timer = System.Windows.Forms.Timer;
 
 namespace TechnologyStore.Desktop
@@ -19,6 +22,8 @@ namespace TechnologyStore.Desktop
         private readonly ILeaveRepository _leaveRepository;
         private readonly ISalesReportService _salesReportService;
         private readonly IOrderRepository _orderRepository;
+        private readonly ISupplierRepository _supplierRepository;
+        private readonly IPurchaseOrderService _purchaseOrderService;
         private readonly EmailSettings _emailSettings;
         private readonly UiSettings _uiSettings;
         private readonly ApplicationSettings _appSettings;
@@ -34,6 +39,8 @@ namespace TechnologyStore.Desktop
         private Button? _btnLeaveApproval;
         private Button? _btnReports;
         private Button? _btnOrders;
+        private Button? _btnSuppliers;
+        private Button? _btnPurchaseOrders;
         private Button? _btnSettings;
 
         private const string ErrorTitle = "Error";
@@ -52,6 +59,8 @@ namespace TechnologyStore.Desktop
             _leaveRepository = deps.LeaveRepository;
             _salesReportService = deps.SalesReportService;
             _orderRepository = deps.OrderRepository;
+            _supplierRepository = deps.SupplierRepository;
+            _purchaseOrderService = deps.PurchaseOrderService;
             _emailSettings = deps.EmailSettings;
             _uiSettings = deps.UiSettings;
             _appSettings = deps.AppSettings;
@@ -222,10 +231,36 @@ namespace TechnologyStore.Desktop
             _btnOrders.Click += BtnOrders_Click;
             toolbar.Controls.Add(_btnOrders);
 
+            // Suppliers Button (admin only)
+            if (_authService.IsAdmin)
+            {
+                _btnSuppliers = new Button();
+                _btnSuppliers.Text = "🏭 Suppliers";
+                _btnSuppliers.Location = new Point(1060, 8);
+                _btnSuppliers.Size = new Size(100, 35);
+                _btnSuppliers.FlatStyle = FlatStyle.Flat;
+                _btnSuppliers.BackColor = Color.FromArgb(0, 150, 136);
+                _btnSuppliers.ForeColor = Color.White;
+                _btnSuppliers.FlatAppearance.BorderSize = 0;
+                _btnSuppliers.Click += BtnSuppliers_Click;
+                toolbar.Controls.Add(_btnSuppliers);
+
+                _btnPurchaseOrders = new Button();
+                _btnPurchaseOrders.Text = "📋 POs";
+                _btnPurchaseOrders.Location = new Point(1170, 8);
+                _btnPurchaseOrders.Size = new Size(80, 35);
+                _btnPurchaseOrders.FlatStyle = FlatStyle.Flat;
+                _btnPurchaseOrders.BackColor = Color.FromArgb(255, 87, 34);
+                _btnPurchaseOrders.ForeColor = Color.White;
+                _btnPurchaseOrders.FlatAppearance.BorderSize = 0;
+                _btnPurchaseOrders.Click += BtnPurchaseOrders_Click;
+                toolbar.Controls.Add(_btnPurchaseOrders);
+            }
+
             // Settings Button
             _btnSettings = new Button();
             _btnSettings.Text = "⚙️ Settings";
-            _btnSettings.Location = new Point(_authService.IsAdmin ? 1060 : 950, 8);
+            _btnSettings.Location = new Point(_authService.IsAdmin ? 1260 : 950, 8);
             _btnSettings.Size = new Size(90, 35);
             _btnSettings.FlatStyle = FlatStyle.Flat;
             _btnSettings.BackColor = Color.FromArgb(117, 117, 117);
@@ -570,6 +605,36 @@ namespace TechnologyStore.Desktop
             {
                 GlobalExceptionHandler.ReportException(ex, "Settings");
                 MessageBox.Show($"Error opening settings: {ex.Message}", ErrorTitle,
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void BtnSuppliers_Click(object? sender, EventArgs e)
+        {
+            try
+            {
+                var suppliersForm = new SupplierManagementForm(_supplierRepository);
+                suppliersForm.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                GlobalExceptionHandler.ReportException(ex, "Supplier Management");
+                MessageBox.Show($"Error opening supplier management: {ex.Message}", ErrorTitle,
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void BtnPurchaseOrders_Click(object? sender, EventArgs e)
+        {
+            try
+            {
+                var poForm = new PurchaseOrdersForm(_purchaseOrderService, _authService);
+                poForm.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                GlobalExceptionHandler.ReportException(ex, "Purchase Orders");
+                MessageBox.Show($"Error opening purchase orders: {ex.Message}", ErrorTitle,
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }

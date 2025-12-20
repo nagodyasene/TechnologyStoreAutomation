@@ -26,5 +26,10 @@ public interface IBackgroundJobService
     /// Cleans up old Hangfire job data
     /// </summary>
     Task CleanupOldHangfireJobs();
+    
+    /// <summary>
+    /// Scans for low-stock products and generates purchase orders
+    /// </summary>
+    Task GenerateLowStockPurchaseOrders();
 }
 
