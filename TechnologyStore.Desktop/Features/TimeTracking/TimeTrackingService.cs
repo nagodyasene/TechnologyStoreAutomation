@@ -116,7 +116,7 @@ public class TimeTrackingService : ITimeTrackingService
         return CalculateHoursFromEntries(entries, date.Date == DateTime.Today ? DateTime.Now : null);
     }
 
-    private static TimeSpan CalculateHoursFromEntries(List<TimeEntry> entries, DateTime? currentWorkEndTime)
+    public static TimeSpan CalculateHoursFromEntries(IEnumerable<TimeEntry> entries, DateTime? currentWorkEndTime = null)
     {
         TimeSpan totalWork = TimeSpan.Zero;
         DateTime? workStart = null;

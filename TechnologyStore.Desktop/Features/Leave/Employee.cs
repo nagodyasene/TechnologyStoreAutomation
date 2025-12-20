@@ -11,6 +11,7 @@ public class Employee
     public string? Department { get; set; }
     public DateTime HireDate { get; set; }
     public int RemainingLeaveDays { get; set; } = 14;
+    public decimal HourlyRate { get; set; } = 15.00m;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     // Navigation property (not populated by default)

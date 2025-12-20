@@ -231,6 +231,9 @@ public static class ServiceConfiguration
         services.AddSingleton<IEmailService, GmailEmailService>();
         // Register aggregated dependencies for MainForm
         services.AddTransient<RepositoryDependencies>();
+        // Register available services
+        services.AddScoped<IPayrollService, PayrollService>();
+
         services.AddTransient<MainFormDependencies>(sp =>
         {
             var deps = ActivatorUtilities.CreateInstance<MainFormDependencies>(sp);
@@ -238,7 +241,8 @@ public static class ServiceConfiguration
             deps.ConfigureTimeTracking(
                 sp.GetRequiredService<ITimeTrackingService>(),
                 sp.GetRequiredService<IWorkShiftRepository>(),
-                sp.GetRequiredService<IUserRepository>()
+                sp.GetRequiredService<IUserRepository>(),
+                sp.GetRequiredService<IPayrollService>()
             );
             return deps;
         });

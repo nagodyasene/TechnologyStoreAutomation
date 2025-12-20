@@ -8,6 +8,7 @@ using TechnologyStore.Desktop.Features.Purchasing;
 using TechnologyStore.Desktop.Features.Products.Data;
 using TechnologyStore.Desktop.Features.TimeTracking;
 using TechnologyStore.Desktop.Features.TimeTracking.Forms;
+using TechnologyStore.Desktop.Features.Payroll.Forms; // Add this
 using TechnologyStore.Shared.Interfaces;
 using TechnologyStore.Desktop.UI.Forms;
 using IOrderRepository = TechnologyStore.Shared.Interfaces.IOrderRepository;
@@ -672,6 +673,25 @@ namespace TechnologyStore.Desktop
             {
                 GlobalExceptionHandler.ReportException(ex, "Shift Management");
                 MessageBox.Show($"Error opening shift management: {ex.Message}", ErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void BtnPayroll_Click(object? sender, EventArgs e)
+        {
+            try
+            {
+                if (_payrollService == null)
+                {
+                    MessageBox.Show("Payroll service is not available.", ErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                var form = new PayrollForm(_payrollService, _authService);
+                form.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                GlobalExceptionHandler.ReportException(ex, "Payroll");
+                MessageBox.Show($"Error opening payroll: {ex.Message}", ErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
