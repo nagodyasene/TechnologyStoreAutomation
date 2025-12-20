@@ -165,6 +165,13 @@ public static class ServiceConfiguration
             return new SalesReportService(settings.ConnectionString);
         });
 
+        // Register order repository (for order management)
+        services.AddSingleton<TechnologyStore.Shared.Interfaces.IOrderRepository>(sp =>
+        {
+            var settings = sp.GetRequiredService<DatabaseSettings>();
+            return new TechnologyStore.Shared.Services.OrderRepository(settings.ConnectionString);
+        });
+
         // Register email service
         services.AddSingleton<IEmailService, GmailEmailService>();
         // Register aggregated dependencies for MainForm

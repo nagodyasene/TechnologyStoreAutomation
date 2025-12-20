@@ -4,6 +4,7 @@ using TechnologyStore.Desktop.Features.Auth;
 using TechnologyStore.Desktop.Features.Leave;
 using TechnologyStore.Desktop.Features.Reporting;
 using TechnologyStore.Desktop.Features.Products.Data;
+using IOrderRepository = TechnologyStore.Shared.Interfaces.IOrderRepository;
 
 namespace TechnologyStore.Desktop
 {
@@ -18,6 +19,7 @@ namespace TechnologyStore.Desktop
         public IAuthenticationService AuthService { get; }
         public ILeaveRepository LeaveRepository { get; }
         public ISalesReportService SalesReportService { get; }
+        public IOrderRepository OrderRepository { get; }
         public EmailSettings EmailSettings { get; }
         public UiSettings UiSettings { get; }
         public ApplicationSettings AppSettings { get; }
@@ -28,6 +30,7 @@ namespace TechnologyStore.Desktop
             IAuthenticationService authService,
             ILeaveRepository leaveRepository,
             ISalesReportService salesReportService,
+            IOrderRepository orderRepository,
             AppSettings rootSettings)
         {
             Repository = repository ?? throw new ArgumentNullException(nameof(repository));
@@ -35,6 +38,7 @@ namespace TechnologyStore.Desktop
             AuthService = authService ?? throw new ArgumentNullException(nameof(authService));
             LeaveRepository = leaveRepository ?? throw new ArgumentNullException(nameof(leaveRepository));
             SalesReportService = salesReportService ?? throw new ArgumentNullException(nameof(salesReportService));
+            OrderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
 
             if (rootSettings == null) throw new ArgumentNullException(nameof(rootSettings));
             EmailSettings = rootSettings.Email;

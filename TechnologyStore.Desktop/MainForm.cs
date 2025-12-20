@@ -3,8 +3,10 @@ using TechnologyStore.Desktop.Services;
 using TechnologyStore.Desktop.Features.Auth;
 using TechnologyStore.Desktop.Features.Leave;
 using TechnologyStore.Desktop.Features.Reporting;
+using TechnologyStore.Desktop.Features.Orders;
 using TechnologyStore.Desktop.Features.Products.Data;
 using TechnologyStore.Desktop.UI.Forms;
+using IOrderRepository = TechnologyStore.Shared.Interfaces.IOrderRepository;
 using Timer = System.Windows.Forms.Timer;
 
 namespace TechnologyStore.Desktop
@@ -16,6 +18,7 @@ namespace TechnologyStore.Desktop
         private readonly IAuthenticationService _authService;
         private readonly ILeaveRepository _leaveRepository;
         private readonly ISalesReportService _salesReportService;
+        private readonly IOrderRepository _orderRepository;
         private readonly EmailSettings _emailSettings;
         private readonly UiSettings _uiSettings;
         private readonly ApplicationSettings _appSettings;
@@ -30,6 +33,7 @@ namespace TechnologyStore.Desktop
         private Button? _btnLeaveRequest;
         private Button? _btnLeaveApproval;
         private Button? _btnReports;
+        private Button? _btnOrders;
         private Button? _btnSettings;
 
         private const string ErrorTitle = "Error";
@@ -47,6 +51,7 @@ namespace TechnologyStore.Desktop
             _authService = deps.AuthService;
             _leaveRepository = deps.LeaveRepository;
             _salesReportService = deps.SalesReportService;
+            _orderRepository = deps.OrderRepository;
             _emailSettings = deps.EmailSettings;
             _uiSettings = deps.UiSettings;
             _appSettings = deps.AppSettings;
@@ -205,10 +210,22 @@ namespace TechnologyStore.Desktop
             _btnReports.Click += BtnReports_Click;
             toolbar.Controls.Add(_btnReports);
 
+            // Orders Button
+            _btnOrders = new Button();
+            _btnOrders.Text = "📦 Orders";
+            _btnOrders.Location = new Point(_authService.IsAdmin ? 960 : 850, 8);
+            _btnOrders.Size = new Size(90, 35);
+            _btnOrders.FlatStyle = FlatStyle.Flat;
+            _btnOrders.BackColor = Color.FromArgb(103, 58, 183);
+            _btnOrders.ForeColor = Color.White;
+            _btnOrders.FlatAppearance.BorderSize = 0;
+            _btnOrders.Click += BtnOrders_Click;
+            toolbar.Controls.Add(_btnOrders);
+
             // Settings Button
             _btnSettings = new Button();
             _btnSettings.Text = "⚙️ Settings";
-            _btnSettings.Location = new Point(_authService.IsAdmin ? 960 : 850, 8);
+            _btnSettings.Location = new Point(_authService.IsAdmin ? 1060 : 950, 8);
             _btnSettings.Size = new Size(90, 35);
             _btnSettings.FlatStyle = FlatStyle.Flat;
             _btnSettings.BackColor = Color.FromArgb(117, 117, 117);
@@ -523,6 +540,21 @@ namespace TechnologyStore.Desktop
             {
                 GlobalExceptionHandler.ReportException(ex, "Sales Reports");
                 MessageBox.Show($"Error opening sales reports: {ex.Message}", ErrorTitle,
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void BtnOrders_Click(object? sender, EventArgs e)
+        {
+            try
+            {
+                var ordersForm = new OrderManagementForm(_orderRepository);
+                ordersForm.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                GlobalExceptionHandler.ReportException(ex, "Order Management");
+                MessageBox.Show($"Error opening order management: {ex.Message}", ErrorTitle,
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
