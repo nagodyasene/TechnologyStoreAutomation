@@ -37,29 +37,28 @@ public class OrderService : IOrderService
             return OrderResult.Failed(string.Join("\n", stockErrors));
         }
 
-        var reservedItems = new List<(int ProductId, int Quantity)>();
         try
         {
-            var reserveResult = await TryReserveStockAsync(cartItems, reservedItems);
-            if (reserveResult != null)
-            {
-                return reserveResult;
-            }
-
             var orderNumber = await _orderRepository.GenerateOrderNumberAsync();
             var order = CreateOrderFromCart(customerId, cartItems, notes, pickupDate, orderNumber);
 
-            var createdOrder = await _orderRepository.CreateOrderAsync(order);
+            // Reserve stock and create order atomically
+            var itemsToReserve = cartItems.Select(item => (item.ProductId, item.Quantity)).ToList();
+            var createdOrder = await _orderRepository.CreateOrderAsync(order, itemsToReserve);
 
             _logger.LogInformation("Order {OrderNumber} created successfully for customer {CustomerId}",
                 createdOrder.OrderNumber, customerId);
 
             return OrderResult.Succeeded(createdOrder);
         }
+        catch (InvalidOperationException ex) when (ex.Message.Contains("Insufficient stock"))
+        {
+            _logger.LogWarning(ex, "Stock reservation failed during order creation for customer {CustomerId}", customerId);
+            return OrderResult.Failed("One or more products are out of stock. Please update your cart and try again.");
+        }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to create order for customer {CustomerId}", customerId);
-            await RollbackReservedStockAsync(reservedItems);
             return OrderResult.Failed("An error occurred while placing your order. Please try again.");
         }
     }
@@ -87,35 +86,6 @@ public class OrderService : IOrderService
         return errors;
     }
 
-    private async Task<OrderResult?> TryReserveStockAsync(List<CartItem> cartItems, List<(int ProductId, int Quantity)> reservedItems)
-    {
-        foreach (var item in cartItems)
-        {
-            var reserved = await _productRepository.ReserveStockAsync(item.ProductId, item.Quantity);
-            if (!reserved)
-            {
-                await RollbackReservedStockAsync(reservedItems);
-                return OrderResult.Failed($"Failed to reserve stock for '{item.ProductName}'. Please try again.");
-            }
-            reservedItems.Add((item.ProductId, item.Quantity));
-        }
-        return null;
-    }
-
-    private async Task RollbackReservedStockAsync(List<(int ProductId, int Quantity)> reservedItems)
-    {
-        foreach (var (productId, quantity) in reservedItems)
-        {
-            try
-            {
-                await _productRepository.ReleaseStockAsync(productId, quantity);
-            }
-            catch (Exception releaseEx)
-            {
-                _logger.LogError(releaseEx, "Failed to release stock for product {ProductId}", productId);
-            }
-        }
-    }
 
     private static Order CreateOrderFromCart(int customerId, List<CartItem> cartItems, string? notes, DateTime? pickupDate, string orderNumber)
     {
@@ -168,14 +138,15 @@ public class OrderService : IOrderService
             return false;
         }
 
-        // Restore stock
-        foreach (var item in order.Items)
+        // Cancel order and restore stock atomically
+        var items = order.Items.Select(item => (item.ProductId, item.Quantity)).ToList();
+        var success = await _orderRepository.CancelOrderAndRestoreStockAsync(orderId, items);
+        
+        if (!success)
         {
-            await _productRepository.ReleaseStockAsync(item.ProductId, item.Quantity);
+            _logger.LogWarning("Cancel failed: Order {OrderId} may have already been cancelled or is in an invalid state", orderId);
+            return false;
         }
-
-        // Update order status
-        await _orderRepository.UpdateStatusAsync(orderId, OrderStatus.Cancelled);
 
         _logger.LogInformation("Order {OrderNumber} cancelled, stock restored", order.OrderNumber);
         return true;

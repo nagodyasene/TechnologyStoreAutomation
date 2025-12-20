@@ -2,7 +2,6 @@ using Hangfire;
 using Hangfire.PostgreSql;
 using Microsoft.Extensions.Logging;
 using TechnologyStore.Desktop.Features.Products;
-using TechnologyStore.Desktop.Features.Products.Data;
 using TechnologyStore.Shared.Interfaces;
 
 namespace TechnologyStore.Desktop.Services;
@@ -13,14 +12,14 @@ namespace TechnologyStore.Desktop.Services;
 public class BackgroundJobService : IBackgroundJobService
 {
     private readonly string _connectionString;
-    private readonly Features.Products.Data.IProductRepository _repository;
+    private readonly IProductRepository _repository;
     private readonly ILifecycleSentinel _lifecycleSentinel;
     private readonly IPurchaseOrderService? _purchaseOrderService;
     private readonly ILogger<BackgroundJobService> _logger;
 
     public BackgroundJobService(
         string connectionString,
-        Features.Products.Data.IProductRepository repository,
+        IProductRepository repository,
         ILifecycleSentinel lifecycleSentinel,
         IPurchaseOrderService? purchaseOrderService = null)
     {

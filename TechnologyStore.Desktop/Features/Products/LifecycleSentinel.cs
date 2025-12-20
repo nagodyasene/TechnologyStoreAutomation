@@ -2,7 +2,7 @@ using TechnologyStore.Desktop.Services;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using TechnologyStore.Desktop.Features.Products.Data;
+using TechnologyStore.Shared.Interfaces;
 
 namespace TechnologyStore.Desktop.Features.Products;
 

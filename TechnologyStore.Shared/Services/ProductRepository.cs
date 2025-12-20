@@ -86,10 +86,24 @@ public class ProductRepository : IProductRepository
                     SELECT 
                         @Date,
                         p.id,
-                        COALESCE(SUM(t.quantity_change), 0) as closing_stock,
-                        COALESCE(ABS(SUM(CASE WHEN t.quantity_change < 0 AND t.transaction_date >= @Date THEN t.quantity_change ELSE 0 END)), 0) as sold_today
+                        -- Closing stock = current stock at end of snapshot date
+                        -- Calculate as: initial stock (0) + sum of all transactions up to snapshot date
+                        COALESCE((
+                            SELECT COALESCE(SUM(t.quantity_change), 0)
+                            FROM inventory_transactions t
+                            WHERE t.product_id = p.id 
+                              AND t.transaction_date::date <= @Date
+                        ), 0) as closing_stock,
+                        -- Total sold = sum of negative quantity changes on the snapshot date only
+                        COALESCE(ABS(SUM(CASE 
+                            WHEN t.quantity_change < 0 
+                             AND t.transaction_date::date = @Date 
+                            THEN t.quantity_change 
+                            ELSE 0 
+                        END)), 0) as total_sold
                     FROM products p
-                    LEFT JOIN inventory_transactions t ON p.id = t.product_id
+                    LEFT JOIN inventory_transactions t ON p.id = t.product_id 
+                        AND t.transaction_date::date = @Date
                     GROUP BY p.id
                     ON CONFLICT (summary_date, product_id) DO UPDATE 
                     SET closing_stock = EXCLUDED.closing_stock, total_sold = EXCLUDED.total_sold;";
@@ -111,20 +125,66 @@ public class ProductRepository : IProductRepository
         {
             using (var db = CreateConnection())
             {
-                _logger.LogInformation("Updating product {ProductId} to phase {Phase}. Reason: {Reason}",
-                    productId, newPhase, reason);
+                if (db is NpgsqlConnection npgsqlConn)
+                {
+                    await npgsqlConn.OpenAsync().ConfigureAwait(false);
+                    using (var transaction = await npgsqlConn.BeginTransactionAsync().ConfigureAwait(false))
+                    {
+                        try
+                        {
+                            _logger.LogInformation("Updating product {ProductId} to phase {Phase}. Reason: {Reason}",
+                                productId, newPhase, reason);
 
-                var sql = @"
-                    UPDATE products 
-                    SET lifecycle_phase = @Phase::lifecycle_phase_type, 
-                        last_updated = CURRENT_TIMESTAMP 
-                    WHERE id = @Id;
+                            var sql = @"
+                                UPDATE products 
+                                SET lifecycle_phase = @Phase::lifecycle_phase_type, 
+                                    last_updated = CURRENT_TIMESTAMP 
+                                WHERE id = @Id;
 
-                    INSERT INTO lifecycle_audit_log (product_id, new_phase, reason)
-                    VALUES (@Id, @Phase::lifecycle_phase_type, @Reason);";
+                                INSERT INTO lifecycle_audit_log (product_id, new_phase, reason)
+                                VALUES (@Id, @Phase::lifecycle_phase_type, @Reason);";
 
-                await db.ExecuteAsync(sql, new { Id = productId, Phase = newPhase, Reason = reason }).ConfigureAwait(false);
-                return true;
+                            await db.ExecuteAsync(sql, new { Id = productId, Phase = newPhase, Reason = reason }, transaction).ConfigureAwait(false);
+                            await transaction.CommitAsync().ConfigureAwait(false);
+                            return true;
+                        }
+                        catch
+                        {
+                            await transaction.RollbackAsync().ConfigureAwait(false);
+                            throw;
+                        }
+                    }
+                }
+                else
+                {
+                    db.Open();
+                    using (var transaction = db.BeginTransaction())
+                    {
+                        try
+                        {
+                            _logger.LogInformation("Updating product {ProductId} to phase {Phase}. Reason: {Reason}",
+                                productId, newPhase, reason);
+
+                            var sql = @"
+                                UPDATE products 
+                                SET lifecycle_phase = @Phase::lifecycle_phase_type, 
+                                    last_updated = CURRENT_TIMESTAMP 
+                                WHERE id = @Id;
+
+                                INSERT INTO lifecycle_audit_log (product_id, new_phase, reason)
+                                VALUES (@Id, @Phase::lifecycle_phase_type, @Reason);";
+
+                            await db.ExecuteAsync(sql, new { Id = productId, Phase = newPhase, Reason = reason }, transaction).ConfigureAwait(false);
+                            transaction.Commit();
+                            return true;
+                        }
+                        catch
+                        {
+                            transaction.Rollback();
+                            throw;
+                        }
+                    }
+                }
             }
         }, nameof(UpdateProductPhaseAsync)).ConfigureAwait(false);
     }
@@ -133,39 +193,80 @@ public class ProductRepository : IProductRepository
     {
         using (var db = CreateConnection())
         {
-            db.Open();
-            using (var transaction = db.BeginTransaction())
+            if (db is NpgsqlConnection npgsqlConn)
             {
-                try
+                await npgsqlConn.OpenAsync().ConfigureAwait(false);
+                using (var transaction = await npgsqlConn.BeginTransactionAsync().ConfigureAwait(false))
                 {
-                    var date = saleDate ?? DateTime.Today;
-                    var parameters = new { ProductId = productId, Quantity = quantitySold, Amount = totalAmount, Date = date };
+                    try
+                    {
+                        var date = saleDate ?? DateTime.Today;
+                        var parameters = new { ProductId = productId, Quantity = quantitySold, Amount = totalAmount, Date = date };
 
-                    var insertSql = @"
-                        INSERT INTO sales_transactions (product_id, quantity_sold, total_amount, sale_date)
-                        VALUES (@ProductId, @Quantity, @Amount, @Date)
-                        RETURNING id;";
-                    var saleId = await db.ExecuteScalarAsync<int>(insertSql, parameters, transaction);
+                        var insertSql = @"
+                            INSERT INTO sales_transactions (product_id, quantity_sold, total_amount, sale_date)
+                            VALUES (@ProductId, @Quantity, @Amount, @Date)
+                            RETURNING id;";
+                        var saleId = await db.ExecuteScalarAsync<int>(insertSql, parameters, transaction).ConfigureAwait(false);
 
-                    var updateStockSql = @"
-                        UPDATE products 
-                        SET current_stock = current_stock - @Quantity,
-                            last_updated = CURRENT_TIMESTAMP
-                        WHERE id = @ProductId;";
-                    await db.ExecuteAsync(updateStockSql, parameters, transaction);
+                        var updateStockSql = @"
+                            UPDATE products 
+                            SET current_stock = current_stock - @Quantity,
+                                last_updated = CURRENT_TIMESTAMP
+                            WHERE id = @ProductId;";
+                        await db.ExecuteAsync(updateStockSql, parameters, transaction).ConfigureAwait(false);
 
-                    var inventorySql = @"
-                        INSERT INTO inventory_transactions (product_id, quantity_change, transaction_type, transaction_date)
-                        VALUES (@ProductId, -@Quantity, 'SALE', @Date);";
-                    await db.ExecuteAsync(inventorySql, parameters, transaction);
+                        var inventorySql = @"
+                            INSERT INTO inventory_transactions (product_id, quantity_change, transaction_type, transaction_date)
+                            VALUES (@ProductId, -@Quantity, 'SALE', @Date);";
+                        await db.ExecuteAsync(inventorySql, parameters, transaction).ConfigureAwait(false);
 
-                    transaction.Commit();
-                    return saleId;
+                        await transaction.CommitAsync().ConfigureAwait(false);
+                        return saleId;
+                    }
+                    catch
+                    {
+                        await transaction.RollbackAsync().ConfigureAwait(false);
+                        throw;
+                    }
                 }
-                catch
+            }
+            else
+            {
+                db.Open();
+                using (var transaction = db.BeginTransaction())
                 {
-                    transaction.Rollback();
-                    throw;
+                    try
+                    {
+                        var date = saleDate ?? DateTime.Today;
+                        var parameters = new { ProductId = productId, Quantity = quantitySold, Amount = totalAmount, Date = date };
+
+                        var insertSql = @"
+                            INSERT INTO sales_transactions (product_id, quantity_sold, total_amount, sale_date)
+                            VALUES (@ProductId, @Quantity, @Amount, @Date)
+                            RETURNING id;";
+                        var saleId = await db.ExecuteScalarAsync<int>(insertSql, parameters, transaction).ConfigureAwait(false);
+
+                        var updateStockSql = @"
+                            UPDATE products 
+                            SET current_stock = current_stock - @Quantity,
+                                last_updated = CURRENT_TIMESTAMP
+                            WHERE id = @ProductId;";
+                        await db.ExecuteAsync(updateStockSql, parameters, transaction).ConfigureAwait(false);
+
+                        var inventorySql = @"
+                            INSERT INTO inventory_transactions (product_id, quantity_change, transaction_type, transaction_date)
+                            VALUES (@ProductId, -@Quantity, 'SALE', @Date);";
+                        await db.ExecuteAsync(inventorySql, parameters, transaction).ConfigureAwait(false);
+
+                        transaction.Commit();
+                        return saleId;
+                    }
+                    catch
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
                 }
             }
         }

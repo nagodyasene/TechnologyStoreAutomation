@@ -259,23 +259,51 @@ public class PurchaseOrderRepository : IPurchaseOrderRepository
     }
 
     /// <inheritdoc />
-    public async Task<bool> MarkAsReceivedAsync(int orderId)
+    public async Task<bool> MarkAsReceivedAsync(int orderId, IEnumerable<(int ProductId, int Quantity)> items)
     {
         using var db = CreateConnection();
+        await db.OpenAsync();
+        using var transaction = await db.BeginTransactionAsync();
 
-        const string sql = @"
-            UPDATE purchase_orders 
-            SET status = 'RECEIVED'::purchase_order_status, received_at = CURRENT_TIMESTAMP
-            WHERE id = @OrderId AND status = 'SENT'::purchase_order_status";
-
-        var rowsAffected = await db.ExecuteAsync(sql, new { OrderId = orderId });
-
-        if (rowsAffected > 0)
+        try
         {
-            _logger.LogInformation("Marked PO {OrderId} as received", orderId);
-        }
+            // Update purchase order status
+            const string orderSql = @"
+                UPDATE purchase_orders 
+                SET status = 'RECEIVED'::purchase_order_status, received_at = CURRENT_TIMESTAMP
+                WHERE id = @OrderId AND status = 'SENT'::purchase_order_status";
 
-        return rowsAffected > 0;
+            var rowsAffected = await db.ExecuteAsync(orderSql, new { OrderId = orderId }, transaction);
+
+            if (rowsAffected == 0)
+            {
+                await transaction.RollbackAsync();
+                return false;
+            }
+
+            // Update product stock levels for each item atomically
+            const string stockSql = @"
+                UPDATE products 
+                SET current_stock = current_stock + @Quantity,
+                    last_updated = CURRENT_TIMESTAMP
+                WHERE id = @ProductId";
+
+            foreach (var (productId, quantity) in items)
+            {
+                await db.ExecuteAsync(stockSql, new { ProductId = productId, Quantity = quantity }, transaction);
+            }
+
+            await transaction.CommitAsync();
+
+            _logger.LogInformation("Marked PO {OrderId} as received and updated stock for {ItemCount} products", 
+                orderId, items.Count());
+            return true;
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
     }
 
     /// <inheritdoc />

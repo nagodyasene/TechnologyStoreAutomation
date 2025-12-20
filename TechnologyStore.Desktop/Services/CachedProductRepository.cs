@@ -1,7 +1,8 @@
 using TechnologyStore.Desktop.Config;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
-using TechnologyStore.Desktop.Features.Products.Data;
+using TechnologyStore.Shared.Interfaces;
+using TechnologyStore.Shared.Models;
 
 namespace TechnologyStore.Desktop.Services;
 
@@ -156,6 +157,59 @@ public class CachedProductRepository : IProductRepository
         InvalidateDashboardCache();
 
         _logger.LogDebug("Daily snapshot generated and dashboard cache invalidated");
+    }
+
+    /// <summary>
+    /// Gets all products with full details (alias for GetAllProductsAsync)
+    /// </summary>
+    public async Task<IEnumerable<Product>> GetAllAsync()
+    {
+        return await GetAllProductsAsync();
+    }
+
+    /// <summary>
+    /// Gets a product by ID (no caching - direct lookup)
+    /// </summary>
+    public async Task<Product?> GetByIdAsync(int productId)
+    {
+        return await _innerRepository.GetByIdAsync(productId);
+    }
+
+    /// <summary>
+    /// Gets products available for purchase (no caching - filtered query)
+    /// </summary>
+    public async Task<IEnumerable<Product>> GetAvailableProductsAsync()
+    {
+        return await _innerRepository.GetAvailableProductsAsync();
+    }
+
+    /// <summary>
+    /// Reserves stock for an order (invalidates caches)
+    /// </summary>
+    public async Task<bool> ReserveStockAsync(int productId, int quantity)
+    {
+        var result = await _innerRepository.ReserveStockAsync(productId, quantity);
+        
+        if (result)
+        {
+            // Invalidate product-related caches
+            InvalidateProductCaches();
+            _logger.LogDebug("Stock reserved and caches invalidated for product {ProductId}", productId);
+        }
+        
+        return result;
+    }
+
+    /// <summary>
+    /// Releases reserved stock (invalidates caches)
+    /// </summary>
+    public async Task ReleaseStockAsync(int productId, int quantity)
+    {
+        await _innerRepository.ReleaseStockAsync(productId, quantity);
+        
+        // Invalidate product-related caches
+        InvalidateProductCaches();
+        _logger.LogDebug("Stock released and caches invalidated for product {ProductId}", productId);
     }
 
     #region Cache Invalidation

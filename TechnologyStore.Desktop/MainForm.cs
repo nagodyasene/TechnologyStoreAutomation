@@ -5,7 +5,7 @@ using TechnologyStore.Desktop.Features.Leave;
 using TechnologyStore.Desktop.Features.Reporting;
 using TechnologyStore.Desktop.Features.Orders;
 using TechnologyStore.Desktop.Features.Purchasing;
-using TechnologyStore.Desktop.Features.Products.Data;
+using TechnologyStore.Shared.Models;
 using TechnologyStore.Desktop.Features.TimeTracking;
 using TechnologyStore.Desktop.Features.TimeTracking.Forms;
 using TechnologyStore.Desktop.Features.Payroll.Forms;
@@ -17,7 +17,6 @@ using ISupplierRepository = TechnologyStore.Shared.Interfaces.ISupplierRepositor
 using IPurchaseOrderService = TechnologyStore.Shared.Interfaces.IPurchaseOrderService;
 using Timer = System.Windows.Forms.Timer;
 // Resolve ambiguities favoring Desktop versions
-using IProductRepository = TechnologyStore.Desktop.Features.Products.Data.IProductRepository;
 using IAuthenticationService = TechnologyStore.Desktop.Features.Auth.IAuthenticationService;
 using IUserRepository = TechnologyStore.Desktop.Features.Auth.IUserRepository;
 
@@ -25,7 +24,7 @@ namespace TechnologyStore.Desktop
 {
     public partial class MainForm : Form
     {
-        private readonly IProductRepository _repository;
+        private readonly TechnologyStore.Shared.Interfaces.IProductRepository _repository;
         private readonly IHealthCheckService _healthCheckService;
         private readonly IAuthenticationService _authService;
         private readonly ILeaveRepository _leaveRepository;

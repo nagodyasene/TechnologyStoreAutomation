@@ -3,7 +3,7 @@ using TechnologyStore.Desktop.Services;
 using TechnologyStore.Desktop.Features.Auth;
 using TechnologyStore.Desktop.Features.Leave;
 using TechnologyStore.Desktop.Features.Reporting;
-using TechnologyStore.Desktop.Features.Products.Data;
+using TechnologyStore.Shared.Models;
 using TechnologyStore.Desktop.Features.TimeTracking;
 using TechnologyStore.Desktop.Features.Payroll;
 using TechnologyStore.Shared.Interfaces;
@@ -11,7 +11,6 @@ using IOrderRepository = TechnologyStore.Shared.Interfaces.IOrderRepository;
 using ISupplierRepository = TechnologyStore.Shared.Interfaces.ISupplierRepository;
 using IPurchaseOrderService = TechnologyStore.Shared.Interfaces.IPurchaseOrderService;
 // Resolve ambiguities favoring Desktop versions
-using IProductRepository = TechnologyStore.Desktop.Features.Products.Data.IProductRepository;
 using IAuthenticationService = TechnologyStore.Desktop.Features.Auth.IAuthenticationService;
 using IUserRepository = TechnologyStore.Desktop.Features.Auth.IUserRepository;
 
@@ -22,13 +21,13 @@ namespace TechnologyStore.Desktop
     /// </summary>
     public class RepositoryDependencies
     {
-        public IProductRepository ProductRepository { get; }
+        public TechnologyStore.Shared.Interfaces.IProductRepository ProductRepository { get; }
         public ILeaveRepository LeaveRepository { get; }
         public IOrderRepository OrderRepository { get; }
         public ISupplierRepository SupplierRepository { get; }
 
         public RepositoryDependencies(
-            IProductRepository productRepository,
+            TechnologyStore.Shared.Interfaces.IProductRepository productRepository,
             ILeaveRepository leaveRepository,
             IOrderRepository orderRepository,
             ISupplierRepository supplierRepository)
@@ -46,7 +45,7 @@ namespace TechnologyStore.Desktop
     /// </summary>
     public class MainFormDependencies
     {
-        public IProductRepository Repository { get; }
+        public TechnologyStore.Shared.Interfaces.IProductRepository Repository { get; }
         public IHealthCheckService HealthCheckService { get; }
         public IAuthenticationService AuthService { get; }
         public ILeaveRepository LeaveRepository { get; }

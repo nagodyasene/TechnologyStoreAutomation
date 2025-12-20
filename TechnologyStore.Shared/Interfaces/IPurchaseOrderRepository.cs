@@ -48,9 +48,9 @@ public interface IPurchaseOrderRepository
     Task<bool> MarkAsSentAsync(int orderId);
 
     /// <summary>
-    /// Marks a purchase order as received
+    /// Marks a purchase order as received and updates product stock levels atomically
     /// </summary>
-    Task<bool> MarkAsReceivedAsync(int orderId);
+    Task<bool> MarkAsReceivedAsync(int orderId, IEnumerable<(int ProductId, int Quantity)> items);
 
     /// <summary>
     /// Generates a unique purchase order number (e.g., "PO-2024-00001")

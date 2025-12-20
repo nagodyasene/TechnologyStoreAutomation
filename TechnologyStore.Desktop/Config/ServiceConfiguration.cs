@@ -4,23 +4,20 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using TechnologyStore.Desktop.Services;
 using TechnologyStore.Desktop.Features.Auth;
-using TechnologyStore.Desktop.Features.Email;
 using TechnologyStore.Desktop.Features.Leave;
 using TechnologyStore.Desktop.Features.Reporting;
 using TechnologyStore.Desktop.Features.Products;
-using TechnologyStore.Desktop.Features.Products.Data;
+using TechnologyStore.Shared.Interfaces;
+using TechnologyStore.Shared.Services;
+using TechnologyStore.Shared.Models;
 using TechnologyStore.Desktop.Features.VisitorPrediction;
 using TechnologyStore.Desktop.Features.TimeTracking;
 using TechnologyStore.Desktop.Features.Payroll;
 using TechnologyStore.Desktop.UI.Forms;
 using TechnologyStore.Shared.Interfaces;
-// Resolve ambiguities - Desktop versions take precedence
-using IProductRepository = TechnologyStore.Desktop.Features.Products.Data.IProductRepository;
+// Resolve ambiguities - Desktop versions take precedence for Desktop-specific features
 using IUserRepository = TechnologyStore.Desktop.Features.Auth.IUserRepository;
 using IAuthenticationService = TechnologyStore.Desktop.Features.Auth.IAuthenticationService;
-using IEmailService = TechnologyStore.Desktop.Features.Email.IEmailService;
-using ITrendCalculator = TechnologyStore.Desktop.Features.Products.ITrendCalculator;
-using IRecommendationEngine = TechnologyStore.Desktop.Features.Products.IRecommendationEngine;
 using ITimeTrackingRepository = TechnologyStore.Shared.Interfaces.ITimeTrackingRepository;
 using IWorkShiftRepository = TechnologyStore.Shared.Interfaces.IWorkShiftRepository;
 
@@ -102,28 +99,28 @@ public static class ServiceConfiguration
         // Register HttpClient factory
         services.AddHttpClient();
 
-        // Register inner repository (not cached - used internally)
-        services.AddSingleton<ProductRepository>(sp =>
+        // Register trend calculator and recommendation engine (Shared services)
+        services.AddSingleton<TechnologyStore.Shared.Interfaces.ITrendCalculator, TechnologyStore.Shared.Services.TrendCalculatorService>();
+        services.AddSingleton<TechnologyStore.Shared.Interfaces.IRecommendationEngine, TechnologyStore.Shared.Services.RecommendationEngine>();
+
+        // Register inner repository (not cached - used internally) - Shared service
+        services.AddSingleton<TechnologyStore.Shared.Services.ProductRepository>(sp =>
         {
             var settings = sp.GetRequiredService<DatabaseSettings>();
-            var trendCalculator = sp.GetRequiredService<ITrendCalculator>();
-            var recommendationEngine = sp.GetRequiredService<IRecommendationEngine>();
-            return new ProductRepository(settings.ConnectionString, trendCalculator, recommendationEngine);
+            var trendCalculator = sp.GetRequiredService<TechnologyStore.Shared.Interfaces.ITrendCalculator>();
+            var recommendationEngine = sp.GetRequiredService<TechnologyStore.Shared.Interfaces.IRecommendationEngine>();
+            return new TechnologyStore.Shared.Services.ProductRepository(settings.ConnectionString, trendCalculator, recommendationEngine);
         });
 
         // Register cached repository as IProductRepository (decorator pattern)
-        services.AddSingleton<IProductRepository>(sp =>
+        services.AddSingleton<TechnologyStore.Shared.Interfaces.IProductRepository>(sp =>
         {
-            var innerRepository = sp.GetRequiredService<ProductRepository>();
+            var innerRepository = sp.GetRequiredService<TechnologyStore.Shared.Services.ProductRepository>();
             var cache = sp.GetRequiredService<IMemoryCache>();
             var cachingSettings = sp.GetRequiredService<CachingSettings>();
             var logger = sp.GetRequiredService<ILogger<CachedProductRepository>>();
             return new CachedProductRepository(innerRepository, cache, cachingSettings, logger);
         });
-
-        // Register business services
-        services.AddSingleton<IRecommendationEngine, RecommendationEngine>();
-        services.AddSingleton<ITrendCalculator, TrendCalculatorService>();
 
         services.AddSingleton<IVisitorCountPredictor>(sp =>
         {
@@ -133,20 +130,10 @@ public static class ServiceConfiguration
 
         services.AddSingleton<ILifecycleSentinel>(sp =>
         {
-            var repository = sp.GetRequiredService<IProductRepository>();
+            var repository = sp.GetRequiredService<TechnologyStore.Shared.Interfaces.IProductRepository>();
             var config = sp.GetRequiredService<IConfiguration>();
             var httpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
             return new LifecycleSentinel(repository, config, httpClientFactory);
-        });
-
-        // Register background job service
-        services.AddSingleton<IBackgroundJobService>(sp =>
-        {
-            var settings = sp.GetRequiredService<DatabaseSettings>();
-            var repository = sp.GetRequiredService<IProductRepository>();
-            var lifecycleSentinel = sp.GetRequiredService<ILifecycleSentinel>();
-            // Note: IPurchaseOrderService is registered later, so we defer resolution
-            return new BackgroundJobService(settings.ConnectionString, repository, lifecycleSentinel, null);
         });
 
         // Register health check service
@@ -211,20 +198,17 @@ public static class ServiceConfiguration
             return new TechnologyStore.Shared.Services.PurchaseOrderRepository(settings.ConnectionString);
         });
 
+        // Register email service (Shared service) - must be before PurchaseOrderService
+        services.AddSingleton<TechnologyStore.Shared.Interfaces.IEmailService, TechnologyStore.Shared.Services.GmailEmailService>();
+
         services.AddSingleton<TechnologyStore.Shared.Interfaces.IPurchaseOrderService>(sp =>
         {
             var poRepo = sp.GetRequiredService<TechnologyStore.Shared.Interfaces.IPurchaseOrderRepository>();
             var supplierRepo = sp.GetRequiredService<TechnologyStore.Shared.Interfaces.ISupplierRepository>();
-            // Create Shared versions of dependencies
-            var dbSettings = sp.GetRequiredService<DatabaseSettings>();
-            // Create Shared TrendCalculator and RecommendationEngine
-            var sharedTrendCalc = new TechnologyStore.Shared.Services.TrendCalculatorService();
-            var sharedRecEngine = new TechnologyStore.Shared.Services.RecommendationEngine();
-            var sharedProductRepo = new TechnologyStore.Shared.Services.ProductRepository(
-                dbSettings.ConnectionString, sharedTrendCalc, sharedRecEngine);
-            // Wrap Desktop email service as Shared.IEmailService  
-            var desktopEmailService = sp.GetRequiredService<IEmailService>();
-            var sharedEmailService = new SharedEmailServiceWrapper(desktopEmailService);
+            // Use registered Shared ProductRepository (the cached one implements Shared.Interfaces.IProductRepository)
+            var sharedProductRepo = sp.GetRequiredService<TechnologyStore.Shared.Interfaces.IProductRepository>();
+            // Use registered Shared email service
+            var sharedEmailService = sp.GetRequiredService<TechnologyStore.Shared.Interfaces.IEmailService>();
             // Use Shared.BusinessRuleSettings
             var desktopRules = sp.GetRequiredService<BusinessRuleSettings>();
             var businessRules = new TechnologyStore.Shared.Config.BusinessRuleSettings
@@ -238,8 +222,16 @@ public static class ServiceConfiguration
                 poRepo, supplierRepo, sharedProductRepo, sharedEmailService, businessRules);
         });
 
-        // Register email service
-        services.AddSingleton<IEmailService, GmailEmailService>();
+        // Register background job service (after PurchaseOrderService so it can be injected)
+        services.AddSingleton<IBackgroundJobService>(sp =>
+        {
+            var settings = sp.GetRequiredService<DatabaseSettings>();
+            var repository = sp.GetRequiredService<TechnologyStore.Shared.Interfaces.IProductRepository>();
+            var lifecycleSentinel = sp.GetRequiredService<ILifecycleSentinel>();
+            // Resolve PurchaseOrderService (may be null if not configured, which is handled in BackgroundJobService)
+            var purchaseOrderService = sp.GetService<TechnologyStore.Shared.Interfaces.IPurchaseOrderService>();
+            return new BackgroundJobService(settings.ConnectionString, repository, lifecycleSentinel, purchaseOrderService);
+        });
         // Register aggregated dependencies for MainForm
         services.AddTransient<RepositoryDependencies>();
         // Register available services

@@ -6,7 +6,8 @@ using System.Linq;
 using System.Windows.Forms;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using TechnologyStore.Desktop.Features.Products.Data;
+using TechnologyStore.Shared.Interfaces;
+using TechnologyStore.Shared.Models;
 
 namespace TechnologyStore.Desktop.UI.Forms;
 

@@ -159,9 +159,13 @@ public class PurchaseOrderService : IPurchaseOrderService
                 return PurchaseOrderResult.Failed("At least one item is required.");
 
             var orderItems = new List<PurchaseOrderItem>();
+            var allProducts = await _productRepository.GetAllAsync();
+            if (allProducts == null)
+                return PurchaseOrderResult.Failed("Failed to retrieve product list.");
+                
             foreach (var (productId, quantity, unitCost) in items)
             {
-                var product = (await _productRepository.GetAllAsync()).FirstOrDefault(p => p.Id == productId);
+                var product = allProducts.FirstOrDefault(p => p.Id == productId);
                 if (product == null)
                     return PurchaseOrderResult.Failed($"Product ID {productId} not found.");
 
@@ -288,17 +292,14 @@ public class PurchaseOrderService : IPurchaseOrderService
             if (order.Status != PurchaseOrderStatus.Sent)
                 return PurchaseOrderResult.Failed($"Cannot mark as received. Order is in '{order.Status}' status.");
 
-            // Update product stock levels for each item in the order
-            foreach (var item in order.Items)
-            {
-                await _productRepository.ReleaseStockAsync(item.ProductId, item.Quantity);
-                _logger.LogDebug("Incremented stock for product {ProductId} by {Quantity} from PO {OrderNumber}",
-                    item.ProductId, item.Quantity, order.OrderNumber);
-            }
-
-            var success = await _purchaseOrderRepository.MarkAsReceivedAsync(orderId);
+            // Update order status and product stock levels atomically
+            var items = order.Items.Select(item => (item.ProductId, item.Quantity)).ToList();
+            var success = await _purchaseOrderRepository.MarkAsReceivedAsync(orderId, items);
             if (!success)
-                return PurchaseOrderResult.Failed("Failed to update order status.");
+                return PurchaseOrderResult.Failed("Failed to update order status. Order may have already been received or is in an invalid state.");
+
+            _logger.LogDebug("Updated stock for {ItemCount} products from PO {OrderNumber}",
+                items.Count, order.OrderNumber);
 
             order.Status = PurchaseOrderStatus.Received;
             order.ReceivedAt = DateTime.UtcNow;

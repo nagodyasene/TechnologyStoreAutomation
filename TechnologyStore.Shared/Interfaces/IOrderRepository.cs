@@ -8,9 +8,9 @@ namespace TechnologyStore.Shared.Interfaces;
 public interface IOrderRepository
 {
     /// <summary>
-    /// Creates a new order with items
+    /// Creates a new order with items and reserves stock atomically
     /// </summary>
-    Task<Order> CreateOrderAsync(Order order);
+    Task<Order> CreateOrderAsync(Order order, IEnumerable<(int ProductId, int Quantity)> itemsToReserve);
     
     /// <summary>
     /// Gets an order by ID
@@ -36,6 +36,11 @@ public interface IOrderRepository
     /// Updates order status
     /// </summary>
     Task UpdateStatusAsync(int orderId, string status);
+    
+    /// <summary>
+    /// Cancels an order and restores product stock levels atomically
+    /// </summary>
+    Task<bool> CancelOrderAndRestoreStockAsync(int orderId, IEnumerable<(int ProductId, int Quantity)> items);
     
     /// <summary>
     /// Generates a unique order number (e.g., ORD-2024-00001)

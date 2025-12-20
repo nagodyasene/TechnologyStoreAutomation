@@ -1,4 +1,3 @@
-using TechnologyStore.Desktop.Features.Products.Data;
 
 namespace TechnologyStore.Desktop.Services;
 

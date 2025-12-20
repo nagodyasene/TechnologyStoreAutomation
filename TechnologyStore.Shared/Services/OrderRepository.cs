@@ -26,7 +26,7 @@ public class OrderRepository : IOrderRepository
 
     private NpgsqlConnection CreateConnection() => new NpgsqlConnection(_connectionString);
 
-    public async Task<Order> CreateOrderAsync(Order order)
+    public async Task<Order> CreateOrderAsync(Order order, IEnumerable<(int ProductId, int Quantity)> itemsToReserve)
     {
         using var db = CreateConnection();
         await db.OpenAsync();
@@ -34,6 +34,25 @@ public class OrderRepository : IOrderRepository
 
         try
         {
+            // Reserve stock for all items atomically (within transaction)
+            const string reserveStockSql = @"
+                UPDATE products 
+                SET current_stock = current_stock - @Quantity,
+                    last_updated = CURRENT_TIMESTAMP
+                WHERE id = @ProductId AND current_stock >= @Quantity";
+
+            foreach (var (productId, quantity) in itemsToReserve)
+            {
+                var rowsAffected = await db.ExecuteAsync(reserveStockSql, 
+                    new { ProductId = productId, Quantity = quantity }, transaction);
+                
+                if (rowsAffected == 0)
+                {
+                    await transaction.RollbackAsync();
+                    throw new InvalidOperationException($"Insufficient stock for product ID {productId}");
+                }
+            }
+
             // Insert order
             var orderSql = @"
                 INSERT INTO orders (order_number, customer_id, status, subtotal, tax, total, notes, pickup_date)
@@ -65,7 +84,8 @@ public class OrderRepository : IOrderRepository
 
             await transaction.CommitAsync();
             
-            _logger.LogInformation("Created order {OrderNumber} for customer {CustomerId}", order.OrderNumber, order.CustomerId);
+            _logger.LogInformation("Created order {OrderNumber} for customer {CustomerId} with reserved stock", 
+                order.OrderNumber, order.CustomerId);
             return order;
         }
         catch
@@ -193,6 +213,56 @@ public class OrderRepository : IOrderRepository
         
         await db.ExecuteAsync(sql, new { OrderId = orderId, Status = status });
         _logger.LogInformation("Updated order {OrderId} status to {Status}", orderId, status);
+    }
+
+    public async Task<bool> CancelOrderAndRestoreStockAsync(int orderId, IEnumerable<(int ProductId, int Quantity)> items)
+    {
+        using var db = CreateConnection();
+        await db.OpenAsync();
+        using var transaction = await db.BeginTransactionAsync();
+
+        try
+        {
+            // Update order status to CANCELLED
+            var orderSql = @"
+                UPDATE orders 
+                SET status = 'CANCELLED'::order_status, 
+                    updated_at = CURRENT_TIMESTAMP,
+                    completed_at = CURRENT_TIMESTAMP
+                WHERE id = @OrderId 
+                  AND status IN ('PENDING', 'CONFIRMED')::order_status";
+
+            var rowsAffected = await db.ExecuteAsync(orderSql, new { OrderId = orderId }, transaction);
+
+            if (rowsAffected == 0)
+            {
+                await transaction.RollbackAsync();
+                return false;
+            }
+
+            // Restore product stock levels for each item atomically
+            const string stockSql = @"
+                UPDATE products 
+                SET current_stock = current_stock + @Quantity,
+                    last_updated = CURRENT_TIMESTAMP
+                WHERE id = @ProductId";
+
+            foreach (var (productId, quantity) in items)
+            {
+                await db.ExecuteAsync(stockSql, new { ProductId = productId, Quantity = quantity }, transaction);
+            }
+
+            await transaction.CommitAsync();
+
+            _logger.LogInformation("Cancelled order {OrderId} and restored stock for {ItemCount} products", 
+                orderId, items.Count());
+            return true;
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
     }
 
     public async Task<string> GenerateOrderNumberAsync()
