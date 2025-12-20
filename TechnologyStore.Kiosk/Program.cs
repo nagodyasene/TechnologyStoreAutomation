@@ -3,7 +3,6 @@ using System.Windows.Forms;
 using TechnologyStore.Shared.Interfaces;
 using TechnologyStore.Shared.Models; // Add Models if used
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using System.IO;
 
@@ -11,8 +10,8 @@ namespace TechnologyStore.Kiosk
 {
     static class Program
     {
-        public static IConfiguration Configuration { get; private set; }
-        public static IServiceProvider ServiceProvider { get; private set; }
+        public static IConfiguration Configuration { get; private set; } = null!;
+        public static IServiceProvider ServiceProvider { get; private set; } = null!;
 
         [STAThread]
         static void Main()

@@ -13,6 +13,16 @@ using TechnologyStore.Desktop.Features.VisitorPrediction;
 using TechnologyStore.Desktop.Features.TimeTracking;
 using TechnologyStore.Desktop.Features.Payroll;
 using TechnologyStore.Desktop.UI.Forms;
+using TechnologyStore.Shared.Interfaces;
+// Resolve ambiguities - Desktop versions take precedence
+using IProductRepository = TechnologyStore.Desktop.Features.Products.Data.IProductRepository;
+using IUserRepository = TechnologyStore.Desktop.Features.Auth.IUserRepository;
+using IAuthenticationService = TechnologyStore.Desktop.Features.Auth.IAuthenticationService;
+using IEmailService = TechnologyStore.Desktop.Features.Email.IEmailService;
+using ITrendCalculator = TechnologyStore.Desktop.Features.Products.ITrendCalculator;
+using IRecommendationEngine = TechnologyStore.Desktop.Features.Products.IRecommendationEngine;
+using ITimeTrackingRepository = TechnologyStore.Shared.Interfaces.ITimeTrackingRepository;
+using IWorkShiftRepository = TechnologyStore.Shared.Interfaces.IWorkShiftRepository;
 
 namespace TechnologyStore.Desktop.Config;
 

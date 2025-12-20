@@ -11,7 +11,7 @@ namespace TechnologyStore.Kiosk
     {
         private readonly List<CartItem> _cart;
         private readonly IProductRepository _repository;
-        private Label _lblStatus;
+        private Label _lblStatus = null!;
 
         public PaymentForm(List<CartItem> cart, IProductRepository repository)
         {

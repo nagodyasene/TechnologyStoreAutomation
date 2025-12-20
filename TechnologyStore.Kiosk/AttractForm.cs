@@ -44,7 +44,7 @@ namespace TechnologyStore.Kiosk
             lblSubtitle.Click += AttractForm_Click;
         }
 
-        private void AttractForm_Click(object sender, EventArgs e)
+        private void AttractForm_Click(object? sender, EventArgs e)
         {
             var scanForm = _serviceProvider.GetRequiredService<ScanForm>();
             scanForm.Show();

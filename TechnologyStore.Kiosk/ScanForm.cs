@@ -22,13 +22,13 @@ namespace TechnologyStore.Kiosk
         private readonly IServiceProvider _serviceProvider;
 
         // UI Controls
-        private PictureBox _pbCam;
-        private TextBox _txtSku;
-        private DataGridView _gridCart;
-        private Label _lblTotal;
-        private Button _btnPay;
-        private ComboBox _cbCameras;
-        private System.Windows.Forms.Timer _decodingTimer;
+        private PictureBox _pbCam = null!;
+        private TextBox _txtSku = null!;
+        private DataGridView _gridCart = null!;
+        private Label _lblTotal = null!;
+        private Button _btnPay = null!;
+        private ComboBox _cbCameras = null!;
+        private System.Windows.Forms.Timer _decodingTimer = null!;
 
         // Cart State
         private List<CartItem> _cart = new List<CartItem>();
@@ -87,7 +87,7 @@ namespace TechnologyStore.Kiosk
             rightPanel.Controls.Add(_txtSku);
 
             var btnAdd = new Button() { Text = "Add", Location = new Point(320, 38), Size = new Size(80, 34), BackColor = Color.LightGray };
-            btnAdd.Click += (s, e) => AddProductToCart(_txtSku.Text);
+            btnAdd.Click += async (s, e) => await AddProductToCart(_txtSku.Text);
             rightPanel.Controls.Add(btnAdd);
 
             // Cart Grid
@@ -162,6 +162,12 @@ namespace TechnologyStore.Kiosk
                 _videoSource.WaitForStop();
             }
 
+            if (_videoDevices == null || _cbCameras.SelectedIndex < 0 || _cbCameras.SelectedIndex >= _videoDevices.Count)
+            {
+                MessageBox.Show("No camera selected or available.");
+                return;
+            }
+
             _videoSource = new VideoCaptureDevice(_videoDevices[_cbCameras.SelectedIndex].MonikerString);
             _videoSource.NewFrame += VideoSource_NewFrame;
             _videoSource.Start();
@@ -190,10 +196,11 @@ namespace TechnologyStore.Kiosk
                 if (result != null)
                 {
                     _decodingTimer.Start(); // Cooldown
-                    this.Invoke(new Action(() =>
+                    var barcodeText = result.Text; // Capture the value before Invoke
+                    this.Invoke(new Action(async () =>
                     {
                         SystemSounds.Beep.Play();
-                        AddProductToCart(result.Text);
+                        await AddProductToCart(barcodeText);
                     }));
                 }
             }
@@ -224,11 +231,11 @@ namespace TechnologyStore.Kiosk
             _txtSku.Clear();
         }
 
-        private void TxtSku_KeyDown(object? sender, KeyEventArgs e)
+        private async void TxtSku_KeyDown(object? sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
             {
-                AddProductToCart(_txtSku.Text);
+                await AddProductToCart(_txtSku.Text);
                 e.SuppressKeyPress = true; // Prevent ding
             }
         }
