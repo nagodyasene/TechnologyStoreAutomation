@@ -54,8 +54,8 @@ internal static class Program
 
         // Show login form first
         var loginForm = serviceProvider.GetRequiredService<CustomerLoginForm>();
-        
-if (loginForm.ShowDialog() != DialogResult.OK)
+
+        if (loginForm.ShowDialog() != DialogResult.OK)
         {
             // User cancelled login or closed the form
             return;
@@ -72,42 +72,52 @@ if (loginForm.ShowDialog() != DialogResult.OK)
     /// </summary>
     private static void LoadEnvFile()
     {
-        var envPath = Path.Combine(AppContext.BaseDirectory, ".env");
-        if (!File.Exists(envPath))
+        var envPath = FindEnvFile();
+        if (envPath == null) return;
+
+        foreach (var line in File.ReadAllLines(envPath))
         {
-            // Try parent directories
-            envPath = Path.Combine(AppContext.BaseDirectory, "..", ".env");
+            ParseAndSetEnvVariable(line);
         }
-        
-if (!File.Exists(envPath))
+    }
+
+    private static string? FindEnvFile()
+    {
+        var searchPaths = new[]
         {
-            envPath = Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".env");
+            Path.Combine(AppContext.BaseDirectory, ".env"),
+            Path.Combine(AppContext.BaseDirectory, "..", ".env"),
+            Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".env")
+        };
+
+        return searchPaths.FirstOrDefault(File.Exists);
+    }
+
+    private static void ParseAndSetEnvVariable(string line)
+    {
+        var trimmedLine = line.Trim();
+        if (string.IsNullOrEmpty(trimmedLine) || trimmedLine.StartsWith('#'))
+            return;
+
+        var equalsIndex = trimmedLine.IndexOf('=');
+        if (equalsIndex <= 0) return;
+
+        var key = trimmedLine[..equalsIndex].Trim();
+        var value = RemoveQuotes(trimmedLine[(equalsIndex + 1)..].Trim());
+
+        Environment.SetEnvironmentVariable(key, value);
+    }
+
+    private static string RemoveQuotes(string value)
+    {
+        if (value.Length < 2) return value;
+
+        if ((value.StartsWith('"') && value.EndsWith('"')) ||
+            (value.StartsWith('\'') && value.EndsWith('\'')))
+        {
+            return value[1..^1];
         }
 
-        if (File.Exists(envPath))
-        {
-            foreach (var line in File.ReadAllLines(envPath))
-            {
-                var trimmedLine = line.Trim();
-                if (string.IsNullOrEmpty(trimmedLine) || trimmedLine.StartsWith('#'))
-                    continue;
-
-                var equalsIndex = trimmedLine.IndexOf('=');
-                if (equalsIndex > 0)
-                {
-                    var key = trimmedLine.Substring(0, equalsIndex).Trim();
-                    var value = trimmedLine.Substring(equalsIndex + 1).Trim();
-                    
-// Remove quotes if present
-                    if ((value.StartsWith('"') && value.EndsWith('"')) ||
-                        (value.StartsWith('\'') && value.EndsWith('\'')))
-                    {
-                        value = value.Substring(1, value.Length - 2);
-                    }
-                    
-Environment.SetEnvironmentVariable(key, value);
-                }
-            }
-        }
+        return value;
     }
 }

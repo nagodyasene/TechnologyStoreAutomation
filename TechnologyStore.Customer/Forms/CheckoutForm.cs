@@ -347,46 +347,8 @@ public partial class CheckoutForm : Form
     {
         ClearError();
 
-        CustomerModel? customer = _authService.CurrentCustomer;
-
-        // Handle guest checkout
-        if (customer == null || _authService.IsGuest)
-        {
-            var email = _txtGuestEmail?.Text?.Trim() ?? string.Empty;
-            var name = _txtGuestName?.Text?.Trim() ?? string.Empty;
-            var phone = _txtGuestPhone?.Text?.Trim();
-
-            if (string.IsNullOrWhiteSpace(email))
-            {
-                ShowError("Please enter your email address.");
-                _txtGuestEmail?.Focus();
-                return;
-            }
-
-            if (!IsValidEmail(email))
-            {
-                ShowError("Please enter a valid email address.");
-                _txtGuestEmail?.Focus();
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                ShowError("Please enter your full name.");
-                _txtGuestName?.Focus();
-                return;
-            }
-
-            try
-            {
-                customer = await _authService.GetOrCreateGuestAsync(email, name, phone);
-            }
-            catch (Exception ex)
-            {
-                ShowError(ex.Message);
-                return;
-            }
-        }
+        var customer = await GetOrValidateCustomerAsync();
+        if (customer == null) return;
 
         SetFormEnabled(false);
 
@@ -396,32 +358,11 @@ public partial class CheckoutForm : Form
             DateTime? pickupDate = _chkSpecifyDate?.Checked == true ? _dtpPickupDate?.Value : null;
 
             var cartItems = _cartService.GetItems().ToList();
-            var result = await _orderService.PlaceOrderAsync(customer!.Id, cartItems, notes, pickupDate);
+            var result = await _orderService.PlaceOrderAsync(customer.Id, cartItems, notes, pickupDate);
 
             if (result.Success && result.Order != null)
             {
-                // Send invoice email
-                try
-                {
-                    var invoiceHtml = _invoiceGenerator.GenerateInvoice(result.Order, customer);
-                    var subject = _invoiceGenerator.GenerateSubject(result.Order);
-                    await _emailService.SendEmailAsync(customer.Email, subject, invoiceHtml);
-                }
-                catch (Exception emailEx)
-                {
-                    // Log but don't fail the order
-                    Console.WriteLine($"Failed to send invoice email: {emailEx.Message}");
-                }
-
-                // Clear cart
-                _cartService.Clear();
-
-                // Show confirmation
-                using var confirmForm = new OrderConfirmationForm(result.Order, customer);
-                confirmForm.ShowDialog(this);
-
-                this.DialogResult = DialogResult.OK;
-                this.Close();
+                await HandleOrderSuccessAsync(result.Order, customer);
             }
             else
             {
@@ -435,6 +376,85 @@ public partial class CheckoutForm : Form
         finally
         {
             SetFormEnabled(true);
+        }
+    }
+
+    private async Task<CustomerModel?> GetOrValidateCustomerAsync()
+    {
+        var customer = _authService.CurrentCustomer;
+
+        if (customer != null && !_authService.IsGuest)
+            return customer;
+
+        // Guest checkout validation
+        var email = _txtGuestEmail?.Text?.Trim() ?? string.Empty;
+        var name = _txtGuestName?.Text?.Trim() ?? string.Empty;
+        var phone = _txtGuestPhone?.Text?.Trim();
+
+        if (!ValidateGuestInfo(email, name))
+            return null;
+
+        try
+        {
+            return await _authService.GetOrCreateGuestAsync(email, name, phone);
+        }
+        catch (Exception ex)
+        {
+            ShowError(ex.Message);
+            return null;
+        }
+    }
+
+    private bool ValidateGuestInfo(string email, string name)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            ShowError("Please enter your email address.");
+            _txtGuestEmail?.Focus();
+            return false;
+        }
+
+        if (!IsValidEmail(email))
+        {
+            ShowError("Please enter a valid email address.");
+            _txtGuestEmail?.Focus();
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            ShowError("Please enter your full name.");
+            _txtGuestName?.Focus();
+            return false;
+        }
+
+        return true;
+    }
+
+    private async Task HandleOrderSuccessAsync(Order order, CustomerModel customer)
+    {
+        await TrySendInvoiceEmailAsync(order, customer);
+
+        _cartService.Clear();
+
+        using var confirmForm = new OrderConfirmationForm(order, customer);
+        confirmForm.ShowDialog(this);
+
+        this.DialogResult = DialogResult.OK;
+        this.Close();
+    }
+
+    private async Task TrySendInvoiceEmailAsync(Order order, CustomerModel customer)
+    {
+        try
+        {
+            var invoiceHtml = _invoiceGenerator.GenerateInvoice(order, customer);
+            var subject = _invoiceGenerator.GenerateSubject(order);
+            await _emailService.SendEmailAsync(customer.Email, subject, invoiceHtml);
+        }
+        catch (Exception emailEx)
+        {
+            Console.WriteLine($"Failed to send invoice email: {emailEx.Message}");
         }
     }
 

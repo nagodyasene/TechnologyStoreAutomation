@@ -13,7 +13,6 @@ namespace TechnologyStore.Desktop.UI.Forms;
 public partial class LeaveRequestForm : Form
 {
     private readonly ILeaveRepository _leaveRepository;
-    private readonly IAuthenticationService _authService;
     private readonly Employee? _currentEmployee;
     private readonly ILogger<LeaveRequestForm> _logger;
 
@@ -30,7 +29,7 @@ public partial class LeaveRequestForm : Form
     public LeaveRequestForm(ILeaveRepository leaveRepository, IAuthenticationService authService, Employee? employee)
     {
         _leaveRepository = leaveRepository ?? throw new ArgumentNullException(nameof(leaveRepository));
-        _authService = authService ?? throw new ArgumentNullException(nameof(authService));
+        ArgumentNullException.ThrowIfNull(authService); // Validate but don't store since unused currently
         _currentEmployee = employee;
         _logger = AppLogger.CreateLogger<LeaveRequestForm>();
 

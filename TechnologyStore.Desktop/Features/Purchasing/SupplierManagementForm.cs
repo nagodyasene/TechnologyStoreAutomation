@@ -30,7 +30,7 @@ public class SupplierManagementForm : Form
         _logger = AppLogger.CreateLogger<SupplierManagementForm>();
 
         InitializeComponent();
-        LoadSuppliersAsync();
+        await LoadSuppliersAsync();
     }
 
     private void InitializeComponent()
