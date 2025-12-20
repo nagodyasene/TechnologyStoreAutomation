@@ -2,6 +2,8 @@ using System.Drawing;
 using System.Windows.Forms;
 using TechnologyStore.Shared.Interfaces;
 
+using static TechnologyStore.Customer.UiConstants;
+
 namespace TechnologyStore.Customer.Forms;
 
 /// <summary>
@@ -54,7 +56,7 @@ public partial class RegistrationForm : Form
             Text = "📝 Create Your Account",
             Location = new Point(0, yPos),
             Width = this.ClientSize.Width,
-            Font = new Font("Segoe UI", 16, FontStyle.Bold),
+            Font = new Font(DefaultFontFamily, 16, FontStyle.Bold),
             TextAlign = ContentAlignment.MiddleCenter,
             ForeColor = Color.FromArgb(0, 120, 212)
         };
@@ -85,7 +87,7 @@ public partial class RegistrationForm : Form
             Height = 45,
             ForeColor = Color.Red,
             TextAlign = ContentAlignment.MiddleCenter,
-            Font = new Font("Segoe UI", 9),
+            Font = new Font(DefaultFontFamily, 9),
             Visible = false
         };
         this.Controls.Add(_lblError);
@@ -102,7 +104,7 @@ public partial class RegistrationForm : Form
             BackColor = Color.FromArgb(0, 120, 212),
             ForeColor = Color.White,
             FlatStyle = FlatStyle.Flat,
-            Font = new Font("Segoe UI", 10, FontStyle.Bold),
+            Font = new Font(DefaultFontFamily, 10, FontStyle.Bold),
             Cursor = Cursors.Hand
         };
         _btnRegister.FlatAppearance.BorderSize = 0;
@@ -119,7 +121,7 @@ public partial class RegistrationForm : Form
             BackColor = Color.FromArgb(108, 117, 125),
             ForeColor = Color.White,
             FlatStyle = FlatStyle.Flat,
-            Font = new Font("Segoe UI", 10),
+            Font = new Font(DefaultFontFamily, 10),
             Cursor = Cursors.Hand
         };
         _btnCancel.FlatAppearance.BorderSize = 0;
@@ -134,7 +136,7 @@ public partial class RegistrationForm : Form
             Text = "* Password must be at least 6 characters",
             Location = new Point(centerX, yPos),
             Width = 300,
-            Font = new Font("Segoe UI", 8),
+            Font = new Font(DefaultFontFamily, 8),
             ForeColor = Color.Gray,
             TextAlign = ContentAlignment.MiddleCenter
         };
@@ -151,7 +153,7 @@ public partial class RegistrationForm : Form
             Text = labelText,
             Location = new Point(centerX, yPos),
             Width = 300,
-            Font = new Font("Segoe UI", 9, FontStyle.Bold)
+            Font = new Font(DefaultFontFamily, 9, FontStyle.Bold)
         };
         this.Controls.Add(label);
 
@@ -162,7 +164,7 @@ public partial class RegistrationForm : Form
             Location = new Point(centerX, yPos),
             Width = 300,
             Height = 28,
-            Font = new Font("Segoe UI", 10)
+            Font = new Font(DefaultFontFamily, 10)
         };
         
         if (isPassword)

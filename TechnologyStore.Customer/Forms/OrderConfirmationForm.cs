@@ -3,6 +3,8 @@ using System.Windows.Forms;
 using TechnologyStore.Shared.Models;
 using CustomerModel = TechnologyStore.Shared.Models.Customer;
 
+using static TechnologyStore.Customer.UiConstants;
+
 namespace TechnologyStore.Customer.Forms;
 
 /// <summary>
@@ -49,7 +51,7 @@ public partial class OrderConfirmationForm : Form
             Text = "✅",
             Location = new Point(0, yPos),
             Width = this.ClientSize.Width,
-            Font = new Font("Segoe UI", 48),
+            Font = new Font(DefaultFontFamily, 48),
             TextAlign = ContentAlignment.MiddleCenter
         };
         this.Controls.Add(lblIcon);
@@ -62,7 +64,7 @@ public partial class OrderConfirmationForm : Form
             Text = "Order Placed Successfully!",
             Location = new Point(0, yPos),
             Width = this.ClientSize.Width,
-            Font = new Font("Segoe UI", 18, FontStyle.Bold),
+            Font = new Font(DefaultFontFamily, 18, FontStyle.Bold),
             ForeColor = Color.FromArgb(40, 167, 69),
             TextAlign = ContentAlignment.MiddleCenter
         };
@@ -84,7 +86,7 @@ public partial class OrderConfirmationForm : Form
         {
             Text = _order.OrderNumber,
             Dock = DockStyle.Fill,
-            Font = new Font("Segoe UI", 22, FontStyle.Bold),
+            Font = new Font(DefaultFontFamily, 22, FontStyle.Bold),
             ForeColor = Color.White,
             TextAlign = ContentAlignment.MiddleCenter
         };
@@ -98,7 +100,7 @@ public partial class OrderConfirmationForm : Form
             Text = "Order Details",
             Location = new Point(50, yPos),
             Width = 400,
-            Font = new Font("Segoe UI", 11, FontStyle.Bold)
+            Font = new Font(DefaultFontFamily, 11, FontStyle.Bold)
         };
         this.Controls.Add(lblDetails);
 
@@ -118,7 +120,7 @@ public partial class OrderConfirmationForm : Form
             Text = $"Items ordered: {_order.Items.Count} product(s), {_order.Items.Sum(i => i.Quantity)} unit(s)",
             Location = new Point(15, 12),
             AutoSize = true,
-            Font = new Font("Segoe UI", 10)
+            Font = new Font(DefaultFontFamily, 10)
         };
         detailsPanel.Controls.Add(lblItemCount);
 
@@ -127,7 +129,7 @@ public partial class OrderConfirmationForm : Form
             Text = $"Total amount: ${_order.Total:N2}",
             Location = new Point(15, 35),
             AutoSize = true,
-            Font = new Font("Segoe UI", 10, FontStyle.Bold)
+            Font = new Font(DefaultFontFamily, 10, FontStyle.Bold)
         };
         detailsPanel.Controls.Add(lblTotalAmount);
 
@@ -139,7 +141,7 @@ public partial class OrderConfirmationForm : Form
             Text = pickupText,
             Location = new Point(15, 58),
             AutoSize = true,
-            Font = new Font("Segoe UI", 10)
+            Font = new Font(DefaultFontFamily, 10)
         };
         detailsPanel.Controls.Add(lblPickup);
 
@@ -148,7 +150,7 @@ public partial class OrderConfirmationForm : Form
             Text = "Payment: Cash at pickup",
             Location = new Point(15, 78),
             AutoSize = true,
-            Font = new Font("Segoe UI", 10),
+            Font = new Font(DefaultFontFamily, 10),
             ForeColor = Color.Gray
         };
         detailsPanel.Controls.Add(lblPayment);
@@ -169,7 +171,7 @@ public partial class OrderConfirmationForm : Form
         {
             Text = $"📧 Invoice sent to: {_customer.Email}",
             Dock = DockStyle.Fill,
-            Font = new Font("Segoe UI", 10),
+            Font = new Font(DefaultFontFamily, 10),
             ForeColor = Color.FromArgb(21, 87, 36),
             TextAlign = ContentAlignment.MiddleCenter
         };
@@ -184,7 +186,7 @@ public partial class OrderConfirmationForm : Form
             Location = new Point(50, yPos),
             Width = 400,
             Height = 40,
-            Font = new Font("Segoe UI", 9),
+            Font = new Font(DefaultFontFamily, 9),
             ForeColor = Color.Gray,
             TextAlign = ContentAlignment.MiddleCenter
         };
@@ -202,7 +204,7 @@ public partial class OrderConfirmationForm : Form
             BackColor = Color.FromArgb(0, 120, 212),
             ForeColor = Color.White,
             FlatStyle = FlatStyle.Flat,
-            Font = new Font("Segoe UI", 11, FontStyle.Bold),
+            Font = new Font(DefaultFontFamily, 11, FontStyle.Bold),
             Cursor = Cursors.Hand
         };
         btnClose.FlatAppearance.BorderSize = 0;

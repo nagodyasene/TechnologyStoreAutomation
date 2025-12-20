@@ -1,4 +1,5 @@
 using TechnologyStore.Desktop.Services;
+using TechnologyStore.Desktop.UI;
 using TechnologyStore.Shared.Interfaces;
 using TechnologyStore.Shared.Models;
 
@@ -58,7 +59,7 @@ public partial class OrderManagementForm : Form
             Text = "📦 Order Management",
             Location = new Point(20, 15),
             AutoSize = true,
-            Font = new Font("Segoe UI", 18, FontStyle.Bold),
+            Font = new Font(UiConstants.DefaultFontFamily, 18, FontStyle.Bold),
             ForeColor = Color.White
         };
         headerPanel.Controls.Add(lblTitle);
@@ -78,7 +79,7 @@ public partial class OrderManagementForm : Form
             Text = "Status:",
             Location = new Point(15, 18),
             AutoSize = true,
-            Font = new Font("Segoe UI", 10)
+            Font = new Font(UiConstants.DefaultFontFamily, 10)
         };
         filterPanel.Controls.Add(lblStatus);
 
@@ -87,7 +88,7 @@ public partial class OrderManagementForm : Form
             Location = new Point(70, 14),
             Width = 180,
             DropDownStyle = ComboBoxStyle.DropDownList,
-            Font = new Font("Segoe UI", 10)
+            Font = new Font(UiConstants.DefaultFontFamily, 10)
         };
         _cboStatusFilter.Items.AddRange(new object[] {
             "All Orders",
@@ -106,7 +107,7 @@ public partial class OrderManagementForm : Form
             Text = "Search:",
             Location = new Point(280, 18),
             AutoSize = true,
-            Font = new Font("Segoe UI", 10)
+            Font = new Font(UiConstants.DefaultFontFamily, 10)
         };
         filterPanel.Controls.Add(lblSearch);
 
@@ -114,7 +115,7 @@ public partial class OrderManagementForm : Form
         {
             Location = new Point(340, 14),
             Width = 200,
-            Font = new Font("Segoe UI", 10),
+            Font = new Font(UiConstants.DefaultFontFamily, 10),
             PlaceholderText = "Order # or customer..."
         };
         _txtSearch.TextChanged += (s, e) => _ = LoadOrdersAsync();
@@ -129,7 +130,7 @@ public partial class OrderManagementForm : Form
             FlatStyle = FlatStyle.Flat,
             BackColor = Color.FromArgb(0, 120, 212),
             ForeColor = Color.White,
-            Font = new Font("Segoe UI", 9),
+            Font = new Font(UiConstants.DefaultFontFamily, 9),
             Cursor = Cursors.Hand
         };
         _btnRefresh.FlatAppearance.BorderSize = 0;
@@ -177,9 +178,9 @@ public partial class OrderManagementForm : Form
         _gridOrders.CellFormatting += GridOrders_CellFormatting;
 
         // Style the grid
-        _gridOrders.DefaultCellStyle.Font = new Font("Segoe UI", 10);
+        _gridOrders.DefaultCellStyle.Font = new Font(UiConstants.DefaultFontFamily, 10);
         _gridOrders.DefaultCellStyle.Padding = new Padding(5);
-        _gridOrders.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 10, FontStyle.Bold);
+        _gridOrders.ColumnHeadersDefaultCellStyle.Font = new Font(UiConstants.DefaultFontFamily, 10, FontStyle.Bold);
         _gridOrders.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(0, 120, 212);
         _gridOrders.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
         _gridOrders.RowTemplate.Height = 38;
@@ -201,7 +202,7 @@ public partial class OrderManagementForm : Form
             Text = "Select an order to view details",
             Location = new Point(15, 10),
             AutoSize = true,
-            Font = new Font("Segoe UI", 12, FontStyle.Bold),
+            Font = new Font(UiConstants.DefaultFontFamily, 12, FontStyle.Bold),
             ForeColor = Color.FromArgb(0, 120, 212)
         };
         detailsPanel.Controls.Add(_lblOrderDetails);
@@ -226,8 +227,8 @@ public partial class OrderManagementForm : Form
         _gridOrderItems.Columns.Add(new DataGridViewTextBoxColumn { Name = "UnitPrice", HeaderText = "Unit Price", FillWeight = 60 });
         _gridOrderItems.Columns.Add(new DataGridViewTextBoxColumn { Name = "LineTotal", HeaderText = "Line Total", FillWeight = 60 });
 
-        _gridOrderItems.DefaultCellStyle.Font = new Font("Segoe UI", 9);
-        _gridOrderItems.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 9, FontStyle.Bold);
+        _gridOrderItems.DefaultCellStyle.Font = new Font(UiConstants.DefaultFontFamily, 9);
+        _gridOrderItems.ColumnHeadersDefaultCellStyle.Font = new Font(UiConstants.DefaultFontFamily, 9, FontStyle.Bold);
         _gridOrderItems.RowTemplate.Height = 30;
 
         detailsPanel.Controls.Add(_gridOrderItems);
@@ -246,7 +247,7 @@ public partial class OrderManagementForm : Form
             Text = "Update Status:",
             Location = new Point(0, 0),
             AutoSize = true,
-            Font = new Font("Segoe UI", 10, FontStyle.Bold)
+            Font = new Font(UiConstants.DefaultFontFamily, 10, FontStyle.Bold)
         };
         actionPanel.Controls.Add(lblActions);
 
@@ -269,7 +270,7 @@ public partial class OrderManagementForm : Form
             FlatStyle = FlatStyle.Flat,
             BackColor = color,
             ForeColor = Color.White,
-            Font = new Font("Segoe UI", 9, FontStyle.Bold),
+            Font = new Font(UiConstants.DefaultFontFamily, 9, FontStyle.Bold),
             Cursor = Cursors.Hand
         };
         btn.FlatAppearance.BorderSize = 0;

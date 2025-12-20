@@ -3,6 +3,8 @@ using System.Windows.Forms;
 using TechnologyStore.Shared.Interfaces;
 using TechnologyStore.Customer.Services;
 
+using static TechnologyStore.Customer.UiConstants;
+
 namespace TechnologyStore.Customer.Forms;
 
 /// <summary>
@@ -16,7 +18,7 @@ public partial class CartForm : Form
     private readonly IEmailService _emailService;
     private readonly InvoiceGenerator _invoiceGenerator;
     private readonly ICustomerRepository _customerRepository;
-    
+
     private DataGridView? _gridCart;
     private Label? _lblSubtotal;
     private Label? _lblTax;
@@ -38,7 +40,7 @@ public partial class CartForm : Form
         _emailService = emailService;
         _invoiceGenerator = invoiceGenerator;
         _customerRepository = customerRepository;
-        
+
         InitializeComponent();
         SetupUI();
     }
@@ -66,7 +68,7 @@ public partial class CartForm : Form
             Text = "🛒 Your Shopping Cart",
             Location = new Point(20, 15),
             AutoSize = true,
-            Font = new Font("Segoe UI", 18, FontStyle.Bold),
+            Font = new Font(DefaultFontFamily, 18, FontStyle.Bold),
             ForeColor = Color.FromArgb(0, 120, 212)
         };
         this.Controls.Add(lblTitle);
@@ -90,12 +92,12 @@ public partial class CartForm : Form
         _gridCart.Columns.Add(new DataGridViewTextBoxColumn { Name = "ProductId", Visible = false });
         _gridCart.Columns.Add(new DataGridViewTextBoxColumn { Name = "Product", HeaderText = "Product", FillWeight = 150, ReadOnly = true });
         _gridCart.Columns.Add(new DataGridViewTextBoxColumn { Name = "UnitPrice", HeaderText = "Unit Price", FillWeight = 60, ReadOnly = true });
-        
+
         var qtyColumn = new DataGridViewTextBoxColumn { Name = "Quantity", HeaderText = "Qty", FillWeight = 40 };
         _gridCart.Columns.Add(qtyColumn);
-        
+
         _gridCart.Columns.Add(new DataGridViewTextBoxColumn { Name = "LineTotal", HeaderText = "Total", FillWeight = 60, ReadOnly = true });
-        
+
         var removeColumn = new DataGridViewButtonColumn
         {
             Name = "Remove",
@@ -108,9 +110,9 @@ public partial class CartForm : Form
 
         _gridCart.CellClick += GridCart_CellClick;
         _gridCart.CellEndEdit += GridCart_CellEndEdit;
-        _gridCart.DefaultCellStyle.Font = new Font("Segoe UI", 10);
+        _gridCart.DefaultCellStyle.Font = new Font(DefaultFontFamily, 10);
         _gridCart.DefaultCellStyle.Padding = new Padding(5);
-        _gridCart.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 10, FontStyle.Bold);
+        _gridCart.ColumnHeadersDefaultCellStyle.Font = new Font(DefaultFontFamily, 10, FontStyle.Bold);
         _gridCart.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(0, 120, 212);
         _gridCart.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
         _gridCart.RowTemplate.Height = 40;
@@ -133,7 +135,7 @@ public partial class CartForm : Form
             Text = "Subtotal: $0.00",
             Location = new Point(15, 15),
             Width = 230,
-            Font = new Font("Segoe UI", 11),
+            Font = new Font(DefaultFontFamily, 11),
             TextAlign = ContentAlignment.MiddleRight
         };
         totalsPanel.Controls.Add(_lblSubtotal);
@@ -143,7 +145,7 @@ public partial class CartForm : Form
             Text = "Tax (10%): $0.00",
             Location = new Point(15, 40),
             Width = 230,
-            Font = new Font("Segoe UI", 11),
+            Font = new Font(DefaultFontFamily, 11),
             ForeColor = Color.Gray,
             TextAlign = ContentAlignment.MiddleRight
         };
@@ -154,7 +156,7 @@ public partial class CartForm : Form
             Text = "Total: $0.00",
             Location = new Point(15, 70),
             Width = 230,
-            Font = new Font("Segoe UI", 14, FontStyle.Bold),
+            Font = new Font(DefaultFontFamily, 14, FontStyle.Bold),
             ForeColor = Color.FromArgb(0, 120, 212),
             TextAlign = ContentAlignment.MiddleRight
         };
@@ -167,7 +169,7 @@ public partial class CartForm : Form
             Text = "Your cart is empty.\nStart shopping to add items!",
             Location = new Point(20, 375),
             Size = new Size(380, 60),
-            Font = new Font("Segoe UI", 11),
+            Font = new Font(DefaultFontFamily, 11),
             ForeColor = Color.Gray,
             TextAlign = ContentAlignment.MiddleLeft
         };
@@ -183,7 +185,7 @@ public partial class CartForm : Form
             FlatStyle = FlatStyle.Flat,
             BackColor = Color.White,
             ForeColor = Color.FromArgb(0, 120, 212),
-            Font = new Font("Segoe UI", 10),
+            Font = new Font(DefaultFontFamily, 10),
             Cursor = Cursors.Hand
         };
         _btnContinue.FlatAppearance.BorderColor = Color.FromArgb(0, 120, 212);
@@ -199,7 +201,7 @@ public partial class CartForm : Form
             FlatStyle = FlatStyle.Flat,
             BackColor = Color.FromArgb(40, 167, 69),
             ForeColor = Color.White,
-            Font = new Font("Segoe UI", 10, FontStyle.Bold),
+            Font = new Font(DefaultFontFamily, 10, FontStyle.Bold),
             Cursor = Cursors.Hand
         };
         _btnCheckout.FlatAppearance.BorderSize = 0;
@@ -245,10 +247,10 @@ public partial class CartForm : Form
     private void UpdateVisibility()
     {
         var isEmpty = _cartService.IsEmpty;
-        
+
         var lblEmpty = this.Controls.Find("lblEmpty", false).FirstOrDefault();
         if (lblEmpty != null) lblEmpty.Visible = isEmpty;
-        
+
         if (_btnCheckout != null) _btnCheckout.Enabled = !isEmpty;
     }
 
@@ -272,7 +274,7 @@ public partial class CartForm : Form
         {
             var productId = (int)_gridCart.Rows[e.RowIndex].Cells["ProductId"].Value;
             var qtyValue = _gridCart.Rows[e.RowIndex].Cells["Quantity"].Value;
-            
+
             if (int.TryParse(qtyValue?.ToString(), out int newQty))
             {
                 if (newQty <= 0)
@@ -281,11 +283,11 @@ public partial class CartForm : Form
                 }
                 else if (!_cartService.UpdateQuantity(productId, newQty))
                 {
-                    MessageBox.Show("Not enough stock available.", "Stock Limit", 
+                    MessageBox.Show("Not enough stock available.", "Stock Limit",
                         MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
             }
-            
+
             RefreshCart();
         }
     }
@@ -299,9 +301,9 @@ public partial class CartForm : Form
         }
 
         using var checkoutForm = new CheckoutForm(
-            _cartService, _authService, _orderService, 
+            _cartService, _authService, _orderService,
             _emailService, _invoiceGenerator, _customerRepository);
-        
+
         if (checkoutForm.ShowDialog(this) == DialogResult.OK)
         {
             // Order placed successfully, close cart

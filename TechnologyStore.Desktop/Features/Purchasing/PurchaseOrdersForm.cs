@@ -27,7 +27,9 @@ public class PurchaseOrdersForm : Form
     private Button _btnViewDetails = null!;
     private Label _lblStatus = null!;
 
-    private BindingList<PurchaseOrderViewModel> _orders = new();
+    private readonly BindingList<PurchaseOrderViewModel> _orders = new();
+
+    private const string ErrorTitle = "Error";
 
     public PurchaseOrdersForm(IPurchaseOrderService purchaseOrderService, IAuthenticationService authService)
     {
@@ -203,7 +205,7 @@ public class PurchaseOrdersForm : Form
         {
             _logger.LogError(ex, "Failed to load purchase orders");
             _lblStatus.Text = "Error loading orders";
-            MessageBox.Show($"Failed to load orders: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show($"Failed to load orders: {ex.Message}", ErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 
@@ -258,13 +260,13 @@ public class PurchaseOrdersForm : Form
             }
             else
             {
-                MessageBox.Show(result.ErrorMessage ?? "Failed to approve order.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(result.ErrorMessage ?? "Failed to approve order.", ErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to approve order");
-            MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show($"Error: {ex.Message}", ErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 
@@ -294,13 +296,13 @@ public class PurchaseOrdersForm : Form
             }
             else
             {
-                MessageBox.Show(result.ErrorMessage ?? "Failed to send order.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(result.ErrorMessage ?? "Failed to send order.", ErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to send order");
-            MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show($"Error: {ex.Message}", ErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 
@@ -327,13 +329,13 @@ public class PurchaseOrdersForm : Form
             }
             else
             {
-                MessageBox.Show(result.ErrorMessage ?? "Failed to mark as received.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(result.ErrorMessage ?? "Failed to mark as received.", ErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to mark order as received");
-            MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show($"Error: {ex.Message}", ErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 
@@ -360,13 +362,13 @@ public class PurchaseOrdersForm : Form
             }
             else
             {
-                MessageBox.Show(result.ErrorMessage ?? "Failed to cancel order.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(result.ErrorMessage ?? "Failed to cancel order.", ErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to cancel order");
-            MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show($"Error: {ex.Message}", ErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 
@@ -380,7 +382,7 @@ public class PurchaseOrdersForm : Form
             var order = await _purchaseOrderService.GetByIdAsync(selected.Id);
             if (order == null)
             {
-                MessageBox.Show("Order not found.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Order not found.", ErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
@@ -390,7 +392,7 @@ public class PurchaseOrdersForm : Form
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to load order details");
-            MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show($"Error: {ex.Message}", ErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 }

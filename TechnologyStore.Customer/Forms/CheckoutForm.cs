@@ -5,6 +5,8 @@ using TechnologyStore.Shared.Interfaces;
 using TechnologyStore.Customer.Services;
 using CustomerModel = TechnologyStore.Shared.Models.Customer;
 
+using static TechnologyStore.Customer.UiConstants;
+
 namespace TechnologyStore.Customer.Forms;
 
 /// <summary>
@@ -78,7 +80,7 @@ public partial class CheckoutForm : Form
             Text = "📋 Checkout",
             Location = new Point(leftMargin, yPos),
             AutoSize = true,
-            Font = new Font("Segoe UI", 18, FontStyle.Bold),
+            Font = new Font(DefaultFontFamily, 18, FontStyle.Bold),
             ForeColor = Color.FromArgb(0, 120, 212)
         };
         this.Controls.Add(lblTitle);
@@ -91,7 +93,7 @@ public partial class CheckoutForm : Form
             Text = "Order Summary",
             Location = new Point(leftMargin, yPos),
             Width = fieldWidth,
-            Font = new Font("Segoe UI", 12, FontStyle.Bold)
+            Font = new Font(DefaultFontFamily, 12, FontStyle.Bold)
         };
         this.Controls.Add(lblSummary);
 
@@ -114,7 +116,7 @@ public partial class CheckoutForm : Form
             Text = itemsText,
             Location = new Point(15, 15),
             Width = 300,
-            Font = new Font("Segoe UI", 10)
+            Font = new Font(DefaultFontFamily, 10)
         };
         summaryPanel.Controls.Add(lblItems);
 
@@ -123,7 +125,7 @@ public partial class CheckoutForm : Form
             Text = $"Total: ${_cartService.Total:N2}",
             Location = new Point(15, 45),
             Width = 300,
-            Font = new Font("Segoe UI", 14, FontStyle.Bold),
+            Font = new Font(DefaultFontFamily, 14, FontStyle.Bold),
             ForeColor = Color.FromArgb(0, 120, 212)
         };
         summaryPanel.Controls.Add(lblTotal);
@@ -138,7 +140,7 @@ public partial class CheckoutForm : Form
                 Text = "Your Information",
                 Location = new Point(leftMargin, yPos),
                 Width = fieldWidth,
-                Font = new Font("Segoe UI", 12, FontStyle.Bold)
+                Font = new Font(DefaultFontFamily, 12, FontStyle.Bold)
             };
             this.Controls.Add(lblGuestInfo);
 
@@ -161,7 +163,7 @@ public partial class CheckoutForm : Form
                 Text = "Billing Information",
                 Location = new Point(leftMargin, yPos),
                 Width = fieldWidth,
-                Font = new Font("Segoe UI", 12, FontStyle.Bold)
+                Font = new Font(DefaultFontFamily, 12, FontStyle.Bold)
             };
             this.Controls.Add(lblCustomerInfo);
 
@@ -182,7 +184,7 @@ public partial class CheckoutForm : Form
                 Text = $"👤 {customer.FullName}",
                 Location = new Point(15, 12),
                 AutoSize = true,
-                Font = new Font("Segoe UI", 10)
+                Font = new Font(DefaultFontFamily, 10)
             };
             customerPanel.Controls.Add(lblName);
 
@@ -191,7 +193,7 @@ public partial class CheckoutForm : Form
                 Text = $"✉️ {customer.Email}",
                 Location = new Point(15, 35),
                 AutoSize = true,
-                Font = new Font("Segoe UI", 10),
+                Font = new Font(DefaultFontFamily, 10),
                 ForeColor = Color.Gray
             };
             customerPanel.Controls.Add(lblEmail);
@@ -205,7 +207,7 @@ public partial class CheckoutForm : Form
             Text = "Pickup Details",
             Location = new Point(leftMargin, yPos),
             Width = fieldWidth,
-            Font = new Font("Segoe UI", 12, FontStyle.Bold)
+            Font = new Font(DefaultFontFamily, 12, FontStyle.Bold)
         };
         this.Controls.Add(lblPickup);
 
@@ -216,7 +218,7 @@ public partial class CheckoutForm : Form
             Text = "Specify a preferred pickup date",
             Location = new Point(leftMargin, yPos),
             Width = fieldWidth,
-            Font = new Font("Segoe UI", 10)
+            Font = new Font(DefaultFontFamily, 10)
         };
         _chkSpecifyDate.CheckedChanged += (s, e) =>
         {
@@ -231,7 +233,7 @@ public partial class CheckoutForm : Form
         {
             Location = new Point(leftMargin, yPos),
             Width = 200,
-            Font = new Font("Segoe UI", 10),
+            Font = new Font(DefaultFontFamily, 10),
             MinDate = DateTime.Today.AddDays(1),
             Enabled = false
         };
@@ -245,7 +247,7 @@ public partial class CheckoutForm : Form
             Text = "Order Notes (optional)",
             Location = new Point(leftMargin, yPos),
             Width = fieldWidth,
-            Font = new Font("Segoe UI", 10, FontStyle.Bold)
+            Font = new Font(DefaultFontFamily, 10, FontStyle.Bold)
         };
         this.Controls.Add(lblNotes);
 
@@ -256,7 +258,7 @@ public partial class CheckoutForm : Form
             Location = new Point(leftMargin, yPos),
             Size = new Size(fieldWidth, 60),
             Multiline = true,
-            Font = new Font("Segoe UI", 10),
+            Font = new Font(DefaultFontFamily, 10),
             PlaceholderText = "Any special requests or instructions..."
         };
         this.Controls.Add(_txtNotes);
@@ -270,7 +272,7 @@ public partial class CheckoutForm : Form
             Width = fieldWidth,
             Height = 40,
             ForeColor = Color.Red,
-            Font = new Font("Segoe UI", 9),
+            Font = new Font(DefaultFontFamily, 9),
             Visible = false
         };
         this.Controls.Add(_lblError);
@@ -287,7 +289,7 @@ public partial class CheckoutForm : Form
             BackColor = Color.FromArgb(40, 167, 69),
             ForeColor = Color.White,
             FlatStyle = FlatStyle.Flat,
-            Font = new Font("Segoe UI", 12, FontStyle.Bold),
+            Font = new Font(DefaultFontFamily, 12, FontStyle.Bold),
             Cursor = Cursors.Hand
         };
         _btnPlaceOrder.FlatAppearance.BorderSize = 0;
@@ -306,7 +308,7 @@ public partial class CheckoutForm : Form
             FlatStyle = FlatStyle.Flat,
             BackColor = Color.White,
             ForeColor = Color.Gray,
-            Font = new Font("Segoe UI", 10),
+            Font = new Font(DefaultFontFamily, 10),
             Cursor = Cursors.Hand
         };
         btnCancel.FlatAppearance.BorderColor = Color.Gray;
@@ -321,7 +323,7 @@ public partial class CheckoutForm : Form
             Text = label,
             Location = new Point(leftMargin, yPos),
             Width = width,
-            Font = new Font("Segoe UI", 9, FontStyle.Bold)
+            Font = new Font(DefaultFontFamily, 9, FontStyle.Bold)
         };
         this.Controls.Add(lbl);
 
@@ -332,7 +334,7 @@ public partial class CheckoutForm : Form
             Location = new Point(leftMargin, yPos),
             Width = width,
             Height = 28,
-            Font = new Font("Segoe UI", 10)
+            Font = new Font(DefaultFontFamily, 10)
         };
 
         if (isPassword)

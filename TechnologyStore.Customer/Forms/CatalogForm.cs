@@ -4,6 +4,8 @@ using TechnologyStore.Shared.Models;
 using TechnologyStore.Shared.Interfaces;
 using TechnologyStore.Customer.Services;
 
+using static TechnologyStore.Customer.UiConstants;
+
 namespace TechnologyStore.Customer.Forms;
 
 /// <summary>
@@ -81,7 +83,7 @@ public partial class CatalogForm : Form
             Text = "🛒 Technology Store",
             Location = new Point(20, 15),
             AutoSize = true,
-            Font = new Font("Segoe UI", 18, FontStyle.Bold),
+            Font = new Font(DefaultFontFamily, 18, FontStyle.Bold),
             ForeColor = Color.White
         };
         headerPanel.Controls.Add(lblLogo);
@@ -91,7 +93,7 @@ public partial class CatalogForm : Form
         {
             Location = new Point(300, 25),
             AutoSize = true,
-            Font = new Font("Segoe UI", 10),
+            Font = new Font(DefaultFontFamily, 10),
             ForeColor = Color.White
         };
         headerPanel.Controls.Add(_lblWelcome);
@@ -128,7 +130,7 @@ public partial class CatalogForm : Form
             Text = "Search:",
             Location = new Point(20, 20),
             AutoSize = true,
-            Font = new Font("Segoe UI", 10)
+            Font = new Font(DefaultFontFamily, 10)
         };
         filterPanel.Controls.Add(lblSearch);
 
@@ -137,7 +139,7 @@ public partial class CatalogForm : Form
             Location = new Point(80, 17),
             Width = 250,
             Height = 28,
-            Font = new Font("Segoe UI", 10),
+            Font = new Font(DefaultFontFamily, 10),
             PlaceholderText = "Search products..."
         };
         _txtSearch.TextChanged += (s, e) => FilterProducts();
@@ -148,7 +150,7 @@ public partial class CatalogForm : Form
             Text = "Category:",
             Location = new Point(360, 20),
             AutoSize = true,
-            Font = new Font("Segoe UI", 10)
+            Font = new Font(DefaultFontFamily, 10)
         };
         filterPanel.Controls.Add(lblCategory);
 
@@ -157,7 +159,7 @@ public partial class CatalogForm : Form
             Location = new Point(435, 17),
             Width = 180,
             DropDownStyle = ComboBoxStyle.DropDownList,
-            Font = new Font("Segoe UI", 10)
+            Font = new Font(DefaultFontFamily, 10)
         };
         _cboCategory.SelectedIndexChanged += (s, e) => FilterProducts();
         filterPanel.Controls.Add(_cboCategory);
@@ -172,7 +174,7 @@ public partial class CatalogForm : Form
             BackColor = Color.FromArgb(40, 167, 69),
             ForeColor = Color.White,
             FlatStyle = FlatStyle.Flat,
-            Font = new Font("Segoe UI", 10, FontStyle.Bold),
+            Font = new Font(DefaultFontFamily, 10, FontStyle.Bold),
             Cursor = Cursors.Hand,
             Anchor = AnchorStyles.Top | AnchorStyles.Right
         };
@@ -187,7 +189,7 @@ public partial class CatalogForm : Form
             Height = 25,
             BackColor = Color.Red,
             ForeColor = Color.White,
-            Font = new Font("Segoe UI", 9, FontStyle.Bold),
+            Font = new Font(DefaultFontFamily, 9, FontStyle.Bold),
             TextAlign = ContentAlignment.MiddleCenter,
             Text = "0",
             Visible = false,
@@ -237,9 +239,9 @@ public partial class CatalogForm : Form
         _gridProducts.CellFormatting += GridProducts_CellFormatting;
 
         // Style the grid
-        _gridProducts.DefaultCellStyle.Font = new Font("Segoe UI", 10);
+        _gridProducts.DefaultCellStyle.Font = new Font(DefaultFontFamily, 10);
         _gridProducts.DefaultCellStyle.Padding = new Padding(5);
-        _gridProducts.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 10, FontStyle.Bold);
+        _gridProducts.ColumnHeadersDefaultCellStyle.Font = new Font(DefaultFontFamily, 10, FontStyle.Bold);
         _gridProducts.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(0, 120, 212);
         _gridProducts.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
         _gridProducts.RowTemplate.Height = 45;
@@ -330,7 +332,7 @@ public partial class CatalogForm : Form
         {
             var stockText = product.CurrentStock > 0 
                 ? product.CurrentStock.ToString() 
-                : "Out of Stock";
+                : OutOfStockText;
             
             var status = product.LifecyclePhase == "LEGACY" ? "🏷️ Clearance" : "✅ Available";
             
@@ -350,7 +352,7 @@ public partial class CatalogForm : Form
         if (_gridProducts == null || e.RowIndex < 0) return;
 
         var stockCell = _gridProducts.Rows[e.RowIndex].Cells["Stock"];
-        if (stockCell?.Value?.ToString() == "Out of Stock")
+        if (stockCell?.Value?.ToString() == OutOfStockText)
         {
             _gridProducts.Rows[e.RowIndex].DefaultCellStyle.ForeColor = Color.Gray;
         }
@@ -366,9 +368,9 @@ public partial class CatalogForm : Form
             var productName = _gridProducts.Rows[e.RowIndex].Cells["Name"].Value?.ToString() ?? "Product";
             var stockText = _gridProducts.Rows[e.RowIndex].Cells["Stock"].Value?.ToString();
 
-            if (stockText == "Out of Stock")
+            if (stockText == OutOfStockText)
             {
-                MessageBox.Show("This product is currently out of stock.", "Out of Stock", 
+                MessageBox.Show("This product is currently out of stock.", OutOfStockText, 
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }

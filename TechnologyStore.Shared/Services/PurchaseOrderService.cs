@@ -17,6 +17,8 @@ public class PurchaseOrderService : IPurchaseOrderService
     private readonly BusinessRuleSettings _businessRules;
     private readonly ILogger<PurchaseOrderService> _logger;
 
+    private const string OrderNotFoundMessage = "Purchase order not found.";
+
     public PurchaseOrderService(
         IPurchaseOrderRepository purchaseOrderRepository,
         ISupplierRepository supplierRepository,
@@ -41,7 +43,7 @@ public class PurchaseOrderService : IPurchaseOrderService
         {
             // Get dashboard data which includes RunwayDays calculation
             var dashboardData = await _productRepository.GetDashboardDataAsync();
-            
+
             // Filter products with low stock (RunwayDays <= ReorderRunwayDays) that are ACTIVE
             var lowStockProducts = dashboardData
                 .Where(p => p.RunwayDays <= _businessRules.ReorderRunwayDays && p.Phase == "ACTIVE")
@@ -79,7 +81,7 @@ public class PurchaseOrderService : IPurchaseOrderService
                 foreach (var dashboardProduct in supplierGroup)
                 {
                     var product = productDict[dashboardProduct.Id];
-                    
+
                     // Calculate quantity to order: enough for ReorderRunwayDays worth of stock
                     // Based on SalesLast7Days, estimate daily sales
                     var dailySales = dashboardProduct.SalesLast7Days / 7.0;
@@ -140,8 +142,8 @@ public class PurchaseOrderService : IPurchaseOrderService
 
     /// <inheritdoc />
     public async Task<PurchaseOrderResult> CreateManualPurchaseOrderAsync(
-        int supplierId, 
-        List<(int ProductId, int Quantity, decimal UnitCost)> items, 
+        int supplierId,
+        List<(int ProductId, int Quantity, decimal UnitCost)> items,
         string? notes = null)
     {
         try
@@ -205,7 +207,7 @@ public class PurchaseOrderService : IPurchaseOrderService
         {
             var order = await _purchaseOrderRepository.GetByIdAsync(orderId);
             if (order == null)
-                return PurchaseOrderResult.Failed("Purchase order not found.");
+                return PurchaseOrderResult.Failed(OrderNotFoundMessage);
 
             if (order.Status != PurchaseOrderStatus.Pending)
                 return PurchaseOrderResult.Failed($"Cannot approve order in '{order.Status}' status.");
@@ -235,7 +237,7 @@ public class PurchaseOrderService : IPurchaseOrderService
         {
             var order = await _purchaseOrderRepository.GetByIdAsync(orderId);
             if (order == null)
-                return PurchaseOrderResult.Failed("Purchase order not found.");
+                return PurchaseOrderResult.Failed(OrderNotFoundMessage);
 
             if (order.Status != PurchaseOrderStatus.Approved)
                 return PurchaseOrderResult.Failed($"Cannot send order in '{order.Status}' status. Order must be approved first.");
@@ -281,7 +283,7 @@ public class PurchaseOrderService : IPurchaseOrderService
         {
             var order = await _purchaseOrderRepository.GetByIdAsync(orderId);
             if (order == null)
-                return PurchaseOrderResult.Failed("Purchase order not found.");
+                return PurchaseOrderResult.Failed(OrderNotFoundMessage);
 
             if (order.Status != PurchaseOrderStatus.Sent)
                 return PurchaseOrderResult.Failed($"Cannot mark as received. Order is in '{order.Status}' status.");
@@ -313,7 +315,7 @@ public class PurchaseOrderService : IPurchaseOrderService
         {
             var order = await _purchaseOrderRepository.GetByIdAsync(orderId);
             if (order == null)
-                return PurchaseOrderResult.Failed("Purchase order not found.");
+                return PurchaseOrderResult.Failed(OrderNotFoundMessage);
 
             if (order.Status == PurchaseOrderStatus.Sent || order.Status == PurchaseOrderStatus.Received)
                 return PurchaseOrderResult.Failed($"Cannot cancel order that has been '{order.Status}'.");

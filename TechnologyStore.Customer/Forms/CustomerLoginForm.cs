@@ -2,6 +2,8 @@ using System.Drawing;
 using System.Windows.Forms;
 using TechnologyStore.Shared.Interfaces;
 
+using static TechnologyStore.Customer.UiConstants;
+
 namespace TechnologyStore.Customer.Forms;
 
 /// <summary>
@@ -54,7 +56,7 @@ public partial class CustomerLoginForm : Form
             Text = "🛒 Technology Store",
             Location = new Point(0, yPos),
             Width = this.ClientSize.Width,
-            Font = new Font("Segoe UI", 20, FontStyle.Bold),
+            Font = new Font(DefaultFontFamily, 20, FontStyle.Bold),
             TextAlign = ContentAlignment.MiddleCenter,
             ForeColor = Color.FromArgb(0, 120, 212)
         };
@@ -67,7 +69,7 @@ public partial class CustomerLoginForm : Form
             Text = "Welcome! Please sign in to continue",
             Location = new Point(0, yPos),
             Width = this.ClientSize.Width,
-            Font = new Font("Segoe UI", 10),
+            Font = new Font(DefaultFontFamily, 10),
             TextAlign = ContentAlignment.MiddleCenter,
             ForeColor = Color.Gray
         };
@@ -81,7 +83,7 @@ public partial class CustomerLoginForm : Form
             Text = "Email Address",
             Location = new Point(centerX, yPos),
             Width = 300,
-            Font = new Font("Segoe UI", 9, FontStyle.Bold)
+            Font = new Font(DefaultFontFamily, 9, FontStyle.Bold)
         };
         this.Controls.Add(lblEmail);
 
@@ -92,7 +94,7 @@ public partial class CustomerLoginForm : Form
             Location = new Point(centerX, yPos),
             Width = 300,
             Height = 30,
-            Font = new Font("Segoe UI", 11)
+            Font = new Font(DefaultFontFamily, 11)
         };
         _txtEmail.KeyDown += OnTextBoxKeyDown;
         this.Controls.Add(_txtEmail);
@@ -105,7 +107,7 @@ public partial class CustomerLoginForm : Form
             Text = "Password",
             Location = new Point(centerX, yPos),
             Width = 300,
-            Font = new Font("Segoe UI", 9, FontStyle.Bold)
+            Font = new Font(DefaultFontFamily, 9, FontStyle.Bold)
         };
         this.Controls.Add(lblPassword);
 
@@ -116,7 +118,7 @@ public partial class CustomerLoginForm : Form
             Location = new Point(centerX, yPos),
             Width = 300,
             Height = 30,
-            Font = new Font("Segoe UI", 11),
+            Font = new Font(DefaultFontFamily, 11),
             PasswordChar = '●'
         };
         _txtPassword.KeyDown += OnTextBoxKeyDown;
@@ -132,7 +134,7 @@ public partial class CustomerLoginForm : Form
             Height = 40,
             ForeColor = Color.Red,
             TextAlign = ContentAlignment.MiddleCenter,
-            Font = new Font("Segoe UI", 9),
+            Font = new Font(DefaultFontFamily, 9),
             Visible = false
         };
         this.Controls.Add(_lblError);
@@ -149,7 +151,7 @@ public partial class CustomerLoginForm : Form
             BackColor = Color.FromArgb(0, 120, 212),
             ForeColor = Color.White,
             FlatStyle = FlatStyle.Flat,
-            Font = new Font("Segoe UI", 11, FontStyle.Bold),
+            Font = new Font(DefaultFontFamily, 11, FontStyle.Bold),
             Cursor = Cursors.Hand
         };
         _btnLogin.FlatAppearance.BorderSize = 0;
@@ -168,7 +170,7 @@ public partial class CustomerLoginForm : Form
             BackColor = Color.White,
             ForeColor = Color.FromArgb(0, 120, 212),
             FlatStyle = FlatStyle.Flat,
-            Font = new Font("Segoe UI", 10),
+            Font = new Font(DefaultFontFamily, 10),
             Cursor = Cursors.Hand
         };
         _btnRegister.FlatAppearance.BorderColor = Color.FromArgb(0, 120, 212);
@@ -200,7 +202,7 @@ public partial class CustomerLoginForm : Form
             BackColor = Color.FromArgb(108, 117, 125),
             ForeColor = Color.White,
             FlatStyle = FlatStyle.Flat,
-            Font = new Font("Segoe UI", 10),
+            Font = new Font(DefaultFontFamily, 10),
             Cursor = Cursors.Hand
         };
         _btnGuest.FlatAppearance.BorderSize = 0;
