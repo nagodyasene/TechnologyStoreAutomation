@@ -1,0 +1,5622 @@
+{
+  "summary": {
+    "total_methods": 701,
+    "average_complexity": 2.74,
+    "min_complexity": 1,
+    "max_complexity": 17,
+    "simple_count": 613,
+    "moderate_count": 74,
+    "complex_count": 14,
+    "very_complex_count": 0
+  },
+  "methods": [
+    {
+      "file": "TechnologyStore.Desktop/Config/EnvFileLoader.cs",
+      "class": "EnvFileLoader",
+      "method": "TryBuildFromIndividualVariables",
+      "complexity": 17,
+      "line": 170,
+      "rating": "🟠 Karmaşık (Complex)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/RegistrationForm.cs",
+      "class": "RegistrationFormData",
+      "method": "CollectFormData",
+      "complexity": 17,
+      "line": 209,
+      "rating": "🟠 Karmaşık (Complex)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/CheckoutForm.cs",
+      "class": "CheckoutForm",
+      "method": "BtnPlaceOrder_Click",
+      "complexity": 16,
+      "line": 346,
+      "rating": "🟠 Karmaşık (Complex)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/CheckoutForm.cs",
+      "class": "CheckoutForm",
+      "method": "GetOrValidateCustomerAsync",
+      "complexity": 16,
+      "line": 382,
+      "rating": "🟠 Karmaşık (Complex)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/SalesReportForm.cs",
+      "class": "SalesReportForm",
+      "method": "BtnGenerate_Click",
+      "complexity": 13,
+      "line": 206,
+      "rating": "🟠 Karmaşık (Complex)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Orders/OrderManagementForm.cs",
+      "class": "OrderManagementForm",
+      "method": "GetFilteredOrdersAsync",
+      "complexity": 13,
+      "line": 312,
+      "rating": "🟠 Karmaşık (Complex)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/CheckoutForm.cs",
+      "class": "CheckoutForm",
+      "method": "SetFormEnabled",
+      "complexity": 13,
+      "line": 492,
+      "rating": "🟠 Karmaşık (Complex)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/LoginForm.cs",
+      "class": "LoginForm",
+      "method": "BtnLogin_Click",
+      "complexity": 12,
+      "line": 172,
+      "rating": "🟠 Karmaşık (Complex)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Services/GlobalExceptionHandler.cs",
+      "class": "GlobalExceptionHandler",
+      "method": "HandleException",
+      "complexity": 12,
+      "line": 72,
+      "rating": "🟠 Karmaşık (Complex)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/CustomerLoginForm.cs",
+      "class": "CustomerLoginForm",
+      "method": "BtnLogin_Click",
+      "complexity": 12,
+      "line": 224,
+      "rating": "🟠 Karmaşık (Complex)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Purchasing/SupplierManagementForm.cs",
+      "class": "SupplierEditDialog",
+      "method": "BtnSave_Click",
+      "complexity": 11,
+      "line": 328,
+      "rating": "🟠 Karmaşık (Complex)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/TimeTracking/TimeTrackingService.cs",
+      "class": "TimeTrackingService",
+      "method": "ProcessEntry",
+      "complexity": 11,
+      "line": 139,
+      "rating": "🟠 Karmaşık (Complex)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/PurchaseOrderService.cs",
+      "class": "PurchaseOrderService",
+      "method": "GeneratePurchaseOrdersForLowStockAsync",
+      "complexity": 11,
+      "line": 38,
+      "rating": "🟠 Karmaşık (Complex)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/CatalogForm.cs",
+      "class": "CatalogForm",
+      "method": "GridProducts_CellClick",
+      "complexity": 11,
+      "line": 367,
+      "rating": "🟠 Karmaşık (Complex)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/SettingsForm.cs",
+      "class": "SettingsForm",
+      "method": "BtnSave_Click",
+      "complexity": 10,
+      "line": 202,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Purchasing/PurchaseOrdersForm.cs",
+      "class": "PurchaseOrdersForm",
+      "method": "BtnApprove_Click",
+      "complexity": 10,
+      "line": 232,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/MainForm.cs",
+      "class": "MainForm",
+      "method": "SetupDynamicUi",
+      "complexity": 9,
+      "line": 129,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/SalesReportForm.cs",
+      "class": "SalesReportForm",
+      "method": "SetFormEnabled",
+      "complexity": 9,
+      "line": 302,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Config/EnvFileLoader.cs",
+      "class": "EnvFileLoader",
+      "method": "TryGetDatabaseUrlConnectionString",
+      "complexity": 9,
+      "line": 142,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Orders/OrderManagementForm.cs",
+      "class": "OrderManagementForm",
+      "method": "BtnUpdateStatus_Click",
+      "complexity": 9,
+      "line": 402,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Orders/OrderManagementForm.cs",
+      "class": "OrderManagementForm",
+      "method": "GridOrders_CellFormatting",
+      "complexity": 9,
+      "line": 477,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/CustomerAuthService.cs",
+      "class": "CustomerAuthService",
+      "method": "RegisterAsync",
+      "complexity": 9,
+      "line": 28,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/CustomerAuthService.cs",
+      "class": "CustomerAuthService",
+      "method": "LoginAsync",
+      "complexity": 9,
+      "line": 74,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/ProductRepository.cs",
+      "class": "ProductRepository",
+      "method": "RecordSaleAsync",
+      "complexity": 9,
+      "line": 192,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/GmailEmailService.cs",
+      "class": "GmailEmailService",
+      "method": "SendEmailAsync",
+      "complexity": 9,
+      "line": 88,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/CartForm.cs",
+      "class": "CartForm",
+      "method": "GridCart_CellEndEdit",
+      "complexity": 9,
+      "line": 269,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/RegistrationForm.cs",
+      "class": "ValidationResult",
+      "method": "SetFormEnabled",
+      "complexity": 9,
+      "line": 306,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/CatalogForm.cs",
+      "class": "CatalogForm",
+      "method": "LoadProductsAsync",
+      "complexity": 9,
+      "line": 277,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/CatalogForm.cs",
+      "class": "CatalogForm",
+      "method": "FilterProducts",
+      "complexity": 9,
+      "line": 305,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/LeaveApprovalForm.cs",
+      "class": "LeaveApprovalForm",
+      "method": "LoadRequestsAsync",
+      "complexity": 8,
+      "line": 168,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/LeaveApprovalForm.cs",
+      "class": "LeaveApprovalForm",
+      "method": "GridRequests_CellFormatting",
+      "complexity": 8,
+      "line": 197,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/LeaveApprovalForm.cs",
+      "class": "LeaveApprovalForm",
+      "method": "BtnApprove_Click",
+      "complexity": 8,
+      "line": 219,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/LeaveRequestForm.cs",
+      "class": "LeaveRequestForm",
+      "method": "OnDateChanged",
+      "complexity": 8,
+      "line": 248,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/LeaveRequestForm.cs",
+      "class": "LeaveRequestForm",
+      "method": "BtnSubmit_Click",
+      "complexity": 8,
+      "line": 271,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/LeaveRequestForm.cs",
+      "class": "LeaveRequestForm",
+      "method": "SetFormEnabled",
+      "complexity": 8,
+      "line": 329,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/SalesEntryForm.cs",
+      "class": "SalesEntryForm",
+      "method": "ValidateInput",
+      "complexity": 8,
+      "line": 264,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Config/EnvFileLoader.cs",
+      "class": "EnvFileLoader",
+      "method": "LoadFromFile",
+      "complexity": 8,
+      "line": 19,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Config/DatabaseConfig.cs",
+      "class": "DatabaseConfig",
+      "method": "ParseDatabaseUrl",
+      "complexity": 8,
+      "line": 39,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Products/LifecycleSentinel.cs",
+      "class": "LifecycleSentinel",
+      "method": "FuzzyMatchProductName",
+      "complexity": 8,
+      "line": 289,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Purchasing/PurchaseOrdersForm.cs",
+      "class": "PurchaseOrdersForm",
+      "method": "BtnSend_Click",
+      "complexity": 8,
+      "line": 272,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Purchasing/PurchaseOrdersForm.cs",
+      "class": "PurchaseOrdersForm",
+      "method": "BtnReceive_Click",
+      "complexity": 8,
+      "line": 308,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Purchasing/PurchaseOrdersForm.cs",
+      "class": "PurchaseOrdersForm",
+      "method": "BtnCancel_Click",
+      "complexity": 8,
+      "line": 341,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Config/DatabaseConfig.cs",
+      "class": "DatabaseConfig",
+      "method": "ParseDatabaseUrl",
+      "complexity": 8,
+      "line": 39,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/TrendCalculatorService.cs",
+      "class": "TrendCalculatorService",
+      "method": "AnalyzeProduct",
+      "complexity": 8,
+      "line": 15,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/OrderService.cs",
+      "class": "OrderService",
+      "method": "PlaceOrderAsync",
+      "complexity": 8,
+      "line": 25,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/MainForm.cs",
+      "class": "MainForm",
+      "method": "btnSimulateLaunch_Click",
+      "complexity": 7,
+      "line": 443,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/MainForm.cs",
+      "class": "MainForm",
+      "method": "BtnHealthCheck_Click",
+      "complexity": 7,
+      "line": 495,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/LeaveApprovalForm.cs",
+      "class": "LeaveApprovalForm",
+      "method": "BtnReject_Click",
+      "complexity": 7,
+      "line": 265,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/LoginForm.cs",
+      "class": "LoginValidationResult",
+      "method": "HandleLoginResult",
+      "complexity": 7,
+      "line": 217,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/LoginForm.cs",
+      "class": "LoginValidationResult",
+      "method": "SetFormEnabled",
+      "complexity": 7,
+      "line": 255,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/LoginForm.cs",
+      "class": "LoginValidationResult",
+      "method": "OnLoad",
+      "complexity": 7,
+      "line": 268,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Config/DatabaseConfig.cs",
+      "class": "DatabaseConfig",
+      "method": "BuildFromIndividualVariables",
+      "complexity": 7,
+      "line": 66,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Products/LifecycleSentinel.cs",
+      "class": "LifecycleSentinel",
+      "method": "LifecycleSentinel",
+      "complexity": 7,
+      "line": 29,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Products/LifecycleSentinel.cs",
+      "class": "LifecycleSentinel",
+      "method": "CheckGooglePixelEol",
+      "complexity": 7,
+      "line": 180,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Purchasing/PurchaseOrdersForm.cs",
+      "class": "PurchaseOrdersForm",
+      "method": "UpdateButtonStates",
+      "complexity": 7,
+      "line": 216,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Purchasing/PurchaseOrdersForm.cs",
+      "class": "PurchaseOrderViewModel",
+      "method": "PurchaseOrderViewModel",
+      "complexity": 7,
+      "line": 417,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Auth/AuthenticationService.cs",
+      "class": "AuthenticationService",
+      "method": "LoginAsync",
+      "complexity": 7,
+      "line": 27,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/TimeTracking/TimeTrackingService.cs",
+      "class": "TimeTrackingService",
+      "method": "CalculateHoursFromEntries",
+      "complexity": 7,
+      "line": 119,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/TimeTracking/Forms/TimeTrackingForm.cs",
+      "class": "TimeTrackingForm",
+      "method": "UpdateButtonsState",
+      "complexity": 7,
+      "line": 164,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Config/DatabaseConfig.cs",
+      "class": "DatabaseConfig",
+      "method": "BuildFromIndividualVariables",
+      "complexity": 7,
+      "line": 66,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/TrendCalculatorService.cs",
+      "class": "TrendCalculatorService",
+      "method": "CalculateTrendDirection",
+      "complexity": 7,
+      "line": 77,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/PurchaseOrderService.cs",
+      "class": "PurchaseOrderService",
+      "method": "SendToSupplierAsync",
+      "complexity": 7,
+      "line": 238,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/RegistrationForm.cs",
+      "class": "ValidationResult",
+      "method": "ValidateRegistrationForm",
+      "complexity": 7,
+      "line": 252,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/CheckoutForm.cs",
+      "class": "CheckoutForm",
+      "method": "ValidateGuestInfo",
+      "complexity": 7,
+      "line": 408,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/CustomerLoginForm.cs",
+      "class": "LoginValidationResult",
+      "method": "SetFormEnabled",
+      "complexity": 7,
+      "line": 321,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/CatalogForm.cs",
+      "class": "CatalogForm",
+      "method": "DisplayProducts",
+      "complexity": 7,
+      "line": 331,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/CatalogForm.cs",
+      "class": "CatalogForm",
+      "method": "GridProducts_CellFormatting",
+      "complexity": 7,
+      "line": 356,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/MainForm.cs",
+      "class": "MainForm",
+      "method": "LoadDashboardData",
+      "complexity": 6,
+      "line": 384,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/MainForm.cs",
+      "class": "MainForm",
+      "method": "ColorRows",
+      "complexity": 6,
+      "line": 416,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/SalesReportForm.cs",
+      "class": "SalesReportForm",
+      "method": "BtnExport_Click",
+      "complexity": 6,
+      "line": 264,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/SalesEntryForm.cs",
+      "class": "SalesEntryForm",
+      "method": "UpdateTotal",
+      "complexity": 6,
+      "line": 224,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/SalesEntryForm.cs",
+      "class": "SalesEntryForm",
+      "method": "SetFormEnabled",
+      "complexity": 6,
+      "line": 353,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Reporting/SalesReportService.cs",
+      "class": "SalesReportService",
+      "method": "GetCustomRangeReportAsync",
+      "complexity": 6,
+      "line": 85,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Products/LifecycleSentinel.cs",
+      "class": "LifecycleSentinel",
+      "method": "IsProductName",
+      "complexity": 6,
+      "line": 370,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Products/InventoryManager.cs",
+      "class": "InventoryManager",
+      "method": "IsBlackoutPeriod",
+      "complexity": 6,
+      "line": 72,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Purchasing/SupplierManagementForm.cs",
+      "class": "SupplierManagementForm",
+      "method": "BtnEdit_Click",
+      "complexity": 6,
+      "line": 163,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Purchasing/SupplierManagementForm.cs",
+      "class": "SupplierManagementForm",
+      "method": "BtnDelete_Click",
+      "complexity": 6,
+      "line": 201,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Orders/OrderManagementForm.cs",
+      "class": "OrderManagementForm",
+      "method": "TryReselectPreviousOrder",
+      "complexity": 6,
+      "line": 351,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Orders/OrderManagementForm.cs",
+      "class": "OrderManagementForm",
+      "method": "LoadOrderDetailsAsync",
+      "complexity": 6,
+      "line": 374,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Services/HealthCheckService.cs",
+      "class": "HealthCheckService",
+      "method": "CheckDatabaseAsync",
+      "complexity": 6,
+      "line": 147,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Services/HealthCheckService.cs",
+      "class": "HealthCheckService",
+      "method": "CheckDiskSpace",
+      "complexity": 6,
+      "line": 303,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Services/BackgroundJobService.cs",
+      "class": "BackgroundJobService",
+      "method": "CleanupOldHangfireJobs",
+      "complexity": 6,
+      "line": 146,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/RecommendationEngine.cs",
+      "class": "RecommendationEngine",
+      "method": "GetLifecycleRecommendation",
+      "complexity": 6,
+      "line": 54,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/PurchaseOrderRepository.cs",
+      "class": "PurchaseOrderRepository",
+      "method": "GetAllAsync",
+      "complexity": 6,
+      "line": 139,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/PurchaseOrderService.cs",
+      "class": "PurchaseOrderService",
+      "method": "CancelAsync",
+      "complexity": 6,
+      "line": 320,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/OrderService.cs",
+      "class": "OrderService",
+      "method": "CancelOrderAsync",
+      "complexity": 6,
+      "line": 118,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/CustomerLoginForm.cs",
+      "class": "LoginValidationResult",
+      "method": "HandleLoginResult",
+      "complexity": 6,
+      "line": 269,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Kiosk/ScanForm.cs",
+      "class": "ScanForm",
+      "method": "StartCamera",
+      "complexity": 6,
+      "line": 157,
+      "rating": "🟡 Orta (Moderate)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/MainForm.cs",
+      "class": "MainForm",
+      "method": "BtnLeaveRequest_Click",
+      "complexity": 5,
+      "line": 559,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/UserPreferences.cs",
+      "class": "UserPreferences",
+      "method": "Save",
+      "complexity": 5,
+      "line": 15,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/UserPreferences.cs",
+      "class": "UserPreferences",
+      "method": "Load",
+      "complexity": 5,
+      "line": 40,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/LeaveApprovalForm.cs",
+      "class": "LeaveApprovalForm",
+      "method": "LeaveApprovalForm",
+      "complexity": 5,
+      "line": 26,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/SalesReportForm.cs",
+      "class": "SalesReportForm",
+      "method": "SalesReportForm",
+      "complexity": 5,
+      "line": 30,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/SalesReportForm.cs",
+      "class": "SalesReportForm",
+      "method": "CmbReportType_SelectedIndexChanged",
+      "complexity": 5,
+      "line": 197,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/SalesEntryForm.cs",
+      "class": "SalesEntryForm",
+      "method": "CmbProduct_SelectedIndexChanged",
+      "complexity": 5,
+      "line": 215,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/SalesEntryForm.cs",
+      "class": "SalesEntryForm",
+      "method": "BtnRecord_Click",
+      "complexity": 5,
+      "line": 233,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Config/EnvFileLoader.cs",
+      "class": "EnvFileLoader",
+      "method": "GetBool",
+      "complexity": 5,
+      "line": 90,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Products/LifecycleSentinel.cs",
+      "class": "LifecycleSentinel",
+      "method": "CheckAppleVintageList",
+      "complexity": 5,
+      "line": 74,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Products/InventoryManager.cs",
+      "class": "InventoryManager",
+      "method": "CalculatePhase",
+      "complexity": 5,
+      "line": 40,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Purchasing/PurchaseOrdersForm.cs",
+      "class": "PurchaseOrdersForm",
+      "method": "PurchaseOrdersForm",
+      "complexity": 5,
+      "line": 33,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Purchasing/PurchaseOrdersForm.cs",
+      "class": "PurchaseOrdersForm",
+      "method": "BtnViewDetails_Click",
+      "complexity": 5,
+      "line": 374,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Auth/AuthenticationService.cs",
+      "class": "AuthenticationService",
+      "method": "VerifyPassword",
+      "complexity": 5,
+      "line": 111,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/TimeTracking/Forms/ShiftManagementForm.cs",
+      "class": "ShiftManagementForm",
+      "method": "AssignShiftAsync",
+      "complexity": 5,
+      "line": 147,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Leave/LeaveRepository.cs",
+      "class": "LeaveRepository",
+      "method": "ApproveAsync",
+      "complexity": 5,
+      "line": 189,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Services/GlobalExceptionHandler.cs",
+      "class": "GlobalExceptionHandler",
+      "method": "OnUnhandledException",
+      "complexity": 5,
+      "line": 46,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/CustomerAuthService.cs",
+      "class": "CustomerAuthService",
+      "method": "VerifyPassword",
+      "complexity": 5,
+      "line": 164,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/RecommendationEngine.cs",
+      "class": "RecommendationEngine",
+      "method": "GenerateRecommendation",
+      "complexity": 5,
+      "line": 28,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/RecommendationEngine.cs",
+      "class": "RecommendationEngine",
+      "method": "GetStockLevelRecommendation",
+      "complexity": 5,
+      "line": 76,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/ProductRepository.cs",
+      "class": "ProductRepository",
+      "method": "UpdateProductPhaseAsync",
+      "complexity": 5,
+      "line": 119,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/CustomerRepository.cs",
+      "class": "CustomerRepository",
+      "method": "CreateGuestAsync",
+      "complexity": 5,
+      "line": 69,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/TrendCalculatorService.cs",
+      "class": "TrendCalculatorService",
+      "method": "CalculateTrendStrength",
+      "complexity": 5,
+      "line": 109,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/TrendCalculatorService.cs",
+      "class": "TrendCalculatorService",
+      "method": "DetectAcceleration",
+      "complexity": 5,
+      "line": 130,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/PurchaseOrderService.cs",
+      "class": "PurchaseOrderService",
+      "method": "ApproveAsync",
+      "complexity": 5,
+      "line": 208,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/PurchaseOrderService.cs",
+      "class": "PurchaseOrderService",
+      "method": "MarkAsReceivedAsync",
+      "complexity": 5,
+      "line": 284,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/OrderService.cs",
+      "class": "OrderService",
+      "method": "ValidateStockAsync",
+      "complexity": 5,
+      "line": 66,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/GmailEmailService.cs",
+      "class": "GmailEmailService",
+      "method": "GetGmailServiceAsync",
+      "complexity": 5,
+      "line": 35,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Program.cs",
+      "class": "Program",
+      "method": "RemoveQuotes",
+      "complexity": 5,
+      "line": 111,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/CartForm.cs",
+      "class": "CartForm",
+      "method": "GridCart_CellClick",
+      "complexity": 5,
+      "line": 257,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Services/ShoppingCartService.cs",
+      "class": "ShoppingCartService",
+      "method": "AddItemAsync",
+      "complexity": 5,
+      "line": 31,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Kiosk/ScanForm.cs",
+      "class": "ScanForm",
+      "method": "VariableInit",
+      "complexity": 5,
+      "line": 132,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/Integration/ProductRepositoryIntegrationTests.cs",
+      "class": "ProductRepositoryIntegrationTests",
+      "method": "InitializeAsync",
+      "complexity": 5,
+      "line": 28,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/Integration/CachedProductRepositoryIntegrationTests.cs",
+      "class": "CachedProductRepositoryIntegrationTests",
+      "method": "InitializeAsync",
+      "complexity": 5,
+      "line": 36,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/MainForm.cs",
+      "class": "MainForm",
+      "method": "OnRefreshTimerTick",
+      "complexity": 4,
+      "line": 98,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/MainForm.cs",
+      "class": "MainForm",
+      "method": "BtnRecordSale_Click",
+      "complexity": 4,
+      "line": 476,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/MainForm.cs",
+      "class": "MainForm",
+      "method": "BtnLeaveApproval_Click",
+      "complexity": 4,
+      "line": 589,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/MainForm.cs",
+      "class": "MainForm",
+      "method": "BtnPayroll_Click",
+      "complexity": 4,
+      "line": 685,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Program.cs",
+      "class": "Program",
+      "method": "RunApplication",
+      "complexity": 4,
+      "line": 41,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/LeaveApprovalForm.cs",
+      "class": "LeaveApprovalForm",
+      "method": "GetSelectedRequest",
+      "complexity": 4,
+      "line": 303,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/SettingsForm.cs",
+      "class": "SettingsForm",
+      "method": "UpdateStatusLabel",
+      "complexity": 4,
+      "line": 177,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/SettingsForm.cs",
+      "class": "SettingsForm",
+      "method": "SaveSettingsToFile",
+      "complexity": 4,
+      "line": 236,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/LeaveRequestForm.cs",
+      "class": "LeaveRequestForm",
+      "method": "LeaveRequestForm",
+      "complexity": 4,
+      "line": 29,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/LeaveRequestForm.cs",
+      "class": "LeaveRequestForm",
+      "method": "LoadHistoryAsync",
+      "complexity": 4,
+      "line": 232,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/SalesEntryForm.cs",
+      "class": "SalesEntryForm",
+      "method": "LoadProducts",
+      "complexity": 4,
+      "line": 195,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Config/EnvFileLoader.cs",
+      "class": "EnvFileLoader",
+      "method": "GetConnectionString",
+      "complexity": 4,
+      "line": 120,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Config/DatabaseConfig.cs",
+      "class": "DatabaseConfig",
+      "method": "BuildConnectionStringFromEnv",
+      "complexity": 4,
+      "line": 18,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Config/DatabaseConfig.cs",
+      "class": "DatabaseConfig",
+      "method": "GetEnvWithFallback",
+      "complexity": 4,
+      "line": 83,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Products/LifecycleSentinel.cs",
+      "class": "LifecycleSentinel",
+      "method": "ProcessAppleProduct",
+      "complexity": 4,
+      "line": 163,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Products/LifecycleSentinel.cs",
+      "class": "LifecycleSentinel",
+      "method": "UpdateProductPhaseByName",
+      "complexity": 4,
+      "line": 252,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Products/InventoryManager.cs",
+      "class": "InventoryManager",
+      "method": "GetRecommendation",
+      "complexity": 4,
+      "line": 17,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Purchasing/PurchaseOrdersForm.cs",
+      "class": "PurchaseOrdersForm",
+      "method": "LoadOrdersAsync",
+      "complexity": 4,
+      "line": 176,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Purchasing/SupplierManagementForm.cs",
+      "class": "SupplierManagementForm",
+      "method": "BtnAdd_Click",
+      "complexity": 4,
+      "line": 154,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/VisitorPrediction/VisitorCountPredictor.cs",
+      "class": "VisitorCountPredictor",
+      "method": "PredictTrafficAsync",
+      "complexity": 4,
+      "line": 96,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/VisitorPrediction/VisitorCountPredictor.cs",
+      "class": "VisitorCountPredictor",
+      "method": "CalculateWeeklyTrend",
+      "complexity": 4,
+      "line": 218,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/TimeTracking/TimeTrackingService.cs",
+      "class": "TimeTrackingService",
+      "method": "ClockInAsync",
+      "complexity": 4,
+      "line": 23,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/TimeTracking/TimeTrackingService.cs",
+      "class": "TimeTrackingService",
+      "method": "StartLunchAsync",
+      "complexity": 4,
+      "line": 69,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Orders/OrderManagementForm.cs",
+      "class": "OrderManagementForm",
+      "method": "LoadOrdersAsync",
+      "complexity": 4,
+      "line": 288,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Orders/OrderManagementForm.cs",
+      "class": "OrderManagementForm",
+      "method": "GridOrders_SelectionChanged",
+      "complexity": 4,
+      "line": 366,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Orders/OrderManagementForm.cs",
+      "class": "OrderManagementForm",
+      "method": "IsValidStatusTransition",
+      "complexity": 4,
+      "line": 454,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Payroll/Forms/PayrollForm.cs",
+      "class": "PayrollForm",
+      "method": "CommitRunAsync",
+      "complexity": 4,
+      "line": 121,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Payroll/Forms/PayrollForm.cs",
+      "class": "PayrollForm",
+      "method": "ExportCsv",
+      "complexity": 4,
+      "line": 148,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Leave/LeaveRepository.cs",
+      "class": "LeaveRepository",
+      "method": "GetAllRequestsAsync",
+      "complexity": 4,
+      "line": 159,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Services/HealthCheckService.cs",
+      "class": "HealthReport",
+      "method": "GetSummary",
+      "complexity": 4,
+      "line": 48,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Services/HealthCheckService.cs",
+      "class": "HealthCheckService",
+      "method": "CheckDatabaseConnectionPoolAsync",
+      "complexity": 4,
+      "line": 203,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Services/HealthCheckService.cs",
+      "class": "HealthCheckService",
+      "method": "CheckMemory",
+      "complexity": 4,
+      "line": 251,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Services/GlobalExceptionHandler.cs",
+      "class": "GlobalExceptionHandler",
+      "method": "Initialize",
+      "complexity": 4,
+      "line": 16,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Services/CachedProductRepository.cs",
+      "class": "CachedProductRepository",
+      "method": "GetDashboardDataAsync",
+      "complexity": 4,
+      "line": 46,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Services/CachedProductRepository.cs",
+      "class": "CachedProductRepository",
+      "method": "GetAllProductsAsync",
+      "complexity": 4,
+      "line": 70,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Services/CachedProductRepository.cs",
+      "class": "CachedProductRepository",
+      "method": "GetSalesHistoryAsync",
+      "complexity": 4,
+      "line": 94,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Services/BackgroundJobService.cs",
+      "class": "BackgroundJobService",
+      "method": "GenerateLowStockPurchaseOrders",
+      "complexity": 4,
+      "line": 215,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Config/DatabaseConfig.cs",
+      "class": "DatabaseConfig",
+      "method": "BuildConnectionStringFromEnv",
+      "complexity": 4,
+      "line": 18,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Config/DatabaseConfig.cs",
+      "class": "DatabaseConfig",
+      "method": "GetEnvWithFallback",
+      "complexity": 4,
+      "line": 83,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/PurchaseOrderRepository.cs",
+      "class": "PurchaseOrderRepository",
+      "method": "CreateAsync",
+      "complexity": 4,
+      "line": 26,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/PurchaseOrderRepository.cs",
+      "class": "PurchaseOrderRepository",
+      "method": "GetByOrderNumberAsync",
+      "complexity": 4,
+      "line": 128,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/PurchaseOrderRepository.cs",
+      "class": "PurchaseOrderRepository",
+      "method": "UpdateStatusAsync",
+      "complexity": 4,
+      "line": 212,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Program.cs",
+      "class": "Program",
+      "method": "ParseAndSetEnvVariable",
+      "complexity": 4,
+      "line": 96,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/CartForm.cs",
+      "class": "CartForm",
+      "method": "UpdateTotals",
+      "complexity": 4,
+      "line": 240,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/CartForm.cs",
+      "class": "CartForm",
+      "method": "BtnCheckout_Click",
+      "complexity": 4,
+      "line": 295,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/RegistrationForm.cs",
+      "class": "RegistrationForm",
+      "method": "BtnRegister_Click",
+      "complexity": 4,
+      "line": 180,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/RegistrationForm.cs",
+      "class": "RegistrationFormData",
+      "method": "HandleValidationResult",
+      "complexity": 4,
+      "line": 220,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/RegistrationForm.cs",
+      "class": "RegistrationFormData",
+      "method": "HandleRegistrationResult",
+      "complexity": 4,
+      "line": 231,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/CheckoutForm.cs",
+      "class": "CheckoutForm",
+      "method": "SetupUI",
+      "complexity": 4,
+      "line": 69,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/CatalogForm.cs",
+      "class": "CatalogForm",
+      "method": "UpdateWelcomeMessage",
+      "complexity": 4,
+      "line": 260,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/CatalogForm.cs",
+      "class": "CatalogForm",
+      "method": "MatchesCategory",
+      "complexity": 4,
+      "line": 325,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/CatalogForm.cs",
+      "class": "CatalogForm",
+      "method": "UpdateCartBadge",
+      "complexity": 4,
+      "line": 401,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/CatalogForm.cs",
+      "class": "CatalogForm",
+      "method": "BtnLogout_Click",
+      "complexity": 4,
+      "line": 419,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Services/ShoppingCartService.cs",
+      "class": "ShoppingCartService",
+      "method": "UpdateQuantity",
+      "complexity": 4,
+      "line": 80,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Services/ShoppingCartService.cs",
+      "class": "ShoppingCartService",
+      "method": "RefreshStockAsync",
+      "complexity": 4,
+      "line": 146,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Kiosk/ScanForm.cs",
+      "class": "ScanForm",
+      "method": "Cleanup",
+      "complexity": 4,
+      "line": 176,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Kiosk/ScanForm.cs",
+      "class": "ScanForm",
+      "method": "VideoSource_NewFrame",
+      "complexity": 4,
+      "line": 185,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Kiosk/ScanForm.cs",
+      "class": "ScanForm",
+      "method": "BtnPay_Click",
+      "complexity": 4,
+      "line": 252,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/MainForm.Designer.cs",
+      "class": "MainForm",
+      "method": "Dispose",
+      "complexity": 3,
+      "line": 16,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/MainForm.cs",
+      "class": "MainForm",
+      "method": "OnRefreshButtonClick",
+      "complexity": 3,
+      "line": 115,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/MainForm.cs",
+      "class": "MainForm",
+      "method": "BtnLogout_Click",
+      "complexity": 3,
+      "line": 543,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/MainForm.cs",
+      "class": "MainForm",
+      "method": "BtnReports_Click",
+      "complexity": 3,
+      "line": 611,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/MainForm.cs",
+      "class": "MainForm",
+      "method": "BtnOrders_Click",
+      "complexity": 3,
+      "line": 626,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/MainForm.cs",
+      "class": "MainForm",
+      "method": "BtnSettings_Click",
+      "complexity": 3,
+      "line": 641,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/MainForm.cs",
+      "class": "MainForm",
+      "method": "BtnShiftManagement_Click",
+      "complexity": 3,
+      "line": 670,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/MainForm.cs",
+      "class": "MainForm",
+      "method": "BtnSuppliers_Click",
+      "complexity": 3,
+      "line": 704,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/MainForm.cs",
+      "class": "MainForm",
+      "method": "BtnPurchaseOrders_Click",
+      "complexity": 3,
+      "line": 719,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/LeaveApprovalForm.cs",
+      "class": "LeaveApprovalForm",
+      "method": "ShowInputDialog",
+      "complexity": 3,
+      "line": 314,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/SettingsForm.cs",
+      "class": "SettingsForm",
+      "method": "SettingsForm",
+      "complexity": 3,
+      "line": 21,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/SettingsForm.cs",
+      "class": "SettingsForm",
+      "method": "LoadCurrentSettings",
+      "complexity": 3,
+      "line": 193,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/SalesReportForm.cs",
+      "class": "SalesReportForm",
+      "method": "DisplayReport",
+      "complexity": 3,
+      "line": 249,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/LoginForm.cs",
+      "class": "LoginForm",
+      "method": "LoginForm",
+      "complexity": 3,
+      "line": 21,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/LoginForm.cs",
+      "class": "LoginForm",
+      "method": "OnTextBoxKeyDown",
+      "complexity": 3,
+      "line": 163,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/LoginForm.cs",
+      "class": "LoginValidationResult",
+      "method": "ValidateLoginForm",
+      "complexity": 3,
+      "line": 206,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/SalesEntryForm.cs",
+      "class": "SalesEntryForm",
+      "method": "SalesEntryForm",
+      "complexity": 3,
+      "line": 36,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Config/EnvFileLoader.cs",
+      "class": "EnvFileLoader",
+      "method": "TryGetDirectConnectionString",
+      "complexity": 3,
+      "line": 136,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Config/ServiceConfiguration.cs",
+      "class": "ServiceConfiguration",
+      "method": "BuildConfiguration",
+      "complexity": 3,
+      "line": 42,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Products/LifecycleSentinel.cs",
+      "class": "LifecycleSentinel",
+      "method": "UpdateSectionState",
+      "complexity": 3,
+      "line": 146,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Products/LifecycleSentinel.cs",
+      "class": "LifecycleSentinel",
+      "method": "ExtractModelIdentifier",
+      "complexity": 3,
+      "line": 344,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Purchasing/PurchaseOrdersForm.cs",
+      "class": "PurchaseOrdersForm",
+      "method": "GetSelectedOrder",
+      "complexity": 3,
+      "line": 227,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Purchasing/PurchaseOrdersForm.cs",
+      "class": "PurchaseOrderDetailsDialog",
+      "method": "PurchaseOrderDetailsDialog",
+      "complexity": 3,
+      "line": 435,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Purchasing/SupplierManagementForm.cs",
+      "class": "SupplierManagementForm",
+      "method": "SupplierManagementForm",
+      "complexity": 3,
+      "line": 23,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Purchasing/SupplierManagementForm.cs",
+      "class": "SupplierManagementForm",
+      "method": "LoadSuppliersAsync",
+      "complexity": 3,
+      "line": 131,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Purchasing/SupplierManagementForm.cs",
+      "class": "SupplierManagementForm",
+      "method": "SaveSupplierAsync",
+      "complexity": 3,
+      "line": 178,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Purchasing/SupplierManagementForm.cs",
+      "class": "SupplierEditDialog",
+      "method": "SupplierEditDialog",
+      "complexity": 3,
+      "line": 247,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Auth/UserRepository.cs",
+      "class": "UserRepository",
+      "method": "GetByUsernameAsync",
+      "complexity": 3,
+      "line": 68,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Auth/AuthenticationService.cs",
+      "class": "AuthenticationService",
+      "method": "AuthenticationService",
+      "complexity": 3,
+      "line": 17,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/VisitorPrediction/VisitorCountPredictor.cs",
+      "class": "VisitorCountPredictor",
+      "method": "DetermineTrendDirection",
+      "complexity": 3,
+      "line": 204,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/TimeTracking/TimeTrackingService.cs",
+      "class": "TimeTrackingService",
+      "method": "TimeTrackingService",
+      "complexity": 3,
+      "line": 17,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/TimeTracking/TimeTrackingService.cs",
+      "class": "TimeTrackingService",
+      "method": "ClockOutAsync",
+      "complexity": 3,
+      "line": 50,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/TimeTracking/TimeTrackingService.cs",
+      "class": "TimeTrackingService",
+      "method": "EndLunchAsync",
+      "complexity": 3,
+      "line": 87,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/TimeTracking/Forms/TimeTrackingForm.cs",
+      "class": "TimeTrackingForm",
+      "method": "LoadDataAsync",
+      "complexity": 3,
+      "line": 140,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Orders/OrderManagementForm.cs",
+      "class": "OrderManagementForm",
+      "method": "OrderManagementForm",
+      "complexity": 3,
+      "line": 25,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Orders/OrderManagementForm.cs",
+      "class": "OrderManagementForm",
+      "method": "AddOrderToGrid",
+      "complexity": 3,
+      "line": 331,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Payroll/PayrollService.cs",
+      "class": "PayrollService",
+      "method": "PayrollService",
+      "complexity": 3,
+      "line": 19,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Payroll/PayrollService.cs",
+      "class": "PayrollService",
+      "method": "CommitPayrollRunAsync",
+      "complexity": 3,
+      "line": 84,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Leave/LeaveRepository.cs",
+      "class": "LeaveRepository",
+      "method": "RejectAsync",
+      "complexity": 3,
+      "line": 233,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Leave/LeaveRepository.cs",
+      "class": "LeaveRepository",
+      "method": "GetByIdAsync",
+      "complexity": 3,
+      "line": 260,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Services/HealthCheckService.cs",
+      "class": "HealthCheckService",
+      "method": "CheckAllAsync",
+      "complexity": 3,
+      "line": 100,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Services/GlobalExceptionHandler.cs",
+      "class": "GlobalExceptionHandler",
+      "method": "GetUserFriendlyMessage",
+      "complexity": 3,
+      "line": 127,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Services/GlobalExceptionHandler.cs",
+      "class": "GlobalExceptionHandler",
+      "method": "ReportException",
+      "complexity": 3,
+      "line": 173,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/CustomerAuthService.cs",
+      "class": "CustomerAuthService",
+      "method": "CustomerAuthService",
+      "complexity": 3,
+      "line": 18,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/RecommendationEngine.cs",
+      "class": "RecommendationEngine",
+      "method": "GetRisingTrendRecommendation",
+      "complexity": 3,
+      "line": 107,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/ProductRepository.cs",
+      "class": "ProductRepository",
+      "method": "GetDashboardDataAsync",
+      "complexity": 3,
+      "line": 317,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/PurchaseOrderRepository.cs",
+      "class": "PurchaseOrderRepository",
+      "method": "PurchaseOrderRepository",
+      "complexity": 3,
+      "line": 17,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/PurchaseOrderRepository.cs",
+      "class": "PurchaseOrderRepository",
+      "method": "GetByIdAsync",
+      "complexity": 3,
+      "line": 82,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/OrderService.cs",
+      "class": "OrderService",
+      "method": "CreateOrderFromCart",
+      "complexity": 3,
+      "line": 90,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/OrderRepository.cs",
+      "class": "OrderRepository",
+      "method": "GetByIdAsync",
+      "complexity": 3,
+      "line": 98,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/OrderRepository.cs",
+      "class": "OrderRepository",
+      "method": "GetByOrderNumberAsync",
+      "complexity": 3,
+      "line": 125,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/GmailEmailService.cs",
+      "class": "GmailEmailService",
+      "method": "GmailEmailService",
+      "complexity": 3,
+      "line": 26,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/GmailEmailService.cs",
+      "class": "GmailEmailService",
+      "method": "IsConfiguredAsync",
+      "complexity": 3,
+      "line": 141,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/GmailEmailService.cs",
+      "class": "GmailEmailService",
+      "method": "CreateMimeMessage",
+      "complexity": 3,
+      "line": 165,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/SupplierRepository.cs",
+      "class": "SupplierRepository",
+      "method": "SupplierRepository",
+      "complexity": 3,
+      "line": 17,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/SupplierRepository.cs",
+      "class": "SupplierRepository",
+      "method": "EmailExistsAsync",
+      "complexity": 3,
+      "line": 123,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Program.cs",
+      "class": "Program",
+      "method": "RunApplication",
+      "complexity": 3,
+      "line": 33,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Program.cs",
+      "class": "Program",
+      "method": "LoadEnvFile",
+      "complexity": 3,
+      "line": 73,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/CartForm.cs",
+      "class": "CartForm",
+      "method": "RefreshCart",
+      "complexity": 3,
+      "line": 218,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/CartForm.cs",
+      "class": "CartForm",
+      "method": "UpdateVisibility",
+      "complexity": 3,
+      "line": 247,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/RegistrationForm.cs",
+      "class": "RegistrationForm",
+      "method": "RegistrationForm",
+      "complexity": 3,
+      "line": 25,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/CustomerLoginForm.cs",
+      "class": "CustomerLoginForm",
+      "method": "CustomerLoginForm",
+      "complexity": 3,
+      "line": 25,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/CustomerLoginForm.cs",
+      "class": "CustomerLoginForm",
+      "method": "OnTextBoxKeyDown",
+      "complexity": 3,
+      "line": 215,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/CustomerLoginForm.cs",
+      "class": "LoginValidationResult",
+      "method": "ValidateLoginForm",
+      "complexity": 3,
+      "line": 258,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/CustomerLoginForm.cs",
+      "class": "LoginValidationResult",
+      "method": "BtnRegister_Click",
+      "complexity": 3,
+      "line": 285,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/CatalogForm.cs",
+      "class": "CatalogForm",
+      "method": "MatchesSearchText",
+      "complexity": 3,
+      "line": 318,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Config/CustomerServiceConfiguration.cs",
+      "class": "CustomerServiceConfiguration",
+      "method": "BuildConfiguration",
+      "complexity": 3,
+      "line": 22,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Services/ShoppingCartService.cs",
+      "class": "ShoppingCartService",
+      "method": "ShoppingCartService",
+      "complexity": 3,
+      "line": 15,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Services/InvoiceGenerator.cs",
+      "class": "InvoiceGenerator",
+      "method": "InvoiceGenerator",
+      "complexity": 3,
+      "line": 14,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Kiosk/PaymentForm.cs",
+      "class": "PaymentForm",
+      "method": "ProcessPayment",
+      "complexity": 3,
+      "line": 139,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Kiosk/KioskProductRepository.cs",
+      "class": "KioskProductRepository",
+      "method": "KioskProductRepository",
+      "complexity": 3,
+      "line": 22,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Kiosk/ScanForm.cs",
+      "class": "ScanForm",
+      "method": "AddProductToCart",
+      "complexity": 3,
+      "line": 210,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Kiosk/ScanForm.cs",
+      "class": "ScanForm",
+      "method": "TxtSku_KeyDown",
+      "complexity": 3,
+      "line": 234,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Kiosk/Program.cs",
+      "class": "Program",
+      "method": "ConfigureServices",
+      "complexity": 3,
+      "line": 39,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/TrendCalculatorTests.cs",
+      "class": "TrendCalculatorTests",
+      "method": "AnalyzeProduct_RisingTrend_DetectsCorrectly",
+      "complexity": 3,
+      "line": 248,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/TrendCalculatorTests.cs",
+      "class": "TrendCalculatorTests",
+      "method": "AnalyzeProduct_FallingTrend_DetectsCorrectly",
+      "complexity": 3,
+      "line": 289,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/VisitorCountPredictorTests.cs",
+      "class": "VisitorCountPredictorTests",
+      "method": "CalculateWeeklyTrend_SufficientData_ReturnsNonZero",
+      "complexity": 3,
+      "line": 235,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/VisitorCountPredictorTests.cs",
+      "class": "VisitorCountPredictorTests",
+      "method": "CalculateWeeklyTrend_DecliningTraffic_ReturnsNegative",
+      "complexity": 3,
+      "line": 259,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/MainForm.cs",
+      "class": "MainForm",
+      "method": "MainForm",
+      "complexity": 2,
+      "line": 64,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/MainForm.cs",
+      "class": "MainForm",
+      "method": "BtnTimeClock_Click",
+      "complexity": 2,
+      "line": 656,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Program.cs",
+      "class": "Program",
+      "method": "Main",
+      "complexity": 2,
+      "line": 15,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Program.cs",
+      "class": "Program",
+      "method": "InitializeBackgroundJobs",
+      "complexity": 2,
+      "line": 89,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/LoginForm.cs",
+      "class": "LoginValidationResult",
+      "method": "ShowError",
+      "complexity": 2,
+      "line": 237,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/LoginForm.cs",
+      "class": "LoginValidationResult",
+      "method": "ClearError",
+      "complexity": 2,
+      "line": 246,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/SalesEntryForm.cs",
+      "class": "SalesEntryForm",
+      "method": "RecordSaleAsync",
+      "complexity": 2,
+      "line": 323,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Config/EnvFileLoader.cs",
+      "class": "EnvFileLoader",
+      "method": "GetRequired",
+      "complexity": 2,
+      "line": 54,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Config/EnvFileLoader.cs",
+      "class": "EnvFileLoader",
+      "method": "GetOptional",
+      "complexity": 2,
+      "line": 72,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Config/EnvFileLoader.cs",
+      "class": "EnvFileLoader",
+      "method": "GetInt",
+      "complexity": 2,
+      "line": 81,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Config/EnvFileLoader.cs",
+      "class": "EnvFileLoader",
+      "method": "ValidateRequired",
+      "complexity": 2,
+      "line": 102,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Config/DatabaseConfig.cs",
+      "class": "DatabaseConfig",
+      "method": "GetRequiredConnectionString",
+      "complexity": 2,
+      "line": 92,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Reporting/SalesReportService.cs",
+      "class": "SalesReportService",
+      "method": "SalesReportService",
+      "complexity": 2,
+      "line": 21,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Reporting/SalesReportService.cs",
+      "class": "SalesReportService",
+      "method": "ExportToCsv",
+      "complexity": 2,
+      "line": 151,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Products/LifecycleSentinel.cs",
+      "class": "LifecycleSentinel",
+      "method": "RunDailyAuditAsync",
+      "complexity": 2,
+      "line": 51,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Purchasing/PurchaseOrdersForm.cs",
+      "class": "PurchaseOrdersForm",
+      "method": "GridOrders_SelectionChanged",
+      "complexity": 2,
+      "line": 211,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Purchasing/SupplierManagementForm.cs",
+      "class": "SupplierEditDialog",
+      "method": "InitializeComponent",
+      "complexity": 2,
+      "line": 254,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Auth/UserRepository.cs",
+      "class": "UserRepository",
+      "method": "UserRepository",
+      "complexity": 2,
+      "line": 19,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Auth/UserRepository.cs",
+      "class": "UserRepository",
+      "method": "UpdatePasswordAsync",
+      "complexity": 2,
+      "line": 134,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Auth/AuthenticationService.cs",
+      "class": "AuthenticationService",
+      "method": "Logout",
+      "complexity": 2,
+      "line": 79,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Auth/AuthenticationService.cs",
+      "class": "AuthenticationService",
+      "method": "HashPassword",
+      "complexity": 2,
+      "line": 92,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/VisitorPrediction/VisitorCountPredictor.cs",
+      "class": "VisitorCountPredictor",
+      "method": "GetTrafficSummaryAsync",
+      "complexity": 2,
+      "line": 158,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/VisitorPrediction/VisitorCountPredictor.cs",
+      "class": "VisitorCountPredictor",
+      "method": "ClassifyTrafficLevel",
+      "complexity": 2,
+      "line": 235,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/VisitorPrediction/VisitorCountPredictor.cs",
+      "class": "SpecialDayRule",
+      "method": "ApplySpecialDayAdjustments",
+      "complexity": 2,
+      "line": 282,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/VisitorPrediction/VisitorCountPredictor.cs",
+      "class": "SpecialDayRule",
+      "method": "CalculateStandardDeviation",
+      "complexity": 2,
+      "line": 311,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/TimeTracking/TimeTrackingService.cs",
+      "class": "TimeTrackingService",
+      "method": "GetCurrentStatusAsync",
+      "complexity": 2,
+      "line": 105,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/TimeTracking/TimeTrackingService.cs",
+      "class": "TimeTrackingService",
+      "method": "CalculateDailyHoursAsync",
+      "complexity": 2,
+      "line": 110,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/TimeTracking/TimeTrackingRepository.cs",
+      "class": "TimeTrackingRepository",
+      "method": "GetLastEventAsync",
+      "complexity": 2,
+      "line": 69,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/TimeTracking/WorkShiftRepository.cs",
+      "class": "WorkShiftRepository",
+      "method": "GetByIdAsync",
+      "complexity": 2,
+      "line": 41,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/TimeTracking/Forms/ShiftManagementForm.cs",
+      "class": "ShiftManagementForm",
+      "method": "LoadDataAsync",
+      "complexity": 2,
+      "line": 112,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/TimeTracking/Forms/TimeTrackingForm.cs",
+      "class": "TimeTrackingForm",
+      "method": "RefreshStatusAsync",
+      "complexity": 2,
+      "line": 155,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/TimeTracking/Forms/TimeTrackingForm.cs",
+      "class": "TimeTrackingForm",
+      "method": "RefreshHistoryAsync",
+      "complexity": 2,
+      "line": 207,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/TimeTracking/Forms/TimeTrackingForm.cs",
+      "class": "TimeTrackingForm",
+      "method": "UpdateTimerAsync",
+      "complexity": 2,
+      "line": 221,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/TimeTracking/Forms/TimeTrackingForm.cs",
+      "class": "TimeTrackingForm",
+      "method": "HandleActionAsync",
+      "complexity": 2,
+      "line": 234,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Payroll/PayrollService.cs",
+      "class": "PayrollService",
+      "method": "PreviewPayrollAsync",
+      "complexity": 2,
+      "line": 27,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Payroll/Forms/PayrollForm.cs",
+      "class": "PayrollForm",
+      "method": "LoadPreviewAsync",
+      "complexity": 2,
+      "line": 99,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Leave/LeaveRepository.cs",
+      "class": "LeaveRepository",
+      "method": "LeaveRepository",
+      "complexity": 2,
+      "line": 19,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Leave/LeaveRepository.cs",
+      "class": "LeaveRepository",
+      "method": "GetEmployeeByUserIdAsync",
+      "complexity": 2,
+      "line": 60,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Leave/LeaveRepository.cs",
+      "class": "LeaveRepository",
+      "method": "CreateLeaveRequestAsync",
+      "complexity": 2,
+      "line": 92,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Services/HealthCheckService.cs",
+      "class": "HealthCheckService",
+      "method": "IsDatabaseAvailableAsync",
+      "complexity": 2,
+      "line": 356,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Services/GlobalExceptionHandler.cs",
+      "class": "GlobalExceptionHandler",
+      "method": "OnUnobservedTaskException",
+      "complexity": 2,
+      "line": 61,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Services/GlobalExceptionHandler.cs",
+      "class": "GlobalExceptionHandler",
+      "method": "SafeExecute",
+      "complexity": 2,
+      "line": 182,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Services/GlobalExceptionHandler.cs",
+      "class": "GlobalExceptionHandler",
+      "method": "SafeExecuteAsync",
+      "complexity": 2,
+      "line": 214,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Services/CachedProductRepository.cs",
+      "class": "CachedProductRepository",
+      "method": "RecordSaleAsync",
+      "complexity": 2,
+      "line": 125,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Services/CachedProductRepository.cs",
+      "class": "CachedProductRepository",
+      "method": "GetByIdAsync",
+      "complexity": 2,
+      "line": 173,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Services/CachedProductRepository.cs",
+      "class": "CachedProductRepository",
+      "method": "ReserveStockAsync",
+      "complexity": 2,
+      "line": 189,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Services/CachedProductRepository.cs",
+      "class": "CachedProductRepository",
+      "method": "InvalidateSalesCaches",
+      "complexity": 2,
+      "line": 220,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Services/BackgroundJobService.cs",
+      "class": "BackgroundJobService",
+      "method": "Initialize",
+      "complexity": 2,
+      "line": 36,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Services/BackgroundJobService.cs",
+      "class": "BackgroundJobService",
+      "method": "ScheduleRecurringJobs",
+      "complexity": 2,
+      "line": 66,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Services/BackgroundJobService.cs",
+      "class": "BackgroundJobService",
+      "method": "GenerateDailySnapshot",
+      "complexity": 2,
+      "line": 103,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Services/BackgroundJobService.cs",
+      "class": "BackgroundJobService",
+      "method": "RunLifecycleAudit",
+      "complexity": 2,
+      "line": 125,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Services/BackgroundJobService.cs",
+      "class": "BackgroundJobService",
+      "method": "GetJobStatus",
+      "complexity": 2,
+      "line": 199,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Config/DatabaseConfig.cs",
+      "class": "DatabaseConfig",
+      "method": "GetRequiredConnectionString",
+      "complexity": 2,
+      "line": 92,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/CustomerAuthService.cs",
+      "class": "CustomerAuthService",
+      "method": "Logout",
+      "complexity": 2,
+      "line": 125,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/CustomerAuthService.cs",
+      "class": "CustomerAuthService",
+      "method": "GetOrCreateGuestAsync",
+      "complexity": 2,
+      "line": 135,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/CustomerAuthService.cs",
+      "class": "CustomerAuthService",
+      "method": "HashPassword",
+      "complexity": 2,
+      "line": 149,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/RecommendationEngine.cs",
+      "class": "RecommendationEngine",
+      "method": "GetTrendRecommendation",
+      "complexity": 2,
+      "line": 93,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/RecommendationEngine.cs",
+      "class": "RecommendationEngine",
+      "method": "GetFallingTrendRecommendation",
+      "complexity": 2,
+      "line": 121,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/ProductRepository.cs",
+      "class": "ProductRepository",
+      "method": "IsTransientError",
+      "complexity": 2,
+      "line": 70,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/ProductRepository.cs",
+      "class": "ProductRepository",
+      "method": "GetByIdAsync",
+      "complexity": 2,
+      "line": 369,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/ProductRepository.cs",
+      "class": "ProductRepository",
+      "method": "ReserveStockAsync",
+      "complexity": 2,
+      "line": 405,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/CustomerRepository.cs",
+      "class": "CustomerRepository",
+      "method": "CustomerRepository",
+      "complexity": 2,
+      "line": 17,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/CustomerRepository.cs",
+      "class": "CustomerRepository",
+      "method": "GetByEmailAsync",
+      "complexity": 2,
+      "line": 28,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/CustomerRepository.cs",
+      "class": "CustomerRepository",
+      "method": "GetByIdAsync",
+      "complexity": 2,
+      "line": 41,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/TrendCalculatorService.cs",
+      "class": "TrendCalculatorService",
+      "method": "CalculateRunwayDays",
+      "complexity": 2,
+      "line": 68,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/TrendCalculatorService.cs",
+      "class": "TrendCalculatorService",
+      "method": "CalculateVariance",
+      "complexity": 2,
+      "line": 145,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/PurchaseOrderRepository.cs",
+      "class": "PurchaseOrderRepository",
+      "method": "MarkAsSentAsync",
+      "complexity": 2,
+      "line": 242,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/PurchaseOrderService.cs",
+      "class": "PurchaseOrderService",
+      "method": "GetAllAsync",
+      "complexity": 2,
+      "line": 347,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/PurchaseOrderService.cs",
+      "class": "PurchaseOrderService",
+      "method": "GetByIdAsync",
+      "complexity": 2,
+      "line": 353,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/OrderRepository.cs",
+      "class": "OrderRepository",
+      "method": "OrderRepository",
+      "complexity": 2,
+      "line": 18,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/OrderRepository.cs",
+      "class": "OrderRepository",
+      "method": "order_items",
+      "complexity": 2,
+      "line": 76,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/OrderRepository.cs",
+      "class": "OrderRepository",
+      "method": "GetByCustomerIdAsync",
+      "complexity": 2,
+      "line": 152,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/OrderRepository.cs",
+      "class": "OrderRepository",
+      "method": "GetAllOrdersAsync",
+      "complexity": 2,
+      "line": 183,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/SupplierRepository.cs",
+      "class": "SupplierRepository",
+      "method": "GetAllAsync",
+      "complexity": 2,
+      "line": 26,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/SupplierRepository.cs",
+      "class": "SupplierRepository",
+      "method": "GetByIdAsync",
+      "complexity": 2,
+      "line": 46,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/SupplierRepository.cs",
+      "class": "SupplierRepository",
+      "method": "UpdateAsync",
+      "complexity": 2,
+      "line": 79,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/SupplierRepository.cs",
+      "class": "SupplierRepository",
+      "method": "DeleteAsync",
+      "complexity": 2,
+      "line": 102,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Program.cs",
+      "class": "Program",
+      "method": "Main",
+      "complexity": 2,
+      "line": 14,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Program.cs",
+      "class": "Program",
+      "method": "FindEnvFile",
+      "complexity": 2,
+      "line": 84,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/RegistrationForm.cs",
+      "class": "RegistrationForm",
+      "method": "AddField",
+      "complexity": 2,
+      "line": 149,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/RegistrationForm.cs",
+      "class": "ValidationResult",
+      "method": "IsValidEmail",
+      "complexity": 2,
+      "line": 275,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/RegistrationForm.cs",
+      "class": "ValidationResult",
+      "method": "ShowError",
+      "complexity": 2,
+      "line": 288,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/RegistrationForm.cs",
+      "class": "ValidationResult",
+      "method": "ClearError",
+      "complexity": 2,
+      "line": 297,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/RegistrationForm.cs",
+      "class": "ValidationResult",
+      "method": "OnLoad",
+      "complexity": 2,
+      "line": 321,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/OrderConfirmationForm.cs",
+      "class": "OrderConfirmationForm",
+      "method": "SetupUI",
+      "complexity": 2,
+      "line": 43,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/CheckoutForm.cs",
+      "class": "CheckoutForm",
+      "method": "AddField",
+      "complexity": 2,
+      "line": 316,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/CheckoutForm.cs",
+      "class": "CheckoutForm",
+      "method": "TrySendInvoiceEmailAsync",
+      "complexity": 2,
+      "line": 447,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/CheckoutForm.cs",
+      "class": "CheckoutForm",
+      "method": "IsValidEmail",
+      "complexity": 2,
+      "line": 461,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/CheckoutForm.cs",
+      "class": "CheckoutForm",
+      "method": "ShowError",
+      "complexity": 2,
+      "line": 474,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/CheckoutForm.cs",
+      "class": "CheckoutForm",
+      "method": "ClearError",
+      "complexity": 2,
+      "line": 483,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/CustomerLoginForm.cs",
+      "class": "LoginValidationResult",
+      "method": "BtnGuest_Click",
+      "complexity": 2,
+      "line": 296,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/CustomerLoginForm.cs",
+      "class": "LoginValidationResult",
+      "method": "ShowError",
+      "complexity": 2,
+      "line": 303,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/CustomerLoginForm.cs",
+      "class": "LoginValidationResult",
+      "method": "ClearError",
+      "complexity": 2,
+      "line": 312,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/CustomerLoginForm.cs",
+      "class": "LoginValidationResult",
+      "method": "OnLoad",
+      "complexity": 2,
+      "line": 334,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/CatalogForm.cs",
+      "class": "CatalogForm",
+      "method": "BtnViewCart_Click",
+      "complexity": 2,
+      "line": 411,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Services/InvoiceGenerator.cs",
+      "class": "InvoiceGenerator",
+      "method": "GenerateInvoice",
+      "complexity": 2,
+      "line": 22,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Kiosk/AttractForm.cs",
+      "class": "AttractForm",
+      "method": "AttractForm_Click",
+      "complexity": 2,
+      "line": 47,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Kiosk/PaymentForm.cs",
+      "class": "PaymentForm",
+      "method": "GenerateReceipt",
+      "complexity": 2,
+      "line": 173,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Kiosk/KioskProductRepository.cs",
+      "class": "KioskProductRepository",
+      "method": "GetBySkuAsync",
+      "complexity": 2,
+      "line": 30,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/HealthCheckServiceTests.cs",
+      "class": "HealthCheckServiceTests",
+      "method": "CheckMemory_ReturnsValidResult",
+      "complexity": 2,
+      "line": 178,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/HealthCheckServiceTests.cs",
+      "class": "HealthCheckServiceTests",
+      "method": "CheckDiskSpace_ReturnsValidResult",
+      "complexity": 2,
+      "line": 195,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/ProductRepositoryTests.cs",
+      "class": "ProductRepositoryTests",
+      "method": "GenerateDailySnapshotAsync_MultipleConsecutiveDays_CallsForEachDay",
+      "complexity": 2,
+      "line": 281,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/ProductRepositoryTests.cs",
+      "class": "ProductRepositoryTests",
+      "method": "LifecycleTransition_UpdatesPhaseCorrectly",
+      "complexity": 2,
+      "line": 419,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/TrendCalculatorTests.cs",
+      "class": "TrendCalculatorTests",
+      "method": "CreateSalesHistory",
+      "complexity": 2,
+      "line": 22,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/TrendCalculatorTests.cs",
+      "class": "TrendCalculatorTests",
+      "method": "AnalyzeProduct_WithNegativeStock_HandlesGracefully",
+      "complexity": 2,
+      "line": 134,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/TrendCalculatorTests.cs",
+      "class": "TrendCalculatorTests",
+      "method": "AnalyzeProduct_VeryLongHistory_ProcessesEfficiently",
+      "complexity": 2,
+      "line": 329,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/LifecycleSentinelTests.cs",
+      "class": "LifecycleSentinelTests",
+      "method": "CheckAppleVintageList_ParsesObsoleteProducts",
+      "complexity": 2,
+      "line": 123,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/VisitorCountPredictorTests.cs",
+      "class": "VisitorCountPredictorTests",
+      "method": "CreateHistoricalData",
+      "complexity": 2,
+      "line": 35,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/VisitorCountPredictorTests.cs",
+      "class": "VisitorCountPredictorTests",
+      "method": "CalculateStandardDeviation_VariedValues_ReturnsCorrectValue",
+      "complexity": 2,
+      "line": 83,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/AuthenticationServiceTests.cs",
+      "class": "AuthenticationServiceTests",
+      "method": "Login_WithNonExistentUser_ReturnsFailure",
+      "complexity": 2,
+      "line": 78,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/Integration/ProductRepositoryIntegrationTests.cs",
+      "class": "ProductRepositoryIntegrationTests",
+      "method": "GetDashboardDataAsync_CalculatesSalesAndRunway",
+      "complexity": 2,
+      "line": 316,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/Integration/CachedProductRepositoryIntegrationTests.cs",
+      "class": "CachedProductRepositoryIntegrationTests",
+      "method": "CachedRepository_MaintainsDataConsistency",
+      "complexity": 2,
+      "line": 233,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/MainForm.Designer.cs",
+      "class": "MainForm",
+      "method": "InitializeComponent",
+      "complexity": 1,
+      "line": 24,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/MainForm.cs",
+      "class": "MainForm",
+      "method": "OnLoad",
+      "complexity": 1,
+      "line": 378,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/LeaveApprovalForm.cs",
+      "class": "LeaveApprovalForm",
+      "method": "InitializeComponent",
+      "complexity": 1,
+      "line": 36,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/LeaveApprovalForm.cs",
+      "class": "LeaveApprovalForm",
+      "method": "SetupUI",
+      "complexity": 1,
+      "line": 48,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/LeaveApprovalForm.cs",
+      "class": "LeaveApprovalForm",
+      "method": "OnLoad",
+      "complexity": 1,
+      "line": 162,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/SettingsForm.cs",
+      "class": "SettingsForm",
+      "method": "InitializeComponent",
+      "complexity": 1,
+      "line": 30,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/SettingsForm.cs",
+      "class": "SettingsForm",
+      "method": "SetupUI",
+      "complexity": 1,
+      "line": 45,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/SalesReportForm.cs",
+      "class": "SalesReportForm",
+      "method": "InitializeComponent",
+      "complexity": 1,
+      "line": 39,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/SalesReportForm.cs",
+      "class": "SalesReportForm",
+      "method": "SetupUI",
+      "complexity": 1,
+      "line": 51,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/LoginForm.cs",
+      "class": "LoginForm",
+      "method": "InitializeComponent",
+      "complexity": 1,
+      "line": 28,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/LoginForm.cs",
+      "class": "LoginForm",
+      "method": "SetupUI",
+      "complexity": 1,
+      "line": 43,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/LeaveRequestForm.cs",
+      "class": "LeaveRequestForm",
+      "method": "InitializeComponent",
+      "complexity": 1,
+      "line": 40,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/LeaveRequestForm.cs",
+      "class": "LeaveRequestForm",
+      "method": "SetupUI",
+      "complexity": 1,
+      "line": 55,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/LeaveRequestForm.cs",
+      "class": "LeaveRequestForm",
+      "method": "OnLoad",
+      "complexity": 1,
+      "line": 226,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/SalesEntryForm.cs",
+      "class": "SalesEntryForm",
+      "method": "InitializeComponent",
+      "complexity": 1,
+      "line": 44,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/SalesEntryForm.cs",
+      "class": "SalesEntryForm",
+      "method": "SetupUI",
+      "complexity": 1,
+      "line": 59,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/SalesEntryForm.cs",
+      "class": "SalesEntryForm",
+      "method": "OnLoad",
+      "complexity": 1,
+      "line": 189,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/UI/Forms/SalesEntryForm.cs",
+      "class": "SalesEntryForm",
+      "method": "ShowValidationErrors",
+      "complexity": 1,
+      "line": 310,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Config/ServiceConfiguration.cs",
+      "class": "ServiceConfiguration",
+      "method": "ConfigureServices",
+      "complexity": 1,
+      "line": 58,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Config/ServiceConfiguration.cs",
+      "class": "ServiceConfiguration",
+      "method": "ValidateConfiguration",
+      "complexity": 1,
+      "line": 264,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Config/ServiceConfiguration.cs",
+      "class": "ServiceConfiguration",
+      "method": "GetConfigurationErrorMessage",
+      "complexity": 1,
+      "line": 273,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Reporting/SalesReportService.cs",
+      "class": "SalesReportService",
+      "method": "IsTransientError",
+      "complexity": 1,
+      "line": 57,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Reporting/SalesReportService.cs",
+      "class": "SalesReportService",
+      "method": "GetDailyReportAsync",
+      "complexity": 1,
+      "line": 62,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Reporting/SalesReportService.cs",
+      "class": "SalesReportService",
+      "method": "GetWeeklyReportAsync",
+      "complexity": 1,
+      "line": 67,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Reporting/SalesReportService.cs",
+      "class": "SalesReportService",
+      "method": "GetMonthlyReportAsync",
+      "complexity": 1,
+      "line": 76,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Products/LifecycleSentinel.cs",
+      "class": "LifecycleSentinel",
+      "method": "NormalizeProductName",
+      "complexity": 1,
+      "line": 321,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Products/InventoryManager.cs",
+      "class": "InventoryManager",
+      "method": "CalculateReorderPoint",
+      "complexity": 1,
+      "line": 65,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Products/InventoryProduct.cs",
+      "class": "InventoryProduct",
+      "method": "InventoryProduct",
+      "complexity": 1,
+      "line": 14,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Products/InventoryProduct.cs",
+      "class": "InventoryProduct",
+      "method": "InventoryProduct",
+      "complexity": 1,
+      "line": 21,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Purchasing/PurchaseOrdersForm.cs",
+      "class": "PurchaseOrdersForm",
+      "method": "InitializeComponent",
+      "complexity": 1,
+      "line": 43,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Purchasing/PurchaseOrdersForm.cs",
+      "class": "PurchaseOrdersForm",
+      "method": "CreateButton",
+      "complexity": 1,
+      "line": 161,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Purchasing/SupplierManagementForm.cs",
+      "class": "SupplierManagementForm",
+      "method": "InitializeComponent",
+      "complexity": 1,
+      "line": 32,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Purchasing/SupplierManagementForm.cs",
+      "class": "SupplierManagementForm",
+      "method": "CreateButton",
+      "complexity": 1,
+      "line": 117,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Purchasing/SupplierManagementForm.cs",
+      "class": "SupplierEditDialog",
+      "method": "PopulateFields",
+      "complexity": 1,
+      "line": 317,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Auth/UserRepository.cs",
+      "class": "UserRepository",
+      "method": "IsTransientError",
+      "complexity": 1,
+      "line": 58,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Auth/UserRepository.cs",
+      "class": "UserRepository",
+      "method": "GetAllAsync",
+      "complexity": 1,
+      "line": 83,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Auth/UserRepository.cs",
+      "class": "UserRepository",
+      "method": "UpdateLastLoginAsync",
+      "complexity": 1,
+      "line": 98,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Auth/UserRepository.cs",
+      "class": "UserRepository",
+      "method": "CreateUserAsync",
+      "complexity": 1,
+      "line": 111,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/VisitorPrediction/VisitorCountPredictor.cs",
+      "class": "VisitorCountPredictor",
+      "method": "VisitorCountPredictor",
+      "complexity": 1,
+      "line": 52,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/VisitorPrediction/VisitorCountPredictor.cs",
+      "class": "VisitorCountPredictor",
+      "method": "GetHistoricalTrafficAsync",
+      "complexity": 1,
+      "line": 63,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/VisitorPrediction/VisitorCountPredictor.cs",
+      "class": "SpecialDayRule",
+      "method": "GenerateStaffingRecommendation",
+      "complexity": 1,
+      "line": 293,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/TimeTracking/TimeTrackingService.cs",
+      "class": "TimeTrackingService",
+      "method": "GetUserHistoryAsync",
+      "complexity": 1,
+      "line": 175,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/TimeTracking/TimeTrackingRepository.cs",
+      "class": "TimeTrackingRepository",
+      "method": "TimeTrackingRepository",
+      "complexity": 1,
+      "line": 16,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/TimeTracking/TimeTrackingRepository.cs",
+      "class": "TimeTrackingRepository",
+      "method": "LogEventAsync",
+      "complexity": 1,
+      "line": 24,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/TimeTracking/TimeTrackingRepository.cs",
+      "class": "TimeTrackingRepository",
+      "method": "GetDailyEventsAsync",
+      "complexity": 1,
+      "line": 41,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/TimeTracking/TimeTrackingRepository.cs",
+      "class": "TimeTrackingRepository",
+      "method": "GetHistoryAsync",
+      "complexity": 1,
+      "line": 57,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/TimeTracking/TimeTrackingRepository.cs",
+      "class": "TimeTrackingRepository",
+      "method": "UpdateEntryAsync",
+      "complexity": 1,
+      "line": 81,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/TimeTracking/WorkShiftRepository.cs",
+      "class": "WorkShiftRepository",
+      "method": "WorkShiftRepository",
+      "complexity": 1,
+      "line": 16,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/TimeTracking/WorkShiftRepository.cs",
+      "class": "WorkShiftRepository",
+      "method": "CreateAsync",
+      "complexity": 1,
+      "line": 24,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/TimeTracking/WorkShiftRepository.cs",
+      "class": "WorkShiftRepository",
+      "method": "GetByUserAsync",
+      "complexity": 1,
+      "line": 53,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/TimeTracking/WorkShiftRepository.cs",
+      "class": "WorkShiftRepository",
+      "method": "GetAllAsync",
+      "complexity": 1,
+      "line": 67,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/TimeTracking/WorkShiftRepository.cs",
+      "class": "WorkShiftRepository",
+      "method": "UpdateAsync",
+      "complexity": 1,
+      "line": 80,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/TimeTracking/WorkShiftRepository.cs",
+      "class": "WorkShiftRepository",
+      "method": "DeleteAsync",
+      "complexity": 1,
+      "line": 94,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/TimeTracking/Forms/ShiftManagementForm.cs",
+      "class": "ShiftManagementForm",
+      "method": "ShiftManagementForm",
+      "complexity": 1,
+      "line": 24,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/TimeTracking/Forms/ShiftManagementForm.cs",
+      "class": "ShiftManagementForm",
+      "method": "InitializeComponent",
+      "complexity": 1,
+      "line": 33,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/TimeTracking/Forms/ShiftManagementForm.cs",
+      "class": "ShiftManagementForm",
+      "method": "LoadShiftsAsync",
+      "complexity": 1,
+      "line": 130,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/TimeTracking/Forms/TimeTrackingForm.cs",
+      "class": "TimeTrackingForm",
+      "method": "TimeTrackingForm",
+      "complexity": 1,
+      "line": 25,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/TimeTracking/Forms/TimeTrackingForm.cs",
+      "class": "TimeTrackingForm",
+      "method": "InitializeComponent",
+      "complexity": 1,
+      "line": 34,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/TimeTracking/Forms/TimeTrackingForm.cs",
+      "class": "TimeTrackingForm",
+      "method": "CreateActionButton",
+      "complexity": 1,
+      "line": 115,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/TimeTracking/Forms/TimeTrackingForm.cs",
+      "class": "TimeTrackingForm",
+      "method": "InitializeTimer",
+      "complexity": 1,
+      "line": 133,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/TimeTracking/Forms/TimeTrackingForm.cs",
+      "class": "TimeTrackingForm",
+      "method": "EnableButton",
+      "complexity": 1,
+      "line": 201,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Orders/OrderManagementForm.cs",
+      "class": "OrderManagementForm",
+      "method": "InitializeComponent",
+      "complexity": 1,
+      "line": 33,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Orders/OrderManagementForm.cs",
+      "class": "OrderManagementForm",
+      "method": "SetupUI",
+      "complexity": 1,
+      "line": 46,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Orders/OrderManagementForm.cs",
+      "class": "OrderManagementForm",
+      "method": "AddStatusButton",
+      "complexity": 1,
+      "line": 262,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Orders/OrderManagementForm.cs",
+      "class": "OrderManagementForm",
+      "method": "OnLoad",
+      "complexity": 1,
+      "line": 282,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Payroll/PayrollService.cs",
+      "class": "PayrollService",
+      "method": "CalculateHoursForEmployee",
+      "complexity": 1,
+      "line": 71,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Payroll/PayrollService.cs",
+      "class": "PayrollService",
+      "method": "GetHistoryAsync",
+      "complexity": 1,
+      "line": 121,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Payroll/Forms/PayrollForm.cs",
+      "class": "PayrollForm",
+      "method": "PayrollForm",
+      "complexity": 1,
+      "line": 34,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Payroll/Forms/PayrollForm.cs",
+      "class": "PayrollForm",
+      "method": "InitializeComponent",
+      "complexity": 1,
+      "line": 41,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Leave/LeaveRepository.cs",
+      "class": "LeaveRepository",
+      "method": "IsTransientError",
+      "complexity": 1,
+      "line": 55,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Leave/LeaveRepository.cs",
+      "class": "LeaveRepository",
+      "method": "GetAllEmployeesAsync",
+      "complexity": 1,
+      "line": 76,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Leave/LeaveRepository.cs",
+      "class": "LeaveRepository",
+      "method": "GetByEmployeeAsync",
+      "complexity": 1,
+      "line": 134,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Leave/LeaveRepository.cs",
+      "class": "LeaveRepository",
+      "method": "GetPendingRequestsAsync",
+      "complexity": 1,
+      "line": 154,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Leave/LeaveRepository.cs",
+      "class": "LeaveRepository",
+      "method": "UpdateRemainingLeaveDaysAsync",
+      "complexity": 1,
+      "line": 281,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Features/Leave/LeaveRepository.cs",
+      "class": "LeaveRepository",
+      "method": "DeductLeaveDaysAsync",
+      "complexity": 1,
+      "line": 294,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Services/MainFormDependencies.cs",
+      "class": "MainFormDependencies",
+      "method": "ConfigureTimeTracking",
+      "complexity": 1,
+      "line": 91,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Services/HealthCheckService.cs",
+      "class": "HealthCheckService",
+      "method": "HealthCheckService",
+      "complexity": 1,
+      "line": 91,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Services/GlobalExceptionHandler.cs",
+      "class": "GlobalExceptionHandler",
+      "method": "OnThreadException",
+      "complexity": 1,
+      "line": 38,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Services/CachedProductRepository.cs",
+      "class": "CachedProductRepository",
+      "method": "UpdateProductPhaseAsync",
+      "complexity": 1,
+      "line": 139,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Services/CachedProductRepository.cs",
+      "class": "CachedProductRepository",
+      "method": "GenerateDailySnapshotAsync",
+      "complexity": 1,
+      "line": 152,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Services/CachedProductRepository.cs",
+      "class": "CachedProductRepository",
+      "method": "GetAllAsync",
+      "complexity": 1,
+      "line": 165,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Services/CachedProductRepository.cs",
+      "class": "CachedProductRepository",
+      "method": "GetAvailableProductsAsync",
+      "complexity": 1,
+      "line": 181,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Services/CachedProductRepository.cs",
+      "class": "CachedProductRepository",
+      "method": "ReleaseStockAsync",
+      "complexity": 1,
+      "line": 206,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Services/CachedProductRepository.cs",
+      "class": "CachedProductRepository",
+      "method": "InvalidateProductCaches",
+      "complexity": 1,
+      "line": 246,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Services/CachedProductRepository.cs",
+      "class": "CachedProductRepository",
+      "method": "InvalidateDashboardCache",
+      "complexity": 1,
+      "line": 255,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Services/CachedProductRepository.cs",
+      "class": "CachedProductRepository",
+      "method": "ClearAllCaches",
+      "complexity": 1,
+      "line": 263,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Services/AppLogger.cs",
+      "class": "AppLogger",
+      "method": "CreateLoggerFactory",
+      "complexity": 1,
+      "line": 19,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop/Services/BackgroundJobService.cs",
+      "class": "BackgroundJobService",
+      "method": "TriggerImmediateJob",
+      "complexity": 1,
+      "line": 181,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/ProductRepository.cs",
+      "class": "ProductRepository",
+      "method": "GenerateDailySnapshotAsync",
+      "complexity": 1,
+      "line": 76,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/ProductRepository.cs",
+      "class": "ProductRepository",
+      "method": "GetSalesHistoryAsync",
+      "complexity": 1,
+      "line": 275,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/ProductRepository.cs",
+      "class": "ProductRepository",
+      "method": "GetAllProductsAsync",
+      "complexity": 1,
+      "line": 291,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/ProductRepository.cs",
+      "class": "ProductRepository",
+      "method": "GetAllAsync",
+      "complexity": 1,
+      "line": 296,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/ProductRepository.cs",
+      "class": "ProductRepository",
+      "method": "GetAvailableProductsAsync",
+      "complexity": 1,
+      "line": 386,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/ProductRepository.cs",
+      "class": "ProductRepository",
+      "method": "ReleaseStockAsync",
+      "complexity": 1,
+      "line": 430,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/CustomerRepository.cs",
+      "class": "CustomerRepository",
+      "method": "CreateAsync",
+      "complexity": 1,
+      "line": 54,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/CustomerRepository.cs",
+      "class": "CustomerRepository",
+      "method": "UpdateLastLoginAsync",
+      "complexity": 1,
+      "line": 105,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/CustomerRepository.cs",
+      "class": "CustomerRepository",
+      "method": "EmailExistsAsync",
+      "complexity": 1,
+      "line": 112,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/AppLogger.cs",
+      "class": "AppLogger",
+      "method": "CreateLoggerFactory",
+      "complexity": 1,
+      "line": 18,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/PurchaseOrderRepository.cs",
+      "class": "PurchaseOrderRepository",
+      "method": "GetPendingAsync",
+      "complexity": 1,
+      "line": 179,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/PurchaseOrderRepository.cs",
+      "class": "PurchaseOrderRepository",
+      "method": "GetBySupplierAsync",
+      "complexity": 1,
+      "line": 185,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/PurchaseOrderRepository.cs",
+      "class": "PurchaseOrderRepository",
+      "method": "GenerateOrderNumberAsync",
+      "complexity": 1,
+      "line": 310,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/PurchaseOrderService.cs",
+      "class": "PurchaseOrderService",
+      "method": "GetPendingCountAsync",
+      "complexity": 1,
+      "line": 359,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/PurchaseOrderService.cs",
+      "class": "PurchaseOrderService",
+      "method": "GeneratePurchaseOrderEmailHtml",
+      "complexity": 1,
+      "line": 368,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/OrderRepository.cs",
+      "class": "OrderRepository",
+      "method": "orders",
+      "complexity": 1,
+      "line": 58,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/OrderRepository.cs",
+      "class": "OrderRepository",
+      "method": "UpdateStatusAsync",
+      "complexity": 1,
+      "line": 203,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/OrderRepository.cs",
+      "class": "OrderRepository",
+      "method": "GenerateOrderNumberAsync",
+      "complexity": 1,
+      "line": 268,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/GmailEmailService.cs",
+      "class": "GmailEmailService",
+      "method": "SendEmailAsync",
+      "complexity": 1,
+      "line": 82,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/GmailEmailService.cs",
+      "class": "GmailEmailService",
+      "method": "Base64UrlEncode",
+      "complexity": 1,
+      "line": 192,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Shared/Services/SupplierRepository.cs",
+      "class": "SupplierRepository",
+      "method": "CreateAsync",
+      "complexity": 1,
+      "line": 61,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/CartForm.cs",
+      "class": "CartForm",
+      "method": "InitializeComponent",
+      "complexity": 1,
+      "line": 48,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/CartForm.cs",
+      "class": "CartForm",
+      "method": "SetupUI",
+      "complexity": 1,
+      "line": 63,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/CartForm.cs",
+      "class": "CartForm",
+      "method": "OnLoad",
+      "complexity": 1,
+      "line": 212,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/RegistrationForm.cs",
+      "class": "RegistrationForm",
+      "method": "InitializeComponent",
+      "complexity": 1,
+      "line": 32,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/RegistrationForm.cs",
+      "class": "RegistrationForm",
+      "method": "SetupUI",
+      "complexity": 1,
+      "line": 48,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/OrderConfirmationForm.cs",
+      "class": "OrderConfirmationForm",
+      "method": "OrderConfirmationForm",
+      "complexity": 1,
+      "line": 18,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/OrderConfirmationForm.cs",
+      "class": "OrderConfirmationForm",
+      "method": "InitializeComponent",
+      "complexity": 1,
+      "line": 27,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/CheckoutForm.cs",
+      "class": "CheckoutForm",
+      "method": "InitializeComponent",
+      "complexity": 1,
+      "line": 54,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/CheckoutForm.cs",
+      "class": "CheckoutForm",
+      "method": "HandleOrderSuccessAsync",
+      "complexity": 1,
+      "line": 434,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/CustomerLoginForm.cs",
+      "class": "CustomerLoginForm",
+      "method": "InitializeComponent",
+      "complexity": 1,
+      "line": 32,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/CustomerLoginForm.cs",
+      "class": "CustomerLoginForm",
+      "method": "SetupUI",
+      "complexity": 1,
+      "line": 48,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/CatalogForm.cs",
+      "class": "CatalogForm",
+      "method": "InitializeComponent",
+      "complexity": 1,
+      "line": 55,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/CatalogForm.cs",
+      "class": "CatalogForm",
+      "method": "SetupUI",
+      "complexity": 1,
+      "line": 68,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Forms/CatalogForm.cs",
+      "class": "CatalogForm",
+      "method": "OnLoad",
+      "complexity": 1,
+      "line": 253,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Config/CustomerServiceConfiguration.cs",
+      "class": "CustomerServiceConfiguration",
+      "method": "ConfigureServices",
+      "complexity": 1,
+      "line": 34,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Config/CustomerServiceConfiguration.cs",
+      "class": "CustomerServiceConfiguration",
+      "method": "ValidateConfiguration",
+      "complexity": 1,
+      "line": 117,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Config/CustomerServiceConfiguration.cs",
+      "class": "CustomerServiceConfiguration",
+      "method": "GetConfigurationErrorMessage",
+      "complexity": 1,
+      "line": 123,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Services/ShoppingCartService.cs",
+      "class": "ShoppingCartService",
+      "method": "SetTaxRate",
+      "complexity": 1,
+      "line": 23,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Services/ShoppingCartService.cs",
+      "class": "ShoppingCartService",
+      "method": "RemoveItem",
+      "complexity": 1,
+      "line": 72,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Services/ShoppingCartService.cs",
+      "class": "ShoppingCartService",
+      "method": "Clear",
+      "complexity": 1,
+      "line": 133,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Customer/Services/InvoiceGenerator.cs",
+      "class": "InvoiceGenerator",
+      "method": "GenerateSubject",
+      "complexity": 1,
+      "line": 147,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Kiosk/AttractForm.cs",
+      "class": "AttractForm",
+      "method": "AttractForm",
+      "complexity": 1,
+      "line": 12,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Kiosk/AttractForm.cs",
+      "class": "AttractForm",
+      "method": "InitializeComponent",
+      "complexity": 1,
+      "line": 18,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Kiosk/PaymentForm.cs",
+      "class": "PaymentForm",
+      "method": "PaymentForm",
+      "complexity": 1,
+      "line": 16,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Kiosk/PaymentForm.cs",
+      "class": "PaymentForm",
+      "method": "InitializeComponent",
+      "complexity": 1,
+      "line": 23,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Kiosk/PaymentForm.cs",
+      "class": "PaymentForm",
+      "method": "CreatePaymentButton",
+      "complexity": 1,
+      "line": 125,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Kiosk/KioskProductRepository.cs",
+      "class": "KioskProductRepository",
+      "method": "RecordSaleAsync",
+      "complexity": 1,
+      "line": 37,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Kiosk/ScanForm.cs",
+      "class": "ScanForm",
+      "method": "ScanForm",
+      "complexity": 1,
+      "line": 36,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Kiosk/ScanForm.cs",
+      "class": "ScanForm",
+      "method": "InitializeComponent",
+      "complexity": 1,
+      "line": 43,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Kiosk/ScanForm.cs",
+      "class": "ScanForm",
+      "method": "RefreshCart",
+      "complexity": 1,
+      "line": 243,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Kiosk/Program.cs",
+      "class": "Program",
+      "method": "Main",
+      "complexity": 1,
+      "line": 17,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/RecommendationEngineTests.cs",
+      "class": "RecommendationEngineTests",
+      "method": "GenerateRecommendation_ObsoleteWithStock_ReturnsLiquidate",
+      "complexity": 1,
+      "line": 45,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/RecommendationEngineTests.cs",
+      "class": "RecommendationEngineTests",
+      "method": "GenerateRecommendation_ObsoleteNoStock_ReturnsDiscontinue",
+      "complexity": 1,
+      "line": 53,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/RecommendationEngineTests.cs",
+      "class": "RecommendationEngineTests",
+      "method": "GenerateRecommendation_LegacyLowRunway_ReturnsDiscount",
+      "complexity": 1,
+      "line": 61,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/RecommendationEngineTests.cs",
+      "class": "RecommendationEngineTests",
+      "method": "GenerateRecommendation_LegacyHighRunway_ReturnsMonitor",
+      "complexity": 1,
+      "line": 69,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/RecommendationEngineTests.cs",
+      "class": "RecommendationEngineTests",
+      "method": "GenerateRecommendation_CriticalRunway_ReturnsCriticalAlert",
+      "complexity": 1,
+      "line": 78,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/RecommendationEngineTests.cs",
+      "class": "RecommendationEngineTests",
+      "method": "GenerateRecommendation_UrgentRunway_ReturnsUrgentAlert",
+      "complexity": 1,
+      "line": 86,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/RecommendationEngineTests.cs",
+      "class": "RecommendationEngineTests",
+      "method": "GenerateRecommendation_LowRunway_ReturnsReorderRecommended",
+      "complexity": 1,
+      "line": 94,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/RecommendationEngineTests.cs",
+      "class": "RecommendationEngineTests",
+      "method": "GenerateRecommendation_AcceleratingTrend_ReturnsAccelerating",
+      "complexity": 1,
+      "line": 103,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/RecommendationEngineTests.cs",
+      "class": "RecommendationEngineTests",
+      "method": "GenerateRecommendation_StrongRisingTrend_ReturnsTrendingUp",
+      "complexity": 1,
+      "line": 114,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/RecommendationEngineTests.cs",
+      "class": "RecommendationEngineTests",
+      "method": "GenerateRecommendation_FallingTrend_ReturnsDeclineWarning",
+      "complexity": 1,
+      "line": 125,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/RecommendationEngineTests.cs",
+      "class": "RecommendationEngineTests",
+      "method": "GenerateRecommendation_VolatileTrend_ReturnsVolatileWarning",
+      "complexity": 1,
+      "line": 136,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/RecommendationEngineTests.cs",
+      "class": "RecommendationEngineTests",
+      "method": "GenerateRecommendation_NormalStock_ReturnsNormal",
+      "complexity": 1,
+      "line": 146,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/RecommendationEngineTests.cs",
+      "class": "RecommendationEngineTests",
+      "method": "CalculateReorderQuantity_NoSales_ReturnsZero",
+      "complexity": 1,
+      "line": 155,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/RecommendationEngineTests.cs",
+      "class": "RecommendationEngineTests",
+      "method": "CalculateReorderQuantity_AdequateStock_ReturnsZeroOrNegative",
+      "complexity": 1,
+      "line": 163,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/RecommendationEngineTests.cs",
+      "class": "RecommendationEngineTests",
+      "method": "CalculateReorderQuantity_LowStock_ReturnsPositiveQuantity",
+      "complexity": 1,
+      "line": 171,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/RecommendationEngineTests.cs",
+      "class": "RecommendationEngineTests",
+      "method": "CalculateReorderQuantity_RisingTrend_IncreasesQuantity",
+      "complexity": 1,
+      "line": 179,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/RecommendationEngineTests.cs",
+      "class": "RecommendationEngineTests",
+      "method": "CalculateReorderQuantity_FallingTrend_DecreasesQuantity",
+      "complexity": 1,
+      "line": 191,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/RecommendationEngineTests.cs",
+      "class": "RecommendationEngineTests",
+      "method": "CalculateReorderQuantity_Accelerating_AddsBuffer",
+      "complexity": 1,
+      "line": 203,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/RecommendationEngineTests.cs",
+      "class": "RecommendationEngineTests",
+      "method": "GenerateRecommendation_ZeroOrNegativeRunway_ReturnsCritical",
+      "complexity": 1,
+      "line": 220,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/RecommendationEngineTests.cs",
+      "class": "RecommendationEngineTests",
+      "method": "GenerateRecommendation_ExactlyThreeDaysRunway_ReturnsCritical",
+      "complexity": 1,
+      "line": 228,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/RecommendationEngineTests.cs",
+      "class": "RecommendationEngineTests",
+      "method": "GenerateRecommendation_ExactlySevenDaysRunway_ReturnsUrgent",
+      "complexity": 1,
+      "line": 236,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/RecommendationEngineTests.cs",
+      "class": "RecommendationEngineTests",
+      "method": "GenerateRecommendation_ExactlyFourteenDaysRunway_ReturnsReorder",
+      "complexity": 1,
+      "line": 244,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/RecommendationEngineTests.cs",
+      "class": "RecommendationEngineTests",
+      "method": "GenerateRecommendation_VeryHighRunway_ReturnsNormal",
+      "complexity": 1,
+      "line": 252,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/RecommendationEngineTests.cs",
+      "class": "RecommendationEngineTests",
+      "method": "GenerateRecommendation_LegacyWithExactly30DaysRunway_ReturnsDiscount",
+      "complexity": 1,
+      "line": 260,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/RecommendationEngineTests.cs",
+      "class": "RecommendationEngineTests",
+      "method": "GenerateRecommendation_LegacyWith29DaysRunway_ReturnsDiscount",
+      "complexity": 1,
+      "line": 268,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/RecommendationEngineTests.cs",
+      "class": "RecommendationEngineTests",
+      "method": "GenerateRecommendation_ObsoleteWithExactly5Stock_ReturnsDiscontinue",
+      "complexity": 1,
+      "line": 276,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/RecommendationEngineTests.cs",
+      "class": "RecommendationEngineTests",
+      "method": "GenerateRecommendation_ObsoleteWith6Stock_ReturnsLiquidate",
+      "complexity": 1,
+      "line": 284,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/RecommendationEngineTests.cs",
+      "class": "RecommendationEngineTests",
+      "method": "GenerateRecommendation_CaseInsensitivePhase_UpperCaseWorks",
+      "complexity": 1,
+      "line": 295,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/RecommendationEngineTests.cs",
+      "class": "RecommendationEngineTests",
+      "method": "GenerateRecommendation_UnknownPhase_FallsBackToTrendBased",
+      "complexity": 1,
+      "line": 304,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/RecommendationEngineTests.cs",
+      "class": "RecommendationEngineTests",
+      "method": "GenerateRecommendation_EmptyPhase_FallsBackToTrendBased",
+      "complexity": 1,
+      "line": 312,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/RecommendationEngineTests.cs",
+      "class": "RecommendationEngineTests",
+      "method": "GenerateRecommendation_RisingNotAccelerating_ReturnsTrendingUp",
+      "complexity": 1,
+      "line": 320,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/RecommendationEngineTests.cs",
+      "class": "RecommendationEngineTests",
+      "method": "GenerateRecommendation_RisingWeakTrend_ReturnsSlightIncrease",
+      "complexity": 1,
+      "line": 332,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/RecommendationEngineTests.cs",
+      "class": "RecommendationEngineTests",
+      "method": "GenerateRecommendation_FallingWeakTrend_ReturnsWatchClosely",
+      "complexity": 1,
+      "line": 344,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/RecommendationEngineTests.cs",
+      "class": "RecommendationEngineTests",
+      "method": "CalculateReorderQuantity_VeryHighDailyAverage_ReturnsReasonableQuantity",
+      "complexity": 1,
+      "line": 359,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/RecommendationEngineTests.cs",
+      "class": "RecommendationEngineTests",
+      "method": "CalculateReorderQuantity_NegativeDailyAverage_ReturnsZero",
+      "complexity": 1,
+      "line": 368,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/RecommendationEngineTests.cs",
+      "class": "RecommendationEngineTests",
+      "method": "CalculateReorderQuantity_CustomTargetRunway_CalculatesCorrectly",
+      "complexity": 1,
+      "line": 376,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/RecommendationEngineTests.cs",
+      "class": "RecommendationEngineTests",
+      "method": "CalculateReorderQuantity_VolatileTrend_DoesNotAffectQuantity",
+      "complexity": 1,
+      "line": 389,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/RecommendationEngineTests.cs",
+      "class": "RecommendationEngineTests",
+      "method": "CalculateReorderQuantity_AcceleratingAndRising_AppliesBothMultipliers",
+      "complexity": 1,
+      "line": 402,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/RecommendationEngineTests.cs",
+      "class": "RecommendationEngineTests",
+      "method": "CalculateReorderQuantity_ZeroStock_CalculatesFullTargetAmount",
+      "complexity": 1,
+      "line": 420,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/RecommendationEngineTests.cs",
+      "class": "RecommendationEngineTests",
+      "method": "GenerateRecommendation_BoundaryRunway4Days_ReturnsUrgent",
+      "complexity": 1,
+      "line": 434,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/RecommendationEngineTests.cs",
+      "class": "RecommendationEngineTests",
+      "method": "GenerateRecommendation_BoundaryRunway8Days_ReturnsReorder",
+      "complexity": 1,
+      "line": 442,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/RecommendationEngineTests.cs",
+      "class": "RecommendationEngineTests",
+      "method": "GenerateRecommendation_BoundaryRunway15Days_ReturnsNormalOrTrendBased",
+      "complexity": 1,
+      "line": 450,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/RecommendationEngineTests.cs",
+      "class": "RecommendationEngineTests",
+      "method": "GenerateRecommendation_TrendStrengthExactly03_ReturnsTrendingUp",
+      "complexity": 1,
+      "line": 462,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/RecommendationEngineTests.cs",
+      "class": "RecommendationEngineTests",
+      "method": "GenerateRecommendation_TrendStrengthAbove03_ReturnsTrendingUp",
+      "complexity": 1,
+      "line": 474,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/HealthCheckServiceTests.cs",
+      "class": "HealthCheckServiceTests",
+      "method": "BuildTestConnectionString",
+      "complexity": 1,
+      "line": 24,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/HealthCheckServiceTests.cs",
+      "class": "HealthCheckServiceTests",
+      "method": "HealthCheckResult_DefaultValues_AreCorrect",
+      "complexity": 1,
+      "line": 40,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/HealthCheckServiceTests.cs",
+      "class": "HealthCheckServiceTests",
+      "method": "HealthCheckResult_IsHealthy_ReturnsTrueWhenHealthy",
+      "complexity": 1,
+      "line": 55,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/HealthCheckServiceTests.cs",
+      "class": "HealthCheckServiceTests",
+      "method": "HealthCheckResult_IsHealthy_ReturnsFalseWhenDegraded",
+      "complexity": 1,
+      "line": 65,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/HealthCheckServiceTests.cs",
+      "class": "HealthCheckServiceTests",
+      "method": "HealthCheckResult_IsHealthy_ReturnsFalseWhenUnhealthy",
+      "complexity": 1,
+      "line": 75,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/HealthCheckServiceTests.cs",
+      "class": "HealthCheckServiceTests",
+      "method": "HealthReport_IsHealthy_ReturnsTrueWhenAllHealthy",
+      "complexity": 1,
+      "line": 89,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/HealthCheckServiceTests.cs",
+      "class": "HealthCheckServiceTests",
+      "method": "HealthReport_IsHealthy_ReturnsFalseWhenDegraded",
+      "complexity": 1,
+      "line": 107,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/HealthCheckServiceTests.cs",
+      "class": "HealthCheckServiceTests",
+      "method": "HealthReport_GetSummary_ContainsAllResults",
+      "complexity": 1,
+      "line": 117,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/HealthCheckServiceTests.cs",
+      "class": "HealthCheckServiceTests",
+      "method": "HealthReport_GetSummary_IncludesExceptionMessage",
+      "complexity": 1,
+      "line": 145,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/HealthCheckServiceTests.cs",
+      "class": "HealthCheckServiceTests",
+      "method": "CheckDatabaseAsync_InvalidConnection_ReturnsUnhealthy",
+      "complexity": 1,
+      "line": 215,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/HealthCheckServiceTests.cs",
+      "class": "HealthCheckServiceTests",
+      "method": "IsDatabaseAvailableAsync_InvalidConnection_ReturnsFalse",
+      "complexity": 1,
+      "line": 231,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/HealthCheckServiceTests.cs",
+      "class": "HealthCheckServiceTests",
+      "method": "HealthStatus_HasExpectedValues",
+      "complexity": 1,
+      "line": 248,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/ProductRepositoryTests.cs",
+      "class": "ProductRepositoryTests",
+      "method": "ProductRepositoryTests",
+      "complexity": 1,
+      "line": 23,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/ProductRepositoryTests.cs",
+      "class": "ProductRepositoryTests",
+      "method": "GetAllProductsAsync_ReturnsAllProducts",
+      "complexity": 1,
+      "line": 66,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/ProductRepositoryTests.cs",
+      "class": "ProductRepositoryTests",
+      "method": "GetAllProductsAsync_EmptyDatabase_ReturnsEmptyCollection",
+      "complexity": 1,
+      "line": 88,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/ProductRepositoryTests.cs",
+      "class": "ProductRepositoryTests",
+      "method": "GetAllProductsAsync_ReturnsProductsWithCorrectProperties",
+      "complexity": 1,
+      "line": 102,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/ProductRepositoryTests.cs",
+      "class": "ProductRepositoryTests",
+      "method": "RecordSaleAsync_ValidSale_ReturnsNewSaleId",
+      "complexity": 1,
+      "line": 125,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/ProductRepositoryTests.cs",
+      "class": "ProductRepositoryTests",
+      "method": "RecordSaleAsync_WithSpecificDate_PassesDateCorrectly",
+      "complexity": 1,
+      "line": 140,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/ProductRepositoryTests.cs",
+      "class": "ProductRepositoryTests",
+      "method": "RecordSaleAsync_MultipleSales_ReturnsUniqueIds",
+      "complexity": 1,
+      "line": 156,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/ProductRepositoryTests.cs",
+      "class": "ProductRepositoryTests",
+      "method": "GetSalesHistoryAsync_ReturnsTransactionsForProduct",
+      "complexity": 1,
+      "line": 179,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/ProductRepositoryTests.cs",
+      "class": "ProductRepositoryTests",
+      "method": "GetSalesHistoryAsync_NoSales_ReturnsEmptyCollection",
+      "complexity": 1,
+      "line": 201,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/ProductRepositoryTests.cs",
+      "class": "ProductRepositoryTests",
+      "method": "GetSalesHistoryAsync_CustomDays_UsesCorrectParameter",
+      "complexity": 1,
+      "line": 215,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/ProductRepositoryTests.cs",
+      "class": "ProductRepositoryTests",
+      "method": "UpdateProductPhaseAsync_ValidPhase_CompletesSuccessfully",
+      "complexity": 1,
+      "line": 233,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/ProductRepositoryTests.cs",
+      "class": "ProductRepositoryTests",
+      "method": "UpdateProductPhaseAsync_AllValidPhases_CallsRepository",
+      "complexity": 1,
+      "line": 248,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/ProductRepositoryTests.cs",
+      "class": "ProductRepositoryTests",
+      "method": "GenerateDailySnapshotAsync_ValidDate_CompletesSuccessfully",
+      "complexity": 1,
+      "line": 266,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/ProductRepositoryTests.cs",
+      "class": "ProductRepositoryTests",
+      "method": "GetDashboardDataAsync_ReturnsProductsWithRecommendations",
+      "complexity": 1,
+      "line": 302,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/ProductRepositoryTests.cs",
+      "class": "ProductRepositoryTests",
+      "method": "GetDashboardDataAsync_EmptyInventory_ReturnsEmptyList",
+      "complexity": 1,
+      "line": 343,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/ProductRepositoryTests.cs",
+      "class": "ProductRepositoryTests",
+      "method": "GetDashboardDataAsync_CriticalStockItems_IncludedInResults",
+      "complexity": 1,
+      "line": 357,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/ProductRepositoryTests.cs",
+      "class": "ProductRepositoryTests",
+      "method": "FullSalesFlow_RecordSaleAndVerifyHistory",
+      "complexity": 1,
+      "line": 390,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/ProductRepositoryTests.cs",
+      "class": "ProductRepositoryTests",
+      "method": "Product_AllPropertiesCanBeSet",
+      "complexity": 1,
+      "line": 453,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/ProductRepositoryTests.cs",
+      "class": "ProductRepositoryTests",
+      "method": "SalesTransaction_AllPropertiesCanBeSet",
+      "complexity": 1,
+      "line": 480,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/ProductRepositoryTests.cs",
+      "class": "ProductRepositoryTests",
+      "method": "ProductDashboardDto_AllPropertiesCanBeSet",
+      "complexity": 1,
+      "line": 502,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/ProductRepositoryTests.cs",
+      "class": "ProductRepositoryTests",
+      "method": "RecordSaleAsync_LargeQuantity_HandlesCorrectly",
+      "complexity": 1,
+      "line": 529,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/ProductRepositoryTests.cs",
+      "class": "ProductRepositoryTests",
+      "method": "GetSalesHistoryAsync_ZeroDays_ReturnsNoResults",
+      "complexity": 1,
+      "line": 543,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/ProductRepositoryTests.cs",
+      "class": "ProductRepositoryTests",
+      "method": "UpdateProductPhaseAsync_EmptyReason_StillCompletes",
+      "complexity": 1,
+      "line": 557,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/TrendCalculatorTests.cs",
+      "class": "TrendCalculatorTests",
+      "method": "CreateTestProduct",
+      "complexity": 1,
+      "line": 10,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/TrendCalculatorTests.cs",
+      "class": "TrendCalculatorTests",
+      "method": "AnalyzeProduct_WithNoSalesHistory_ReturnsStableTrend",
+      "complexity": 1,
+      "line": 40,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/TrendCalculatorTests.cs",
+      "class": "TrendCalculatorTests",
+      "method": "AnalyzeProduct_WithEmptySalesHistory_ReturnsStableTrend",
+      "complexity": 1,
+      "line": 56,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/TrendCalculatorTests.cs",
+      "class": "TrendCalculatorTests",
+      "method": "AnalyzeProduct_WithConsistentSales_CalculatesCorrectRunway",
+      "complexity": 1,
+      "line": 72,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/TrendCalculatorTests.cs",
+      "class": "TrendCalculatorTests",
+      "method": "AnalyzeProduct_WithZeroStock_ReturnsZeroRunway",
+      "complexity": 1,
+      "line": 88,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/TrendCalculatorTests.cs",
+      "class": "TrendCalculatorTests",
+      "method": "AnalyzeProduct_SetsCorrectProductInfo",
+      "complexity": 1,
+      "line": 102,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/TrendCalculatorTests.cs",
+      "class": "TrendCalculatorTests",
+      "method": "AnalyzeProduct_WithHighStock_ReturnsHighRunway",
+      "complexity": 1,
+      "line": 118,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/TrendCalculatorTests.cs",
+      "class": "TrendCalculatorTests",
+      "method": "AnalyzeProduct_WithSingleDaySales_CalculatesCorrectly",
+      "complexity": 1,
+      "line": 148,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/TrendCalculatorTests.cs",
+      "class": "TrendCalculatorTests",
+      "method": "AnalyzeProduct_WithVeryLargeSalesVolume_CalculatesCorrectRunway",
+      "complexity": 1,
+      "line": 163,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/TrendCalculatorTests.cs",
+      "class": "TrendCalculatorTests",
+      "method": "AnalyzeProduct_WithDecimalAverages_ReturnsRoundedValue",
+      "complexity": 1,
+      "line": 177,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/TrendCalculatorTests.cs",
+      "class": "TrendCalculatorTests",
+      "method": "AnalyzeProduct_WithAllZeroSales_ReturnsMaxRunway",
+      "complexity": 1,
+      "line": 192,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/TrendCalculatorTests.cs",
+      "class": "TrendCalculatorTests",
+      "method": "AnalyzeProduct_OlderSalesOnly_HandlesCorrectly",
+      "complexity": 1,
+      "line": 207,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/TrendCalculatorTests.cs",
+      "class": "TrendCalculatorTests",
+      "method": "AnalyzeProduct_WithSporadicSales_DetectsVolatility",
+      "complexity": 1,
+      "line": 232,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/TrendCalculatorTests.cs",
+      "class": "TrendCalculatorTests",
+      "method": "TrendDirection_HasAllExpectedValues",
+      "complexity": 1,
+      "line": 360,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/LifecycleSentinelTests.cs",
+      "class": "LifecycleSentinelTests",
+      "method": "LifecycleSentinelTests",
+      "complexity": 1,
+      "line": 26,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/LifecycleSentinelTests.cs",
+      "class": "LifecycleSentinelTests",
+      "method": "RunDailyAudit_CallsBothScrapers",
+      "complexity": 1,
+      "line": 34,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/LifecycleSentinelTests.cs",
+      "class": "LifecycleSentinelTests",
+      "method": "CheckAppleVintageList_ParsesVintageProducts",
+      "complexity": 1,
+      "line": 52,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/LifecycleSentinelTests.cs",
+      "class": "LifecycleSentinelTests",
+      "method": "CheckGooglePixelEOL_DetectsExpiredDevices",
+      "complexity": 1,
+      "line": 173,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/LifecycleSentinelTests.cs",
+      "class": "LifecycleSentinelTests",
+      "method": "CheckGooglePixelEOL_DetectsUpcomingEOL",
+      "complexity": 1,
+      "line": 204,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/LifecycleSentinelTests.cs",
+      "class": "LifecycleSentinelTests",
+      "method": "FuzzyMatching_MatchesProductVariations",
+      "complexity": 1,
+      "line": 234,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/LifecycleSentinelTests.cs",
+      "class": "LifecycleSentinelTests",
+      "method": "RunDailyAudit_HandlesHttpErrors_GracefullyAsync",
+      "complexity": 1,
+      "line": 275,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/LifecycleSentinelTests.cs",
+      "class": "LifecycleSentinelTests",
+      "method": "OnlyUpdatesProducts_WhenPhaseActuallyChanges",
+      "complexity": 1,
+      "line": 297,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/LifecycleSentinelTests.cs",
+      "class": "LifecycleSentinelTests",
+      "method": "FiltersOutNonProductText",
+      "complexity": 1,
+      "line": 336,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/LifecycleSentinelTests.cs",
+      "class": "LifecycleSentinelTests",
+      "method": "RunDailyAudit_EmptyProductList_CompletesWithoutError",
+      "complexity": 1,
+      "line": 382,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/LifecycleSentinelTests.cs",
+      "class": "LifecycleSentinelTests",
+      "method": "RunDailyAudit_EmptyHtmlResponse_HandlesGracefully",
+      "complexity": 1,
+      "line": 407,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/LifecycleSentinelTests.cs",
+      "class": "LifecycleSentinelTests",
+      "method": "RunDailyAudit_MalformedHtml_HandlesGracefully",
+      "complexity": 1,
+      "line": 438,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/LifecycleSentinelTests.cs",
+      "class": "LifecycleSentinelTests",
+      "method": "RunDailyAudit_TimeoutError_HandlesGracefully",
+      "complexity": 1,
+      "line": 465,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/LifecycleSentinelTests.cs",
+      "class": "LifecycleSentinelTests",
+      "method": "RunDailyAudit_NetworkError_HandlesGracefully",
+      "complexity": 1,
+      "line": 481,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/LifecycleSentinelTests.cs",
+      "class": "LifecycleSentinelTests",
+      "method": "ProductPhaseTransition_Active_To_Legacy",
+      "complexity": 1,
+      "line": 497,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/LifecycleSentinelTests.cs",
+      "class": "LifecycleSentinelTests",
+      "method": "ProductPhaseTransition_Legacy_To_Obsolete",
+      "complexity": 1,
+      "line": 538,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/LifecycleSentinelTests.cs",
+      "class": "LifecycleSentinelTests",
+      "method": "MultipleProducts_MatchingSameVintageName_AllUpdated",
+      "complexity": 1,
+      "line": 573,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/LifecycleSentinelTests.cs",
+      "class": "LifecycleSentinelTests",
+      "method": "CaseSensitivity_ProductNameMatching_WorksCorrectly",
+      "complexity": 1,
+      "line": 615,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/LifecycleSentinelTests.cs",
+      "class": "LifecycleSentinelTests",
+      "method": "NonAppleProduct_NotAffectedByAppleScraper",
+      "complexity": 1,
+      "line": 650,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/LifecycleSentinelTests.cs",
+      "class": "LifecycleSentinelTests",
+      "method": "CreateMockConfiguration",
+      "complexity": 1,
+      "line": 692,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/LifecycleSentinelTests.cs",
+      "class": "LifecycleSentinelTests",
+      "method": "CreateMockHttpClientFactory",
+      "complexity": 1,
+      "line": 705,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/VisitorCountPredictorTests.cs",
+      "class": "VisitorCountPredictorTests",
+      "method": "VisitorCountPredictorTests",
+      "complexity": 1,
+      "line": 14,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/VisitorCountPredictorTests.cs",
+      "class": "VisitorCountPredictorTests",
+      "method": "CreateDailyTraffic",
+      "complexity": 1,
+      "line": 22,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/VisitorCountPredictorTests.cs",
+      "class": "VisitorCountPredictorTests",
+      "method": "CalculateStandardDeviation_SingleValue_ReturnsZero",
+      "complexity": 1,
+      "line": 59,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/VisitorCountPredictorTests.cs",
+      "class": "VisitorCountPredictorTests",
+      "method": "CalculateStandardDeviation_EmptyList_ReturnsZero",
+      "complexity": 1,
+      "line": 67,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/VisitorCountPredictorTests.cs",
+      "class": "VisitorCountPredictorTests",
+      "method": "CalculateStandardDeviation_UniformValues_ReturnsZero",
+      "complexity": 1,
+      "line": 75,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/VisitorCountPredictorTests.cs",
+      "class": "VisitorCountPredictorTests",
+      "method": "ClassifyTrafficLevel_ZeroStdDev_ReturnsNormal",
+      "complexity": 1,
+      "line": 109,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/VisitorCountPredictorTests.cs",
+      "class": "VisitorCountPredictorTests",
+      "method": "ApplySpecialDayAdjustments_BlackFriday_Returns250Percent",
+      "complexity": 1,
+      "line": 120,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/VisitorCountPredictorTests.cs",
+      "class": "VisitorCountPredictorTests",
+      "method": "ApplySpecialDayAdjustments_CyberMonday_Returns200Percent",
+      "complexity": 1,
+      "line": 129,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/VisitorCountPredictorTests.cs",
+      "class": "VisitorCountPredictorTests",
+      "method": "ApplySpecialDayAdjustments_ChristmasEve_Returns180Percent",
+      "complexity": 1,
+      "line": 140,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/VisitorCountPredictorTests.cs",
+      "class": "VisitorCountPredictorTests",
+      "method": "ApplySpecialDayAdjustments_PostChristmas_Returns150Percent",
+      "complexity": 1,
+      "line": 148,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/VisitorCountPredictorTests.cs",
+      "class": "VisitorCountPredictorTests",
+      "method": "ApplySpecialDayAdjustments_NewYearSales_Returns130Percent",
+      "complexity": 1,
+      "line": 156,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/VisitorCountPredictorTests.cs",
+      "class": "VisitorCountPredictorTests",
+      "method": "ApplySpecialDayAdjustments_AppleLaunchSeason_Returns140Percent",
+      "complexity": 1,
+      "line": 164,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/VisitorCountPredictorTests.cs",
+      "class": "VisitorCountPredictorTests",
+      "method": "ApplySpecialDayAdjustments_Saturday_Returns120Percent",
+      "complexity": 1,
+      "line": 172,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/VisitorCountPredictorTests.cs",
+      "class": "VisitorCountPredictorTests",
+      "method": "ApplySpecialDayAdjustments_Sunday_Returns110Percent",
+      "complexity": 1,
+      "line": 181,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/VisitorCountPredictorTests.cs",
+      "class": "VisitorCountPredictorTests",
+      "method": "ApplySpecialDayAdjustments_RegularWeekday_ReturnsUnchanged",
+      "complexity": 1,
+      "line": 190,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/VisitorCountPredictorTests.cs",
+      "class": "VisitorCountPredictorTests",
+      "method": "GenerateStaffingRecommendation_IncludesDayName",
+      "complexity": 1,
+      "line": 216,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/VisitorCountPredictorTests.cs",
+      "class": "VisitorCountPredictorTests",
+      "method": "CalculateWeeklyTrend_InsufficientData_ReturnsZero",
+      "complexity": 1,
+      "line": 227,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/VisitorCountPredictorTests.cs",
+      "class": "VisitorCountPredictorTests",
+      "method": "TrafficLevel_HasExpectedValues",
+      "complexity": 1,
+      "line": 285,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/VisitorCountPredictorTests.cs",
+      "class": "VisitorCountPredictorTests",
+      "method": "DailyTraffic_PropertiesSetCorrectly",
+      "complexity": 1,
+      "line": 301,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/VisitorCountPredictorTests.cs",
+      "class": "VisitorCountPredictorTests",
+      "method": "TrafficPrediction_PropertiesSetCorrectly",
+      "complexity": 1,
+      "line": 326,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/VisitorCountPredictorTests.cs",
+      "class": "VisitorCountPredictorTests",
+      "method": "TrafficPrediction_DefaultStaffingRecommendation_IsNull",
+      "complexity": 1,
+      "line": 345,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/VisitorCountPredictorTests.cs",
+      "class": "VisitorCountPredictorTests",
+      "method": "TrafficPrediction_ConfidenceLevel_ThrowsWhenOutOfRange",
+      "complexity": 1,
+      "line": 358,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/VisitorCountPredictorTests.cs",
+      "class": "VisitorCountPredictorTests",
+      "method": "TrafficPrediction_ConfidenceLevel_AcceptsBoundaryValues",
+      "complexity": 1,
+      "line": 378,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/VisitorCountPredictorTests.cs",
+      "class": "VisitorCountPredictorTests",
+      "method": "TrafficAnalysisSummary_DefaultValues_AreCorrect",
+      "complexity": 1,
+      "line": 404,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/VisitorCountPredictorTests.cs",
+      "class": "VisitorCountPredictorTests",
+      "method": "TrafficAnalysisSummary_PropertiesSetCorrectly",
+      "complexity": 1,
+      "line": 416,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/VisitorCountPredictorTests.cs",
+      "class": "VisitorCountPredictorTests",
+      "method": "ApplySpecialDayAdjustments_ZeroBaseVisitors_ReturnsZero",
+      "complexity": 1,
+      "line": 458,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/VisitorCountPredictorTests.cs",
+      "class": "VisitorCountPredictorTests",
+      "method": "ApplySpecialDayAdjustments_LargeBaseVisitors_HandlesCorrectly",
+      "complexity": 1,
+      "line": 466,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/VisitorCountPredictorTests.cs",
+      "class": "VisitorCountPredictorTests",
+      "method": "ClassifyTrafficLevel_ExtremelyHighPrediction_ReturnsVeryHigh",
+      "complexity": 1,
+      "line": 474,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/VisitorCountPredictorTests.cs",
+      "class": "VisitorCountPredictorTests",
+      "method": "ClassifyTrafficLevel_ExtremelyLowPrediction_ReturnsVeryLow",
+      "complexity": 1,
+      "line": 481,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/AuthenticationServiceTests.cs",
+      "class": "AuthenticationServiceTests",
+      "method": "AuthenticationServiceTests",
+      "complexity": 1,
+      "line": 11,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/AuthenticationServiceTests.cs",
+      "class": "AuthenticationServiceTests",
+      "method": "Login_WithValidCredentials_ReturnsSuccess",
+      "complexity": 1,
+      "line": 39,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/AuthenticationServiceTests.cs",
+      "class": "AuthenticationServiceTests",
+      "method": "Login_WithInvalidPassword_ReturnsFailure",
+      "complexity": 1,
+      "line": 59,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/AuthenticationServiceTests.cs",
+      "class": "AuthenticationServiceTests",
+      "method": "Login_WithInactiveUser_ReturnsFailure",
+      "complexity": 1,
+      "line": 95,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/AuthenticationServiceTests.cs",
+      "class": "AuthenticationServiceTests",
+      "method": "Login_WithEmptyUsername_ReturnsFailure",
+      "complexity": 1,
+      "line": 113,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/AuthenticationServiceTests.cs",
+      "class": "AuthenticationServiceTests",
+      "method": "Login_WithEmptyPassword_ReturnsFailure",
+      "complexity": 1,
+      "line": 124,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/AuthenticationServiceTests.cs",
+      "class": "AuthenticationServiceTests",
+      "method": "Login_UpdatesLastLoginTime",
+      "complexity": 1,
+      "line": 135,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/AuthenticationServiceTests.cs",
+      "class": "AuthenticationServiceTests",
+      "method": "Logout_ClearsCurrentUser",
+      "complexity": 1,
+      "line": 155,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/AuthenticationServiceTests.cs",
+      "class": "AuthenticationServiceTests",
+      "method": "Logout_WhenNotLoggedIn_DoesNotThrow",
+      "complexity": 1,
+      "line": 175,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/AuthenticationServiceTests.cs",
+      "class": "AuthenticationServiceTests",
+      "method": "IsAdmin_WithAdminUser_ReturnsTrue",
+      "complexity": 1,
+      "line": 187,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/AuthenticationServiceTests.cs",
+      "class": "AuthenticationServiceTests",
+      "method": "IsAdmin_WithEmployeeUser_ReturnsFalse",
+      "complexity": 1,
+      "line": 203,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/AuthenticationServiceTests.cs",
+      "class": "AuthenticationServiceTests",
+      "method": "IsAdmin_WhenNotLoggedIn_ReturnsFalse",
+      "complexity": 1,
+      "line": 219,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/AuthenticationServiceTests.cs",
+      "class": "AuthenticationServiceTests",
+      "method": "HashPassword_IsDeterministic",
+      "complexity": 1,
+      "line": 230,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/AuthenticationServiceTests.cs",
+      "class": "AuthenticationServiceTests",
+      "method": "HashPassword_DifferentPasswordsProduceDifferentHashes",
+      "complexity": 1,
+      "line": 244,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/AuthenticationServiceTests.cs",
+      "class": "AuthenticationServiceTests",
+      "method": "HashPassword_EmptyString_ReturnsEmptyString",
+      "complexity": 1,
+      "line": 259,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/AuthenticationServiceTests.cs",
+      "class": "AuthenticationServiceTests",
+      "method": "HashPassword_ReturnsLowercaseHexString",
+      "complexity": 1,
+      "line": 269,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/AuthenticationServiceTests.cs",
+      "class": "AuthenticationServiceTests",
+      "method": "Constructor_WithNullRepository_ThrowsArgumentNullException",
+      "complexity": 1,
+      "line": 284,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/Integration/ProductRepositoryIntegrationTests.cs",
+      "class": "ProductRepositoryIntegrationTests",
+      "method": "ProductRepositoryIntegrationTests",
+      "complexity": 1,
+      "line": 23,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/Integration/ProductRepositoryIntegrationTests.cs",
+      "class": "ProductRepositoryIntegrationTests",
+      "method": "GetAllProductsAsync_EmptyDatabase_ReturnsEmptyCollection",
+      "complexity": 1,
+      "line": 64,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/Integration/ProductRepositoryIntegrationTests.cs",
+      "class": "ProductRepositoryIntegrationTests",
+      "method": "GetAllProductsAsync_WithProducts_ReturnsAllProducts",
+      "complexity": 1,
+      "line": 74,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/Integration/ProductRepositoryIntegrationTests.cs",
+      "class": "ProductRepositoryIntegrationTests",
+      "method": "GetAllProductsAsync_ReturnsCorrectProductProperties",
+      "complexity": 1,
+      "line": 89,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/Integration/ProductRepositoryIntegrationTests.cs",
+      "class": "ProductRepositoryIntegrationTests",
+      "method": "RecordSaleAsync_ValidSale_ReturnsTransactionId",
+      "complexity": 1,
+      "line": 111,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/Integration/ProductRepositoryIntegrationTests.cs",
+      "class": "ProductRepositoryIntegrationTests",
+      "method": "RecordSaleAsync_UpdatesProductStock",
+      "complexity": 1,
+      "line": 126,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/Integration/ProductRepositoryIntegrationTests.cs",
+      "class": "ProductRepositoryIntegrationTests",
+      "method": "RecordSaleAsync_CreatesSalesTransaction",
+      "complexity": 1,
+      "line": 146,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/Integration/ProductRepositoryIntegrationTests.cs",
+      "class": "ProductRepositoryIntegrationTests",
+      "method": "RecordSaleAsync_WithPastDate_RecordsCorrectDate",
+      "complexity": 1,
+      "line": 168,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/Integration/ProductRepositoryIntegrationTests.cs",
+      "class": "ProductRepositoryIntegrationTests",
+      "method": "GetSalesHistoryAsync_NoSales_ReturnsEmptyCollection",
+      "complexity": 1,
+      "line": 191,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/Integration/ProductRepositoryIntegrationTests.cs",
+      "class": "ProductRepositoryIntegrationTests",
+      "method": "GetSalesHistoryAsync_WithSales_ReturnsSalesInDateRange",
+      "complexity": 1,
+      "line": 206,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/Integration/ProductRepositoryIntegrationTests.cs",
+      "class": "ProductRepositoryIntegrationTests",
+      "method": "UpdateProductPhaseAsync_ChangesPhase",
+      "complexity": 1,
+      "line": 232,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/Integration/ProductRepositoryIntegrationTests.cs",
+      "class": "ProductRepositoryIntegrationTests",
+      "method": "UpdateProductPhaseAsync_CreatesAuditLogEntry",
+      "complexity": 1,
+      "line": 249,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/Integration/ProductRepositoryIntegrationTests.cs",
+      "class": "ProductRepositoryIntegrationTests",
+      "method": "GetDashboardDataAsync_EmptyDatabase_ReturnsEmptyCollection",
+      "complexity": 1,
+      "line": 272,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/Integration/ProductRepositoryIntegrationTests.cs",
+      "class": "ProductRepositoryIntegrationTests",
+      "method": "GetDashboardDataAsync_WithProducts_ReturnsDashboardDtos",
+      "complexity": 1,
+      "line": 282,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/Integration/ProductRepositoryIntegrationTests.cs",
+      "class": "ProductRepositoryIntegrationTests",
+      "method": "GetDashboardDataAsync_IncludesRecommendations",
+      "complexity": 1,
+      "line": 300,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/Integration/ProductRepositoryIntegrationTests.cs",
+      "class": "ProductRepositoryIntegrationTests",
+      "method": "GenerateDailySnapshotAsync_CreatesSnapshot",
+      "complexity": 1,
+      "line": 345,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/Integration/ProductRepositoryIntegrationTests.cs",
+      "class": "ProductRepositoryIntegrationTests",
+      "method": "RecordSaleAsync_ConcurrentSales_MaintainsDataIntegrity",
+      "complexity": 1,
+      "line": 369,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/Integration/PostgreSqlFixture.cs",
+      "class": "PostgreSqlFixture",
+      "method": "phases",
+      "complexity": 1,
+      "line": 16,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/Integration/PostgreSqlFixture.cs",
+      "class": "PostgreSqlFixture",
+      "method": "InitializeAsync",
+      "complexity": 1,
+      "line": 99,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/Integration/PostgreSqlFixture.cs",
+      "class": "PostgreSqlFixture",
+      "method": "DisposeAsync",
+      "complexity": 1,
+      "line": 105,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/Integration/PostgreSqlFixture.cs",
+      "class": "PostgreSqlFixture",
+      "method": "InitializeDatabaseSchemaAsync",
+      "complexity": 1,
+      "line": 113,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/Integration/PostgreSqlFixture.cs",
+      "class": "PostgreSqlFixture",
+      "method": "ResetDatabaseAsync",
+      "complexity": 1,
+      "line": 125,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/Integration/PostgreSqlFixture.cs",
+      "class": "PostgreSqlFixture",
+      "method": "SeedTestDataAsync",
+      "complexity": 1,
+      "line": 150,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/Integration/CachedProductRepositoryIntegrationTests.cs",
+      "class": "CachedProductRepositoryIntegrationTests",
+      "method": "CachedProductRepositoryIntegrationTests",
+      "complexity": 1,
+      "line": 31,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/Integration/CachedProductRepositoryIntegrationTests.cs",
+      "class": "CachedProductRepositoryIntegrationTests",
+      "method": "DisposeAsync",
+      "complexity": 1,
+      "line": 82,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/Integration/CachedProductRepositoryIntegrationTests.cs",
+      "class": "CachedProductRepositoryIntegrationTests",
+      "method": "GetAllProductsAsync_SecondCall_ReturnsCachedData",
+      "complexity": 1,
+      "line": 93,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/Integration/CachedProductRepositoryIntegrationTests.cs",
+      "class": "CachedProductRepositoryIntegrationTests",
+      "method": "GetDashboardDataAsync_SecondCall_ReturnsCachedData",
+      "complexity": 1,
+      "line": 113,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/Integration/CachedProductRepositoryIntegrationTests.cs",
+      "class": "CachedProductRepositoryIntegrationTests",
+      "method": "RecordSaleAsync_InvalidatesDashboardCache",
+      "complexity": 1,
+      "line": 132,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/Integration/CachedProductRepositoryIntegrationTests.cs",
+      "class": "CachedProductRepositoryIntegrationTests",
+      "method": "UpdateProductPhaseAsync_InvalidatesProductCache",
+      "complexity": 1,
+      "line": 155,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/Integration/CachedProductRepositoryIntegrationTests.cs",
+      "class": "CachedProductRepositoryIntegrationTests",
+      "method": "GetSalesHistoryAsync_CachesPerProduct",
+      "complexity": 1,
+      "line": 176,
+      "rating": "✅ Basit (Simple)"
+    },
+    {
+      "file": "TechnologyStore.Desktop.Tests/Integration/CachedProductRepositoryIntegrationTests.cs",
+      "class": "CachedProductRepositoryIntegrationTests",
+      "method": "ClearAllCaches_RemovesAllCachedData",
+      "complexity": 1,
+      "line": 204,
+      "rating": "✅ Basit (Simple)"
+    }
+  ]
+}

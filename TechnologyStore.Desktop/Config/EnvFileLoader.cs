@@ -119,42 +119,70 @@ namespace TechnologyStore.Desktop
         /// </summary>
         public static string GetConnectionString()
         {
-            // Option 1: Direct connection string
-            var conn = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING");
-            if (!string.IsNullOrWhiteSpace(conn)) return conn;
+            if (TryGetDirectConnectionString(out var conn))
+                return conn;
 
-            // Option 2: DATABASE_URL (Heroku/Docker format)
+            if (TryGetDatabaseUrlConnectionString(out conn))
+                return conn;
+
+            if (TryBuildFromIndividualVariables(out conn))
+                return conn;
+
+            throw new InvalidOperationException(
+                "Database connection string not configured. Please set DB_CONNECTION_STRING, DATABASE_URL, " +
+                "or individual DB_HOST, DB_NAME, DB_USER, DB_PASSWORD environment variables.");
+        }
+
+        private static bool TryGetDirectConnectionString(out string connectionString)
+        {
+            connectionString = Environment.GetEnvironmentVariable("DB_CONNECTION_STRING") ?? string.Empty;
+            return !string.IsNullOrWhiteSpace(connectionString);
+        }
+
+        private static bool TryGetDatabaseUrlConnectionString(out string connectionString)
+        {
+            connectionString = string.Empty;
             var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
-            if (!string.IsNullOrWhiteSpace(databaseUrl) && Uri.TryCreate(databaseUrl, UriKind.Absolute, out var uri) && !string.IsNullOrWhiteSpace(uri.UserInfo))
-            {
-                var userInfo = uri.UserInfo.Split(':');
-                var user = Uri.UnescapeDataString(userInfo[0]);
-                var pass = userInfo.Length > 1 ? Uri.UnescapeDataString(userInfo[1]) : string.Empty;
-                var host = uri.Host;
-                var port = uri.Port > 0 ? uri.Port.ToString() : "5432";
-                var db = uri.AbsolutePath.TrimStart('/');
 
-                if (!string.IsNullOrWhiteSpace(user) && !string.IsNullOrWhiteSpace(pass) && !string.IsNullOrWhiteSpace(db))
-                    return $"Host={host};Port={port};Database={db};Username={user};Password={pass};";
-            }
+            if (string.IsNullOrWhiteSpace(databaseUrl))
+                return false;
 
-            // Option 3: Individual environment variables
+            if (!Uri.TryCreate(databaseUrl, UriKind.Absolute, out var uri))
+                return false;
+
+            if (string.IsNullOrWhiteSpace(uri.UserInfo))
+                return false;
+
+            var userInfo = uri.UserInfo.Split(':');
+            var user = Uri.UnescapeDataString(userInfo[0]);
+            var pass = userInfo.Length > 1 ? Uri.UnescapeDataString(userInfo[1]) : string.Empty;
+            var host = uri.Host;
+            var port = uri.Port > 0 ? uri.Port.ToString() : "5432";
+            var db = uri.AbsolutePath.TrimStart('/');
+
+            if (string.IsNullOrWhiteSpace(user) || string.IsNullOrWhiteSpace(pass) || string.IsNullOrWhiteSpace(db))
+                return false;
+
+            connectionString = $"Host={host};Port={port};Database={db};Username={user};Password={pass};";
+            return true;
+        }
+
+        private static bool TryBuildFromIndividualVariables(out string connectionString)
+        {
+            connectionString = string.Empty;
+
             var hostEnv = Environment.GetEnvironmentVariable("DB_HOST") ?? Environment.GetEnvironmentVariable("PGHOST");
             var dbEnv = Environment.GetEnvironmentVariable("DB_NAME") ?? Environment.GetEnvironmentVariable("PGDATABASE");
             var userEnv = Environment.GetEnvironmentVariable("DB_USER") ?? Environment.GetEnvironmentVariable("PGUSER");
             var passEnv = Environment.GetEnvironmentVariable("DB_PASSWORD") ?? Environment.GetEnvironmentVariable("PGPASSWORD");
             var portEnv = Environment.GetEnvironmentVariable("DB_PORT") ?? Environment.GetEnvironmentVariable("PGPORT") ?? "5432";
 
-            if (string.IsNullOrWhiteSpace(hostEnv) || string.IsNullOrWhiteSpace(dbEnv) || 
+            if (string.IsNullOrWhiteSpace(hostEnv) || string.IsNullOrWhiteSpace(dbEnv) ||
                 string.IsNullOrWhiteSpace(userEnv) || string.IsNullOrWhiteSpace(passEnv))
-            {
-                throw new InvalidOperationException(
-                    "Database connection string not configured. Please set DB_CONNECTION_STRING, DATABASE_URL, " +
-                    "or individual DB_HOST, DB_NAME, DB_USER, DB_PASSWORD environment variables.");
-            }
+                return false;
 
-            return $"Host={hostEnv};Port={portEnv};Database={dbEnv};Username={userEnv};Password={passEnv};";
+            connectionString = $"Host={hostEnv};Port={portEnv};Database={dbEnv};Username={userEnv};Password={passEnv};";
+            return true;
         }
     }
 }
-

@@ -181,77 +181,18 @@ public partial class RegistrationForm : Form
     {
         ClearError();
 
-        var fullName = _txtFullName?.Text?.Trim() ?? string.Empty;
-        var email = _txtEmail?.Text?.Trim() ?? string.Empty;
-        var phone = _txtPhone?.Text?.Trim();
-        var password = _txtPassword?.Text ?? string.Empty;
-        var confirmPassword = _txtConfirmPassword?.Text ?? string.Empty;
+        var formData = CollectFormData();
 
-        // Validation
-        if (string.IsNullOrWhiteSpace(fullName))
-        {
-            ShowError("Please enter your full name.");
-            _txtFullName?.Focus();
+        var validation = ValidateRegistrationForm(formData);
+        if (!HandleValidationResult(validation))
             return;
-        }
-
-        if (string.IsNullOrWhiteSpace(email))
-        {
-            ShowError("Please enter your email address.");
-            _txtEmail?.Focus();
-            return;
-        }
-
-        if (!IsValidEmail(email))
-        {
-            ShowError("Please enter a valid email address.");
-            _txtEmail?.Focus();
-            return;
-        }
-
-        if (string.IsNullOrWhiteSpace(password))
-        {
-            ShowError("Please enter a password.");
-            _txtPassword?.Focus();
-            return;
-        }
-
-        if (password.Length < 6)
-        {
-            ShowError("Password must be at least 6 characters.");
-            _txtPassword?.Focus();
-            return;
-        }
-
-        if (password != confirmPassword)
-        {
-            ShowError("Passwords do not match.");
-            _txtConfirmPassword?.Clear();
-            _txtConfirmPassword?.Focus();
-            return;
-        }
 
         SetFormEnabled(false);
 
         try
         {
-            var result = await _authService.RegisterAsync(email, password, fullName, phone);
-
-            if (result.Success)
-            {
-                MessageBox.Show(
-                    "Account created successfully! You are now logged in.",
-                    "Welcome!",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Information);
-
-                this.DialogResult = DialogResult.OK;
-                this.Close();
-            }
-            else
-            {
-                ShowError(result.ErrorMessage ?? "Registration failed.");
-            }
+            var result = await _authService.RegisterAsync(formData.Email, formData.Password, formData.FullName, formData.Phone);
+            HandleRegistrationResult(result);
         }
         catch (Exception ex)
         {
@@ -261,6 +202,74 @@ public partial class RegistrationForm : Form
         {
             SetFormEnabled(true);
         }
+    }
+
+    private sealed record RegistrationFormData(string FullName, string Email, string? Phone, string Password, string ConfirmPassword);
+
+    private RegistrationFormData CollectFormData()
+    {
+        return new RegistrationFormData(
+            _txtFullName?.Text?.Trim() ?? string.Empty,
+            _txtEmail?.Text?.Trim() ?? string.Empty,
+            _txtPhone?.Text?.Trim(),
+            _txtPassword?.Text ?? string.Empty,
+            _txtConfirmPassword?.Text ?? string.Empty
+        );
+    }
+
+    private bool HandleValidationResult(ValidationResult validation)
+    {
+        if (validation.IsValid)
+            return true;
+
+        ShowError(validation.ErrorMessage);
+        validation.FocusControl?.Focus();
+        validation.ClearControl?.Clear();
+        return false;
+    }
+
+    private void HandleRegistrationResult(Shared.Interfaces.CustomerAuthResult result)
+    {
+        if (result.Success)
+        {
+            MessageBox.Show(
+                "Account created successfully! You are now logged in.",
+                "Welcome!",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
+
+            this.DialogResult = DialogResult.OK;
+            this.Close();
+        }
+        else
+        {
+            ShowError(result.ErrorMessage ?? "Registration failed.");
+        }
+    }
+
+    private sealed record ValidationResult(bool IsValid, string ErrorMessage = "", TextBox? FocusControl = null, TextBox? ClearControl = null);
+
+    private ValidationResult ValidateRegistrationForm(RegistrationFormData data)
+    {
+        if (string.IsNullOrWhiteSpace(data.FullName))
+            return new ValidationResult(false, "Please enter your full name.", _txtFullName);
+
+        if (string.IsNullOrWhiteSpace(data.Email))
+            return new ValidationResult(false, "Please enter your email address.", _txtEmail);
+
+        if (!IsValidEmail(data.Email))
+            return new ValidationResult(false, "Please enter a valid email address.", _txtEmail);
+
+        if (string.IsNullOrWhiteSpace(data.Password))
+            return new ValidationResult(false, "Please enter a password.", _txtPassword);
+
+        if (data.Password.Length < 6)
+            return new ValidationResult(false, "Password must be at least 6 characters.", _txtPassword);
+
+        if (data.Password != data.ConfirmPassword)
+            return new ValidationResult(false, "Passwords do not match.", _txtConfirmPassword, _txtConfirmPassword);
+
+        return new ValidationResult(true);
     }
 
     private static bool IsValidEmail(string email)

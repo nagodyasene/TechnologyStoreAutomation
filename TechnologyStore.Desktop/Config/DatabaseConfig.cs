@@ -65,16 +65,11 @@ public static class DatabaseConfig
     /// </summary>
     private static string BuildFromIndividualVariables()
     {
-        var host = Environment.GetEnvironmentVariable("DB_HOST") ?? 
-                   Environment.GetEnvironmentVariable("PGHOST");
-        var database = Environment.GetEnvironmentVariable("DB_NAME") ??
-                       Environment.GetEnvironmentVariable("PGDATABASE");
-        var user = Environment.GetEnvironmentVariable("DB_USER") ?? 
-                   Environment.GetEnvironmentVariable("PGUSER");
-        var password = Environment.GetEnvironmentVariable("DB_PASSWORD") ??
-                       Environment.GetEnvironmentVariable("PGPASSWORD");
-        var port = Environment.GetEnvironmentVariable("DB_PORT") ??
-                   Environment.GetEnvironmentVariable("PGPORT") ?? "5432";
+        var host = GetEnvWithFallback("DB_HOST", "PGHOST");
+        var database = GetEnvWithFallback("DB_NAME", "PGDATABASE");
+        var user = GetEnvWithFallback("DB_USER", "PGUSER");
+        var password = GetEnvWithFallback("DB_PASSWORD", "PGPASSWORD");
+        var port = GetEnvWithFallback("DB_PORT", "PGPORT") ?? "5432";
 
         if (string.IsNullOrWhiteSpace(host) || string.IsNullOrWhiteSpace(database) ||
             string.IsNullOrWhiteSpace(user) || string.IsNullOrWhiteSpace(password))
@@ -85,6 +80,11 @@ public static class DatabaseConfig
         return $"Host={host};Port={port};Database={database};Username={user};Password={password};";
     }
 
+    private static string? GetEnvWithFallback(string primary, string fallback)
+    {
+        return Environment.GetEnvironmentVariable(primary) ?? Environment.GetEnvironmentVariable(fallback);
+    }
+
     /// <summary>
     /// Gets the connection string or throws an exception with helpful message
     /// </summary>
@@ -92,7 +92,7 @@ public static class DatabaseConfig
     public static string GetRequiredConnectionString()
     {
         var connectionString = BuildConnectionStringFromEnv();
-        
+
         if (string.IsNullOrWhiteSpace(connectionString))
         {
             throw new InvalidOperationException(

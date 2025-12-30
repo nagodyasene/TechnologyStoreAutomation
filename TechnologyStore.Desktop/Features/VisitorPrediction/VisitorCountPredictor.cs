@@ -14,30 +14,30 @@ public class VisitorCountPredictor : IVisitorCountPredictor
 {
     private readonly string _connectionString;
     private readonly ILogger<VisitorCountPredictor> _logger;
-    
+
     #region Configuration Constants
-    
+
     // Conversion rate assumption: ~30% of visitors make a purchase (industry average for tech retail)
     private const double DefaultConversionRate = 0.30;
-    
+
     // Traffic level thresholds (z-score based)
     private const double VeryLowThreshold = -1.5;
     private const double LowThreshold = -0.5;
     private const double HighThreshold = 0.5;
     private const double VeryHighThreshold = 1.5;
-    
+
     // Trend detection thresholds
     private const double RisingTrendThreshold = 0.05;
     private const double FallingTrendThreshold = -0.05;
-    
+
     // Confidence decay rate per day
     private const double ConfidenceDecayRate = 0.05;
     private const double MinimumConfidence = 0.5;
-    
+
     #endregion
-    
+
     #region Special Day Multipliers
-    
+
     private const double BlackFridayMultiplier = 2.5;
     private const double CyberMondayMultiplier = 2.0;
     private const double ChristmasRushMultiplier = 1.8;
@@ -46,9 +46,9 @@ public class VisitorCountPredictor : IVisitorCountPredictor
     private const double AppleLaunchSeasonMultiplier = 1.4;
     private const double SaturdayMultiplier = 1.2;
     private const double SundayMultiplier = 1.1;
-    
+
     #endregion
-    
+
     public VisitorCountPredictor(string connectionString)
     {
         _connectionString = connectionString;
@@ -63,7 +63,7 @@ public class VisitorCountPredictor : IVisitorCountPredictor
     public async Task<IEnumerable<DailyTraffic>> GetHistoricalTrafficAsync(int days = 30)
     {
         using var db = CreateConnection();
-        
+
         var sql = @"
             SELECT 
                 sale_date,
@@ -96,7 +96,7 @@ public class VisitorCountPredictor : IVisitorCountPredictor
     public async Task<IEnumerable<TrafficPrediction>> PredictTrafficAsync(int daysAhead = 7)
     {
         var historicalData = (await GetHistoricalTrafficAsync(30)).ToList();
-        
+
         if (!historicalData.Any())
         {
             _logger.LogWarning("No historical data available for traffic prediction");
@@ -104,11 +104,11 @@ public class VisitorCountPredictor : IVisitorCountPredictor
         }
 
         var predictions = new List<TrafficPrediction>();
-        
+
         // Calculate baseline metrics
         var avgDailyVisitors = historicalData.Average(d => d.EstimatedVisitors);
         var stdDev = CalculateStandardDeviation(historicalData.Select(d => (double)d.EstimatedVisitors).ToList());
-        
+
         // Group by day of week to detect patterns
         var dayOfWeekAverages = historicalData
             .GroupBy(d => d.Date.DayOfWeek)
@@ -121,24 +121,24 @@ public class VisitorCountPredictor : IVisitorCountPredictor
         {
             var predictionDate = DateTime.Today.AddDays(i);
             var dayOfWeek = predictionDate.DayOfWeek;
-            
+
             // Start with day-of-week average if available, otherwise use overall average
-            double basePrediction = dayOfWeekAverages.ContainsKey(dayOfWeek) 
-                ? dayOfWeekAverages[dayOfWeek] 
+            double basePrediction = dayOfWeekAverages.ContainsKey(dayOfWeek)
+                ? dayOfWeekAverages[dayOfWeek]
                 : avgDailyVisitors;
-            
+
             // Apply trend adjustment (compound for future days)
             double trendMultiplier = Math.Pow(1 + trend, i / 7.0);
             int predictedVisitors = (int)Math.Round(basePrediction * trendMultiplier);
-            
+
             // Apply special day adjustments
             predictedVisitors = ApplySpecialDayAdjustments(predictionDate, predictedVisitors);
-            
+
             // Calculate confidence (decreases as we predict further out)
             double confidence = Math.Max(MinimumConfidence, 1.0 - (i * ConfidenceDecayRate));
-            
+
             var trafficLevel = ClassifyTrafficLevel(predictedVisitors, avgDailyVisitors, stdDev);
-            
+
             predictions.Add(new TrafficPrediction
             {
                 PredictionDate = predictionDate,
@@ -171,11 +171,11 @@ public class VisitorCountPredictor : IVisitorCountPredictor
 
         var avgDaily = historical.Average(h => h.EstimatedVisitors);
         var trend = CalculateWeeklyTrend(historical);
-        
+
         // Find peak days
         var peakDay = historical.OrderByDescending(h => h.EstimatedVisitors).First();
         var slowestDay = historical.OrderBy(h => h.EstimatedVisitors).First();
-        
+
         // Day of week analysis
         var busiestDayOfWeek = historical
             .GroupBy(h => h.Date.DayOfWeek)
@@ -205,10 +205,10 @@ public class VisitorCountPredictor : IVisitorCountPredictor
     {
         if (trend > RisingTrendThreshold)
             return "Rising";
-        
+
         if (trend < FallingTrendThreshold)
             return "Falling";
-        
+
         return "Stable";
     }
 
@@ -225,7 +225,7 @@ public class VisitorCountPredictor : IVisitorCountPredictor
             .Sum(d => d.EstimatedVisitors);
 
         if (previousWeek == 0) return 0;
-        
+
         return (double)(recentWeek - previousWeek) / previousWeek;
     }
 
@@ -235,9 +235,9 @@ public class VisitorCountPredictor : IVisitorCountPredictor
     private static TrafficLevel ClassifyTrafficLevel(int predicted, double average, double stdDev)
     {
         const double tolerance = 1e-10;
-        if (Math.Abs(stdDev) < tolerance) 
+        if (Math.Abs(stdDev) < tolerance)
             return TrafficLevel.Normal;
-        
+
         double zScore = (predicted - average) / stdDev;
 
         return zScore switch
@@ -250,42 +250,41 @@ public class VisitorCountPredictor : IVisitorCountPredictor
         };
     }
 
+    #region Special Day Rules
+
+    private sealed record SpecialDayRule(Func<DateTime, bool> Matches, double Multiplier);
+
+    private static readonly List<SpecialDayRule> SpecialDayRules = new()
+    {
+        // Black Friday (4th Friday of November)
+        new(d => d.Month == 11 && d.DayOfWeek == DayOfWeek.Friday && d.Day >= 22 && d.Day <= 28, BlackFridayMultiplier),
+        // Cyber Monday
+        new(d => d.Month == 11 && d.DayOfWeek == DayOfWeek.Monday && d.Day >= 25 && d.Day <= 30, CyberMondayMultiplier),
+        // Christmas Eve rush
+        new(d => d.Month == 12 && d.Day >= 20 && d.Day <= 24, ChristmasRushMultiplier),
+        // Post-Christmas returns/gift cards
+        new(d => d.Month == 12 && d.Day >= 26 && d.Day <= 31, PostChristmasMultiplier),
+        // New Year sales
+        new(d => d.Month == 1 && d.Day <= 7, NewYearSalesMultiplier),
+        // Apple launch season (September)
+        new(d => d.Month == 9 && d.Day >= 10 && d.Day <= 25, AppleLaunchSeasonMultiplier),
+        // Weekend boost - Saturday
+        new(d => d.DayOfWeek == DayOfWeek.Saturday, SaturdayMultiplier),
+        // Weekend boost - Sunday
+        new(d => d.DayOfWeek == DayOfWeek.Sunday, SundayMultiplier)
+    };
+
+    #endregion
+
     /// <summary>
     /// Adjusts predictions for known busy periods (holidays, product launches, etc.)
     /// </summary>
     private static int ApplySpecialDayAdjustments(DateTime date, int baseVisitors)
     {
-        // Black Friday (4th Friday of November)
-        if (date.Month == 11 && date.DayOfWeek == DayOfWeek.Friday && date.Day >= 22 && date.Day <= 28)
-            return (int)(baseVisitors * BlackFridayMultiplier);
-
-        // Cyber Monday
-        if (date.Month == 11 && date.DayOfWeek == DayOfWeek.Monday && date.Day >= 25 && date.Day <= 30)
-            return (int)(baseVisitors * CyberMondayMultiplier);
-
-        // Christmas Eve rush
-        if (date.Month == 12 && date.Day >= 20 && date.Day <= 24)
-            return (int)(baseVisitors * ChristmasRushMultiplier);
-
-        // Post-Christmas returns/gift cards
-        if (date.Month == 12 && date.Day >= 26 && date.Day <= 31)
-            return (int)(baseVisitors * PostChristmasMultiplier);
-
-        // New Year sales
-        if (date.Month == 1 && date.Day <= 7)
-            return (int)(baseVisitors * NewYearSalesMultiplier);
-
-        // Apple launch season (September)
-        if (date.Month == 9 && date.Day >= 10 && date.Day <= 25)
-            return (int)(baseVisitors * AppleLaunchSeasonMultiplier);
-
-        // Weekend boost
-        if (date.DayOfWeek == DayOfWeek.Saturday)
-            return (int)(baseVisitors * SaturdayMultiplier);
-        if (date.DayOfWeek == DayOfWeek.Sunday)
-            return (int)(baseVisitors * SundayMultiplier);
-
-        return baseVisitors;
+        var matchingRule = SpecialDayRules.FirstOrDefault(rule => rule.Matches(date));
+        return matchingRule != null
+            ? (int)(baseVisitors * matchingRule.Multiplier)
+            : baseVisitors;
     }
 
     /// <summary>
@@ -294,7 +293,7 @@ public class VisitorCountPredictor : IVisitorCountPredictor
     private static string GenerateStaffingRecommendation(TrafficLevel level, DayOfWeek dayOfWeek)
     {
         var dayName = dayOfWeek.ToString();
-        
+
         return level switch
         {
             TrafficLevel.VeryLow => $"🟢 {dayName}: Minimal staff needed. Consider reduced hours.",
@@ -312,10 +311,10 @@ public class VisitorCountPredictor : IVisitorCountPredictor
     private static double CalculateStandardDeviation(List<double> values)
     {
         if (values.Count <= 1) return 0;
-        
+
         double avg = values.Average();
         double sumOfSquares = values.Sum(v => Math.Pow(v - avg, 2));
-        
+
         return Math.Sqrt(sumOfSquares / values.Count);
     }
 }

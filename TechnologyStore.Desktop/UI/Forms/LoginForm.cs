@@ -176,17 +176,11 @@ public partial class LoginForm : Form
         var username = _txtUsername?.Text?.Trim() ?? string.Empty;
         var password = _txtPassword?.Text ?? string.Empty;
 
-        if (string.IsNullOrWhiteSpace(username))
+        var validation = ValidateLoginForm(username, password);
+        if (!validation.IsValid)
         {
-            ShowError("Please enter your username.");
-            _txtUsername?.Focus();
-            return;
-        }
-
-        if (string.IsNullOrWhiteSpace(password))
-        {
-            ShowError("Please enter your password.");
-            _txtPassword?.Focus();
+            ShowError(validation.ErrorMessage);
+            validation.FocusControl?.Focus();
             return;
         }
 
@@ -195,24 +189,7 @@ public partial class LoginForm : Form
         try
         {
             var result = await _authService.LoginAsync(username, password);
-
-            if (result.Success)
-            {
-                // Save 'Remember Me' preference
-                if (_chkRememberMe != null)
-                {
-                    UserPreferences.Save(username, _chkRememberMe.Checked);
-                }
-
-                this.DialogResult = DialogResult.OK;
-                this.Close();
-            }
-            else
-            {
-                ShowError(result.ErrorMessage ?? "Login failed.");
-                _txtPassword?.Clear();
-                _txtPassword?.Focus();
-            }
+            HandleLoginResult(result, username);
         }
         catch (Exception ex)
         {
@@ -221,6 +198,39 @@ public partial class LoginForm : Form
         finally
         {
             SetFormEnabled(true);
+        }
+    }
+
+    private sealed record LoginValidationResult(bool IsValid, string ErrorMessage = "", TextBox? FocusControl = null);
+
+    private LoginValidationResult ValidateLoginForm(string username, string password)
+    {
+        if (string.IsNullOrWhiteSpace(username))
+            return new LoginValidationResult(false, "Please enter your username.", _txtUsername);
+
+        if (string.IsNullOrWhiteSpace(password))
+            return new LoginValidationResult(false, "Please enter your password.", _txtPassword);
+
+        return new LoginValidationResult(true);
+    }
+
+    private void HandleLoginResult(Features.Auth.AuthResult result, string username)
+    {
+        if (result.Success)
+        {
+            if (_chkRememberMe != null)
+            {
+                UserPreferences.Save(username, _chkRememberMe.Checked);
+            }
+
+            this.DialogResult = DialogResult.OK;
+            this.Close();
+        }
+        else
+        {
+            ShowError(result.ErrorMessage ?? "Login failed.");
+            _txtPassword?.Clear();
+            _txtPassword?.Focus();
         }
     }
 

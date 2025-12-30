@@ -307,19 +307,25 @@ public partial class CatalogForm : Form
         var searchText = _txtSearch?.Text?.ToLowerInvariant() ?? string.Empty;
         var selectedCategory = _cboCategory?.SelectedItem?.ToString() ?? "All Categories";
 
-        var filtered = _allProducts.Where(p =>
-        {
-            var matchesSearch = string.IsNullOrEmpty(searchText) ||
-                               p.Name.ToLowerInvariant().Contains(searchText) ||
-                               p.Sku.ToLowerInvariant().Contains(searchText);
-            
-            var matchesCategory = selectedCategory == "All Categories" ||
-                                 (p.Category ?? "Other") == selectedCategory;
-
-            return matchesSearch && matchesCategory;
-        }).ToList();
+        var filtered = _allProducts
+            .Where(p => MatchesSearchText(p, searchText))
+            .Where(p => MatchesCategory(p, selectedCategory))
+            .ToList();
 
         DisplayProducts(filtered);
+    }
+
+    private static bool MatchesSearchText(Product product, string searchText)
+    {
+        return string.IsNullOrEmpty(searchText) ||
+               product.Name.ToLowerInvariant().Contains(searchText) ||
+               product.Sku.ToLowerInvariant().Contains(searchText);
+    }
+
+    private static bool MatchesCategory(Product product, string selectedCategory)
+    {
+        return selectedCategory == "All Categories" ||
+               (product.Category ?? "Other") == selectedCategory;
     }
 
     private void DisplayProducts(List<Product> products)

@@ -228,17 +228,11 @@ public partial class CustomerLoginForm : Form
         var email = _txtEmail?.Text?.Trim() ?? string.Empty;
         var password = _txtPassword?.Text ?? string.Empty;
 
-        if (string.IsNullOrWhiteSpace(email))
+        var validation = ValidateLoginForm(email, password);
+        if (!validation.IsValid)
         {
-            ShowError("Please enter your email address.");
-            _txtEmail?.Focus();
-            return;
-        }
-
-        if (string.IsNullOrWhiteSpace(password))
-        {
-            ShowError("Please enter your password.");
-            _txtPassword?.Focus();
+            ShowError(validation.ErrorMessage);
+            validation.FocusControl?.Focus();
             return;
         }
 
@@ -247,19 +241,7 @@ public partial class CustomerLoginForm : Form
         try
         {
             var result = await _authService.LoginAsync(email, password);
-
-            if (result.Success)
-            {
-                IsGuestCheckout = false;
-                this.DialogResult = DialogResult.OK;
-                this.Close();
-            }
-            else
-            {
-                ShowError(result.ErrorMessage ?? "Login failed.");
-                _txtPassword?.Clear();
-                _txtPassword?.Focus();
-            }
+            HandleLoginResult(result);
         }
         catch (Exception ex)
         {
@@ -268,6 +250,35 @@ public partial class CustomerLoginForm : Form
         finally
         {
             SetFormEnabled(true);
+        }
+    }
+
+    private sealed record LoginValidationResult(bool IsValid, string ErrorMessage = "", TextBox? FocusControl = null);
+
+    private LoginValidationResult ValidateLoginForm(string email, string password)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+            return new LoginValidationResult(false, "Please enter your email address.", _txtEmail);
+
+        if (string.IsNullOrWhiteSpace(password))
+            return new LoginValidationResult(false, "Please enter your password.", _txtPassword);
+
+        return new LoginValidationResult(true);
+    }
+
+    private void HandleLoginResult(Shared.Interfaces.CustomerAuthResult result)
+    {
+        if (result.Success)
+        {
+            IsGuestCheckout = false;
+            this.DialogResult = DialogResult.OK;
+            this.Close();
+        }
+        else
+        {
+            ShowError(result.ErrorMessage ?? "Login failed.");
+            _txtPassword?.Clear();
+            _txtPassword?.Focus();
         }
     }
 

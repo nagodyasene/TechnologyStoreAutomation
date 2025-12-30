@@ -293,58 +293,73 @@ public partial class OrderManagementForm : Form
 
             _gridOrders.Rows.Clear();
 
-            var statusFilter = _cboStatusFilter?.SelectedIndex > 0
-                ? _cboStatusFilter.SelectedItem?.ToString()
-                : null;
-
-            var searchText = _txtSearch?.Text?.Trim().ToLowerInvariant() ?? string.Empty;
-
-            var orders = await _orderRepository.GetAllOrdersAsync(statusFilter);
-
-            // Apply search filter
-            if (!string.IsNullOrEmpty(searchText))
-            {
-                orders = orders.Where(o =>
-                    o.OrderNumber.ToLowerInvariant().Contains(searchText) ||
-                    (o.Notes?.ToLowerInvariant().Contains(searchText) ?? false)
-                ).ToList();
-            }
+            var orders = await GetFilteredOrdersAsync();
 
             foreach (var order in orders.OrderByDescending(o => o.CreatedAt))
             {
-                var pickupText = order.PickupDate.HasValue
-                    ? order.PickupDate.Value.ToString("MMM dd, yyyy")
-                    : "ASAP";
-
-                _gridOrders.Rows.Add(
-                    order.Id,
-                    order.OrderNumber,
-                    $"Customer #{order.CustomerId}",
-                    order.Status,
-                    order.Items.Count,
-                    $"${order.Total:N2}",
-                    pickupText,
-                    order.CreatedAt.ToString("MMM dd, yyyy HH:mm")
-                );
+                AddOrderToGrid(order);
             }
 
-            if (_selectedOrder != null && _gridOrders.Rows.Count > 0)
-            {
-                // Try to re-select the previously selected order
-                foreach (DataGridViewRow row in _gridOrders.Rows)
-                {
-                    if ((int)row.Cells["Id"].Value == _selectedOrder.Id)
-                    {
-                        row.Selected = true;
-                        break;
-                    }
-                }
-            }
+            TryReselectPreviousOrder();
         }
         catch (Exception ex)
         {
             MessageBox.Show($"Error loading orders: {ex.Message}", "Error",
                 MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+    }
+
+    private async Task<IEnumerable<Order>> GetFilteredOrdersAsync()
+    {
+        var statusFilter = _cboStatusFilter?.SelectedIndex > 0
+            ? _cboStatusFilter.SelectedItem?.ToString()
+            : null;
+
+        var searchText = _txtSearch?.Text?.Trim().ToLowerInvariant() ?? string.Empty;
+
+        var orders = await _orderRepository.GetAllOrdersAsync(statusFilter);
+
+        if (string.IsNullOrEmpty(searchText))
+            return orders;
+
+        return orders.Where(o =>
+            o.OrderNumber.ToLowerInvariant().Contains(searchText) ||
+            (o.Notes?.ToLowerInvariant().Contains(searchText) ?? false)
+        ).ToList();
+    }
+
+    private void AddOrderToGrid(Order order)
+    {
+        if (_gridOrders == null) return;
+
+        var pickupText = order.PickupDate.HasValue
+            ? order.PickupDate.Value.ToString("MMM dd, yyyy")
+            : "ASAP";
+
+        _gridOrders.Rows.Add(
+            order.Id,
+            order.OrderNumber,
+            $"Customer #{order.CustomerId}",
+            order.Status,
+            order.Items.Count,
+            $"${order.Total:N2}",
+            pickupText,
+            order.CreatedAt.ToString("MMM dd, yyyy HH:mm")
+        );
+    }
+
+    private void TryReselectPreviousOrder()
+    {
+        if (_selectedOrder == null || _gridOrders == null || _gridOrders.Rows.Count == 0)
+            return;
+
+        foreach (DataGridViewRow row in _gridOrders.Rows)
+        {
+            if ((int)row.Cells["Id"].Value == _selectedOrder.Id)
+            {
+                row.Selected = true;
+                break;
+            }
         }
     }
 
@@ -450,38 +465,27 @@ public partial class OrderManagementForm : Form
         };
     }
 
+    private static readonly Dictionary<string, (Color BackColor, Color ForeColor)> StatusColorMap = new()
+    {
+        { OrderStatus.Pending, (Color.FromArgb(255, 243, 224), Color.FromArgb(230, 126, 34)) },
+        { OrderStatus.Confirmed, (Color.FromArgb(227, 242, 253), Color.FromArgb(33, 150, 243)) },
+        { OrderStatus.ReadyForPickup, (Color.FromArgb(232, 245, 233), Color.FromArgb(76, 175, 80)) },
+        { OrderStatus.Completed, (Color.FromArgb(224, 247, 250), Color.FromArgb(0, 150, 136)) },
+        { OrderStatus.Cancelled, (Color.FromArgb(255, 235, 238), Color.FromArgb(244, 67, 54)) }
+    };
+
     private void GridOrders_CellFormatting(object? sender, DataGridViewCellFormattingEventArgs e)
     {
         if (_gridOrders == null || e.RowIndex < 0) return;
+        if (_gridOrders.Columns[e.ColumnIndex].Name != StatusColumnName) return;
 
         var statusCell = _gridOrders.Rows[e.RowIndex].Cells[StatusColumnName];
         var status = statusCell?.Value?.ToString();
 
-        if (_gridOrders.Columns[e.ColumnIndex].Name == StatusColumnName)
+        if (status != null && StatusColorMap.TryGetValue(status, out var colors))
         {
-            switch (status)
-            {
-                case OrderStatus.Pending:
-                    e.CellStyle!.BackColor = Color.FromArgb(255, 243, 224);
-                    e.CellStyle.ForeColor = Color.FromArgb(230, 126, 34);
-                    break;
-                case OrderStatus.Confirmed:
-                    e.CellStyle!.BackColor = Color.FromArgb(227, 242, 253);
-                    e.CellStyle.ForeColor = Color.FromArgb(33, 150, 243);
-                    break;
-                case OrderStatus.ReadyForPickup:
-                    e.CellStyle!.BackColor = Color.FromArgb(232, 245, 233);
-                    e.CellStyle.ForeColor = Color.FromArgb(76, 175, 80);
-                    break;
-                case OrderStatus.Completed:
-                    e.CellStyle!.BackColor = Color.FromArgb(224, 247, 250);
-                    e.CellStyle.ForeColor = Color.FromArgb(0, 150, 136);
-                    break;
-                case OrderStatus.Cancelled:
-                    e.CellStyle!.BackColor = Color.FromArgb(255, 235, 238);
-                    e.CellStyle.ForeColor = Color.FromArgb(244, 67, 54);
-                    break;
-            }
+            e.CellStyle!.BackColor = colors.BackColor;
+            e.CellStyle.ForeColor = colors.ForeColor;
         }
     }
 }
