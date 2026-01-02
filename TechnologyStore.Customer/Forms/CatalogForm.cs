@@ -1,4 +1,5 @@
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 using TechnologyStore.Shared.Models;
 using TechnologyStore.Shared.Interfaces;
@@ -278,7 +279,9 @@ public partial class CatalogForm : Form
     {
         try
         {
-            _allProducts = (await _productRepository.GetAvailableProductsAsync()).ToList();
+            // Get all products (matching desktop app) but filter out OBSOLETE for customer view
+            var allProducts = (await _productRepository.GetAllProductsAsync()).ToList();
+            _allProducts = allProducts.Where(p => p.LifecyclePhase != "OBSOLETE").ToList();
             
             // Populate category filter
             var categories = _allProducts.Select(p => p.Category ?? "Other").Distinct().OrderBy(c => c).ToList();
@@ -408,12 +411,18 @@ public partial class CatalogForm : Form
         _btnViewCart.Text = count > 0 ? $"🛒 View Cart ({count})" : "🛒 View Cart";
     }
 
-    private void BtnViewCart_Click(object? sender, EventArgs e)
+    private async void BtnViewCart_Click(object? sender, EventArgs e)
     {
         using var cartForm = new CartForm(_cartService, _authService, _orderService, 
             _emailService, _invoiceGenerator, _customerRepository);
-        cartForm.ShowDialog(this);
+        var result = cartForm.ShowDialog(this);
         UpdateCartBadge();
+        
+        // If order was placed successfully, refresh products to show updated stock
+        if (result == DialogResult.OK)
+        {
+            await LoadProductsAsync();
+        }
     }
 
     private void BtnLogout_Click(object? sender, EventArgs e)

@@ -212,6 +212,51 @@ public class CachedProductRepository : IProductRepository
         _logger.LogDebug("Stock released and caches invalidated for product {ProductId}", productId);
     }
 
+    /// <summary>
+    /// Creates a new product and invalidates caches
+    /// </summary>
+    public async Task<Product> CreateAsync(Product product)
+    {
+        var result = await _innerRepository.CreateAsync(product);
+        
+        // Invalidate product-related caches
+        InvalidateProductCaches();
+        _logger.LogDebug("Product created and caches invalidated: {ProductName} (ID: {ProductId})", 
+            product.Name, product.Id);
+        
+        return result;
+    }
+
+    /// <summary>
+    /// Updates a product and invalidates caches
+    /// </summary>
+    public async Task UpdateAsync(Product product)
+    {
+        await _innerRepository.UpdateAsync(product);
+        
+        // Invalidate product-related caches
+        InvalidateProductCaches();
+        _logger.LogDebug("Product updated and caches invalidated: {ProductName} (ID: {ProductId})", 
+            product.Name, product.Id);
+    }
+
+    /// <summary>
+    /// Deletes a product and invalidates caches
+    /// </summary>
+    public async Task<bool> DeleteAsync(int productId)
+    {
+        var result = await _innerRepository.DeleteAsync(productId);
+        
+        if (result)
+        {
+            // Invalidate product-related caches
+            InvalidateProductCaches();
+            _logger.LogDebug("Product deleted and caches invalidated: ID {ProductId}", productId);
+        }
+        
+        return result;
+    }
+
     #region Cache Invalidation
 
     /// <summary>

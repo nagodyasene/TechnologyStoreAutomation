@@ -42,18 +42,7 @@ namespace TechnologyStore.Desktop
         private readonly Timer _refreshTimer;
         private DataGridView? _gridInventory;
         private Label? _lblStatus;
-        private Label? _lblUser;
-        private Button? _btnSimulate;
-        private Button? _btnRecordSale;
-        private Button? _btnHealthCheck;
-        private Button? _btnLogout;
-        private Button? _btnLeaveRequest;
-        private Button? _btnLeaveApproval;
-        private Button? _btnReports;
-        private Button? _btnOrders;
-        private Button? _btnSuppliers;
-        private Button? _btnPurchaseOrders;
-        private Button? _btnSettings;
+        private MenuStrip? _menuStrip;
 
         private const string ErrorTitle = "Error";
 
@@ -105,7 +94,7 @@ namespace TechnologyStore.Desktop
             {
                 // Log the exception and update status
                 GlobalExceptionHandler.ReportException(ex, "Dashboard Auto-Refresh");
-                if (_lblStatus != null) _lblStatus.Text = $"Refresh failed: {ex.Message}";
+                UpdateStatusBar($"Refresh failed: {ex.Message}");
             }
         }
 
@@ -131,248 +120,335 @@ namespace TechnologyStore.Desktop
             this.Size = new Size(_uiSettings.WindowWidth, _uiSettings.WindowHeight);
             this.Text = _appSettings.Name;
 
-            // Status Label
-            _lblStatus = new Label();
-            _lblStatus.Dock = DockStyle.Bottom;
-            _lblStatus.Height = _uiSettings.StatusBarHeight;
-            _lblStatus.Text = "Ready";
+            // Status Bar at the bottom
+            _lblStatus = new Label
+            {
+                Dock = DockStyle.Bottom,
+                Height = _uiSettings.StatusBarHeight,
+                Text = GetStatusBarText(),
+                BackColor = Color.FromArgb(240, 240, 240),
+                Padding = new Padding(5, 0, 0, 0),
+                TextAlign = ContentAlignment.MiddleLeft
+            };
             this.Controls.Add(_lblStatus);
 
-            // Toolbar Panel (create now but add later so docking layout is correct)
-            var toolbar = new Panel();
-            toolbar.Dock = DockStyle.Top;
-            toolbar.Height = _uiSettings.ToolbarHeight;
-            toolbar.BackColor = Color.FromArgb(240, 240, 240);
-            // DO NOT add to Controls yet - add after grid so docking/layout places header below toolbar
+            // Menu Strip
+            _menuStrip = new MenuStrip
+            {
+                BackColor = Color.FromArgb(240, 240, 240),
+                RenderMode = ToolStripRenderMode.Professional
+            };
 
-            // Record Sale Button
-            _btnRecordSale = new Button();
-            _btnRecordSale.Text = "📝 Record Sale";
-            _btnRecordSale.Location = new Point(10, 8);
-            _btnRecordSale.Size = new Size(140, 35);
-            _btnRecordSale.BackColor = Color.FromArgb(76, 175, 80);
-            _btnRecordSale.ForeColor = Color.White;
-            _btnRecordSale.FlatStyle = FlatStyle.Flat;
-            _btnRecordSale.Click += BtnRecordSale_Click;
-            toolbar.Controls.Add(_btnRecordSale);
+            // === FILE MENU ===
+            var fileMenu = new ToolStripMenuItem("File");
+            fileMenu.DropDownItems.Add(CreateMenuItem("Settings", "Ctrl+,", BtnSettings_Click));
+            fileMenu.DropDownItems.Add(new ToolStripSeparator());
+            fileMenu.DropDownItems.Add(CreateMenuItem("Logout", "Ctrl+L", BtnLogout_Click));
+            fileMenu.DropDownItems.Add(CreateMenuItem("Exit", "Alt+F4", (s, e) => Application.Exit()));
+            _menuStrip.Items.Add(fileMenu);
 
-            // Simulation Button
-            _btnSimulate = new Button();
-            _btnSimulate.Text = "🚀 Simulate Launch Event";
-            _btnSimulate.Location = new Point(160, 8);
-            _btnSimulate.Size = new Size(180, 35);
-            _btnSimulate.BackColor = Color.FromArgb(33, 150, 243);
-            _btnSimulate.ForeColor = Color.White;
-            _btnSimulate.FlatStyle = FlatStyle.Flat;
-            _btnSimulate.Click += btnSimulateLaunch_Click;
-            toolbar.Controls.Add(_btnSimulate);
+            // === VIEW MENU ===
+            var viewMenu = new ToolStripMenuItem("View");
+            viewMenu.DropDownItems.Add(CreateMenuItem("Refresh", "F5", OnRefreshButtonClick));
+            viewMenu.DropDownItems.Add(new ToolStripSeparator());
+            viewMenu.DropDownItems.Add(CreateMenuItem("Health Check", "Ctrl+H", BtnHealthCheck_Click));
+            _menuStrip.Items.Add(viewMenu);
 
-            // Refresh Button
-            var btnRefresh = new Button();
-            btnRefresh.Text = "🔄 Refresh";
-            btnRefresh.Location = new Point(350, 8);
-            btnRefresh.Size = new Size(100, 35);
-            btnRefresh.FlatStyle = FlatStyle.Flat;
-            btnRefresh.Click += OnRefreshButtonClick;
-            toolbar.Controls.Add(btnRefresh);
+            // === SALES MENU ===
+            var salesMenu = new ToolStripMenuItem("Sales");
+            salesMenu.DropDownItems.Add(CreateMenuItem("Record Sale", "Ctrl+N", BtnRecordSale_Click));
+            salesMenu.DropDownItems.Add(CreateMenuItem("Sales Reports", "Ctrl+R", BtnReports_Click));
+            _menuStrip.Items.Add(salesMenu);
 
-            // Health Check Button
-            _btnHealthCheck = new Button();
-            _btnHealthCheck.Text = "🏥 Health";
-            _btnHealthCheck.Location = new Point(460, 8);
-            _btnHealthCheck.Size = new Size(90, 35);
-            _btnHealthCheck.FlatStyle = FlatStyle.Flat;
-            _btnHealthCheck.Click += BtnHealthCheck_Click;
-            toolbar.Controls.Add(_btnHealthCheck);
+            // === INVENTORY MENU ===
+            var inventoryMenu = new ToolStripMenuItem("Inventory");
+            inventoryMenu.DropDownItems.Add(CreateMenuItem("Simulate Launch Event", "Ctrl+Shift+L", btnSimulateLaunch_Click));
+            _menuStrip.Items.Add(inventoryMenu);
 
-            // Logout Button (right-aligned)
-            _btnLogout = new Button();
-            _btnLogout.Text = "🚪 Logout";
-            _btnLogout.Location = new Point(560, 8);
-            _btnLogout.Size = new Size(90, 35);
-            _btnLogout.FlatStyle = FlatStyle.Flat;
-            _btnLogout.BackColor = Color.FromArgb(244, 67, 54);
-            _btnLogout.ForeColor = Color.White;
-            _btnLogout.FlatAppearance.BorderSize = 0;
-            _btnLogout.Click += BtnLogout_Click;
-            toolbar.Controls.Add(_btnLogout);
-
-            // Leave Request Button (visible to all)
-            _btnLeaveRequest = new Button();
-            _btnLeaveRequest.Text = "📅 Leave";
-            _btnLeaveRequest.Location = new Point(660, 8);
-            _btnLeaveRequest.Size = new Size(80, 35);
-            _btnLeaveRequest.FlatStyle = FlatStyle.Flat;
-            _btnLeaveRequest.BackColor = Color.FromArgb(156, 39, 176);
-            _btnLeaveRequest.ForeColor = Color.White;
-            _btnLeaveRequest.FlatAppearance.BorderSize = 0;
-            _btnLeaveRequest.Click += BtnLeaveRequest_Click;
-            toolbar.Controls.Add(_btnLeaveRequest);
-
-            // Leave Approval Button (admin only)
+            // === ORDERS MENU ===
+            var ordersMenu = new ToolStripMenuItem("Orders");
+            ordersMenu.DropDownItems.Add(CreateMenuItem("Customer Orders", "Ctrl+O", BtnOrders_Click));
             if (_authService.IsAdmin)
             {
-                _btnLeaveApproval = new Button();
-                _btnLeaveApproval.Text = "✅ Approvals";
-                _btnLeaveApproval.Location = new Point(750, 8);
-                _btnLeaveApproval.Size = new Size(100, 35);
-                _btnLeaveApproval.FlatStyle = FlatStyle.Flat;
-                _btnLeaveApproval.BackColor = Color.FromArgb(255, 152, 0);
-                _btnLeaveApproval.ForeColor = Color.White;
-                _btnLeaveApproval.FlatAppearance.BorderSize = 0;
-                _btnLeaveApproval.Click += BtnLeaveApproval_Click;
-                toolbar.Controls.Add(_btnLeaveApproval);
+                ordersMenu.DropDownItems.Add(new ToolStripSeparator());
+                ordersMenu.DropDownItems.Add(CreateMenuItem("Suppliers", null, BtnSuppliers_Click));
+                ordersMenu.DropDownItems.Add(CreateMenuItem("Purchase Orders", null, BtnPurchaseOrders_Click));
             }
+            _menuStrip.Items.Add(ordersMenu);
 
-            // Reports Button
-            _btnReports = new Button();
-            _btnReports.Text = "📊 Reports";
-            _btnReports.Location = new Point(_authService.IsAdmin ? 860 : 750, 8);
-            _btnReports.Size = new Size(90, 35);
-            _btnReports.FlatStyle = FlatStyle.Flat;
-            _btnReports.BackColor = Color.FromArgb(96, 125, 139);
-            _btnReports.ForeColor = Color.White;
-            _btnReports.FlatAppearance.BorderSize = 0;
-            _btnReports.Click += BtnReports_Click;
-            toolbar.Controls.Add(_btnReports);
-
-            // Orders Button
-            _btnOrders = new Button();
-            _btnOrders.Text = "📦 Orders";
-            _btnOrders.Location = new Point(_authService.IsAdmin ? 960 : 850, 8);
-            _btnOrders.Size = new Size(90, 35);
-            _btnOrders.FlatStyle = FlatStyle.Flat;
-            _btnOrders.BackColor = Color.FromArgb(103, 58, 183);
-            _btnOrders.ForeColor = Color.White;
-            _btnOrders.FlatAppearance.BorderSize = 0;
-            _btnOrders.Click += BtnOrders_Click;
-            toolbar.Controls.Add(_btnOrders);
-
-            // Suppliers Button (admin only)
+            // === HR MENU ===
+            var hrMenu = new ToolStripMenuItem("HR");
+            hrMenu.DropDownItems.Add(CreateMenuItem("Time Clock", "Ctrl+T", BtnTimeClock_Click));
+            hrMenu.DropDownItems.Add(CreateMenuItem("Leave Request", null, BtnLeaveRequest_Click));
             if (_authService.IsAdmin)
             {
-                _btnSuppliers = new Button();
-                _btnSuppliers.Text = "🏭 Suppliers";
-                _btnSuppliers.Location = new Point(1060, 8);
-                _btnSuppliers.Size = new Size(100, 35);
-                _btnSuppliers.FlatStyle = FlatStyle.Flat;
-                _btnSuppliers.BackColor = Color.FromArgb(0, 150, 136);
-                _btnSuppliers.ForeColor = Color.White;
-                _btnSuppliers.FlatAppearance.BorderSize = 0;
-                _btnSuppliers.Click += BtnSuppliers_Click;
-                toolbar.Controls.Add(_btnSuppliers);
-
-                _btnPurchaseOrders = new Button();
-                _btnPurchaseOrders.Text = "📋 POs";
-                _btnPurchaseOrders.Location = new Point(1170, 8);
-                _btnPurchaseOrders.Size = new Size(80, 35);
-                _btnPurchaseOrders.FlatStyle = FlatStyle.Flat;
-                _btnPurchaseOrders.BackColor = Color.FromArgb(255, 87, 34);
-                _btnPurchaseOrders.ForeColor = Color.White;
-                _btnPurchaseOrders.FlatAppearance.BorderSize = 0;
-                _btnPurchaseOrders.Click += BtnPurchaseOrders_Click;
-                toolbar.Controls.Add(_btnPurchaseOrders);
+                hrMenu.DropDownItems.Add(new ToolStripSeparator());
+                hrMenu.DropDownItems.Add(CreateMenuItem("Shift Management", null, BtnShiftManagement_Click));
+                hrMenu.DropDownItems.Add(CreateMenuItem("Leave Approvals", null, BtnLeaveApproval_Click));
+                hrMenu.DropDownItems.Add(CreateMenuItem("Payroll", "Ctrl+P", BtnPayroll_Click));
             }
+            _menuStrip.Items.Add(hrMenu);
 
-            // Settings Button
-            _btnSettings = new Button();
-            _btnSettings.Text = "⚙️ Settings";
-            _btnSettings.Location = new Point(_authService.IsAdmin ? 1260 : 950, 8);
-            _btnSettings.Size = new Size(90, 35);
-            _btnSettings.FlatStyle = FlatStyle.Flat;
-            _btnSettings.BackColor = Color.FromArgb(117, 117, 117);
-            _btnSettings.ForeColor = Color.White;
-            _btnSettings.FlatAppearance.BorderSize = 0;
-            _btnSettings.Click += BtnSettings_Click;
-            toolbar.Controls.Add(_btnSettings);
-
-            // Time Clock Button (visible to all)
-            var btnTimeClock = new Button();
-            btnTimeClock.Text = "⏱️ Time Clock";
-            btnTimeClock.Location = new Point(1360, 8);
-            btnTimeClock.Size = new Size(110, 35);
-            btnTimeClock.FlatStyle = FlatStyle.Flat;
-            btnTimeClock.BackColor = Color.FromArgb(0, 188, 212); // Cyan
-            btnTimeClock.ForeColor = Color.White;
-            btnTimeClock.FlatAppearance.BorderSize = 0;
-            btnTimeClock.Click += BtnTimeClock_Click;
-            toolbar.Controls.Add(btnTimeClock);
-
-            // Shift Management (Admin Only)
-            if (_authService.IsAdmin)
+            // === HELP MENU ===
+            var helpMenu = new ToolStripMenuItem("Help");
+            helpMenu.DropDownItems.Add(CreateMenuItem("About", null, (s, e) =>
             {
-                var btnShifts = new Button();
-                btnShifts.Text = "📅 Shifts";
-                btnShifts.Location = new Point(1480, 8);
-                btnShifts.Size = new Size(90, 35);
-                btnShifts.FlatStyle = FlatStyle.Flat;
-                btnShifts.BackColor = Color.FromArgb(63, 81, 181); // Indigo
-                btnShifts.ForeColor = Color.White;
-                btnShifts.FlatAppearance.BorderSize = 0;
-                btnShifts.Click += BtnShiftManagement_Click;
-                toolbar.Controls.Add(btnShifts);
-            }
+                MessageBox.Show(
+                    $"{_appSettings.Name}\nVersion {_appSettings.Version}\n\n© 2025 Technology Store",
+                    "About",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+            }));
+            _menuStrip.Items.Add(helpMenu);
 
-            // User Info Label (right side of toolbar)
-            _lblUser = new Label();
-            _lblUser.Location = new Point(1060, 15);
-            _lblUser.Size = new Size(300, 20);
-            _lblUser.TextAlign = ContentAlignment.MiddleRight;
-            if (_authService.CurrentUser != null)
-            {
-                var roleIcon = _authService.IsAdmin ? "👑" : "👤";
-                _lblUser.Text = $"{roleIcon} {_authService.CurrentUser.FullName} ({_authService.CurrentUser.Role})";
-            }
-            toolbar.Controls.Add(_lblUser);
+            this.MainMenuStrip = _menuStrip;
+            this.Controls.Add(_menuStrip);
 
             // Grid
-            _gridInventory = new DataGridView();
-            _gridInventory.Dock = DockStyle.Fill;
-            _gridInventory.AutoGenerateColumns = false;
-            _gridInventory.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            _gridInventory.ReadOnly = true;
-            _gridInventory.AllowUserToAddRows = false;
-            _gridInventory.RowHeadersVisible = false;
+            _gridInventory = new DataGridView
+            {
+                Dock = DockStyle.Fill,
+                AutoGenerateColumns = false,
+                SelectionMode = DataGridViewSelectionMode.FullRowSelect,
+                ReadOnly = true,
+                AllowUserToAddRows = false,
+                RowHeadersVisible = false,
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
+                ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing,
+                AllowUserToResizeColumns = true,
+                AllowUserToResizeRows = false,
+                ColumnHeadersVisible = true,
+                EnableHeadersVisualStyles = false,
+                BorderStyle = BorderStyle.None,
+                BackgroundColor = Color.White
+            };
+
             _gridInventory.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(250, 250, 250);
-
-            // Make columns expand to fill available width and size headers
-            _gridInventory.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            _gridInventory.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
-            _gridInventory.AllowUserToResizeColumns = true;
-            _gridInventory.AllowUserToResizeRows = false;
-
-            // Ensure headers are visible and styled for readability
-            _gridInventory.ColumnHeadersVisible = true;
-            _gridInventory.EnableHeadersVisualStyles = false;
             _gridInventory.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(230, 230, 230);
             _gridInventory.ColumnHeadersDefaultCellStyle.ForeColor = Color.Black;
             _gridInventory.ColumnHeadersDefaultCellStyle.Font = new Font(this.Font.FontFamily, 10f, FontStyle.Bold);
+            _gridInventory.ColumnHeadersHeight = 28;
+            _gridInventory.RowTemplate.Height = 22;
 
-            // Explicit header and row heights to ensure everything fits without font scaling
-            _gridInventory.ColumnHeadersHeight = 28; // header height in pixels
-            _gridInventory.RowTemplate.Height = 22;   // row height in pixels
+            // Define Columns
+            _gridInventory.Columns.Add(new DataGridViewTextBoxColumn
+            { HeaderText = "Product", DataPropertyName = "Name", FillWeight = 20 });
+            _gridInventory.Columns.Add(new DataGridViewTextBoxColumn
+            { HeaderText = "Category", DataPropertyName = "Category", FillWeight = 10 });
+            _gridInventory.Columns.Add(new DataGridViewTextBoxColumn
+            { HeaderText = "Phase", DataPropertyName = "Phase", FillWeight = 7 });
+            _gridInventory.Columns.Add(new DataGridViewTextBoxColumn
+            { HeaderText = "Price", DataPropertyName = "UnitPrice", FillWeight = 8, DefaultCellStyle = new DataGridViewCellStyle { Format = "C2" } });
+            _gridInventory.Columns.Add(new DataGridViewTextBoxColumn
+            { HeaderText = "Stock", DataPropertyName = "CurrentStock", FillWeight = 7 });
+            _gridInventory.Columns.Add(new DataGridViewTextBoxColumn
+            { HeaderText = "7-Day Sales", DataPropertyName = "SalesLast7Days", FillWeight = 8 });
+            _gridInventory.Columns.Add(new DataGridViewTextBoxColumn
+            { HeaderText = "Runway (Days)", DataPropertyName = "RunwayDays", FillWeight = 9 });
+            _gridInventory.Columns.Add(new DataGridViewTextBoxColumn
+            { HeaderText = "AI Recommendation", DataPropertyName = "Recommendation", FillWeight = 31 });
 
-            // Define Columns (use FillWeight to control relative widths)
-            _gridInventory.Columns.Add(new DataGridViewTextBoxColumn
-            { HeaderText = "Product", DataPropertyName = "Name", FillWeight = 25 });
-            _gridInventory.Columns.Add(new DataGridViewTextBoxColumn
-            { HeaderText = "Category", DataPropertyName = "Category", FillWeight = 12 });
-            _gridInventory.Columns.Add(new DataGridViewTextBoxColumn
-            { HeaderText = "Phase", DataPropertyName = "Phase", FillWeight = 8 });
-            _gridInventory.Columns.Add(new DataGridViewTextBoxColumn
-            { HeaderText = "Stock", DataPropertyName = "CurrentStock", FillWeight = 8 });
-            _gridInventory.Columns.Add(new DataGridViewTextBoxColumn
-            { HeaderText = "7-Day Sales", DataPropertyName = "SalesLast7Days", FillWeight = 9 });
-            _gridInventory.Columns.Add(new DataGridViewTextBoxColumn
-            { HeaderText = "Runway (Days)", DataPropertyName = "RunwayDays", FillWeight = 10 });
-            _gridInventory.Columns.Add(new DataGridViewTextBoxColumn
-            { HeaderText = "AI Recommendation", DataPropertyName = "Recommendation", FillWeight = 28 });
-
-            // Add grid first, then toolbar so dock layout places the toolbar at the top and grid fills remaining area
             this.Controls.Add(_gridInventory);
-            this.Controls.Add(toolbar);
 
-            // No explicit BringToFront required; docking order now correct
+            // Setup context menu for right-click editing
+            SetupContextMenu();
+
+            // Ensure proper z-order: menu at top, then grid fills remaining space
+            _gridInventory.BringToFront();
+        }
+
+        /// <summary>
+        /// Sets up the context menu for the inventory grid
+        /// </summary>
+        private void SetupContextMenu()
+        {
+            if (_gridInventory == null) return;
+
+            var contextMenu = new ContextMenuStrip();
+            
+            var editMenuItem = new ToolStripMenuItem("Edit Product...");
+            editMenuItem.Click += EditProduct_Click;
+            contextMenu.Items.Add(editMenuItem);
+
+            // Add delete option for admins only (will be shown/hidden dynamically)
+            var separator = new ToolStripSeparator();
+            var deleteMenuItem = new ToolStripMenuItem("Delete Product...");
+            deleteMenuItem.Click += DeleteProduct_Click;
+            contextMenu.Items.Add(separator);
+            contextMenu.Items.Add(deleteMenuItem);
+
+            // Update menu visibility when opening based on current admin status
+            contextMenu.Opening += (sender, e) =>
+            {
+                if (sender is ContextMenuStrip menu)
+                {
+                    // Show/hide delete option based on admin status
+                    deleteMenuItem.Visible = _authService.IsAdmin;
+                    separator.Visible = _authService.IsAdmin;
+                }
+            };
+
+            _gridInventory.ContextMenuStrip = contextMenu;
+        }
+
+        /// <summary>
+        /// Handles the Edit Product context menu item click
+        /// </summary>
+        private async void EditProduct_Click(object? sender, EventArgs e)
+        {
+            try
+            {
+                if (_gridInventory == null || _gridInventory.CurrentRow == null)
+                {
+                    MessageBox.Show("Please select a product row first.", "No Selection", 
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
+                var selectedProduct = _gridInventory.CurrentRow.DataBoundItem as ProductDashboardDto;
+                if (selectedProduct == null)
+                {
+                    MessageBox.Show("Unable to get product information.", "Error", 
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // Get full product details from repository
+                var product = await _repository.GetByIdAsync(selectedProduct.Id);
+                if (product == null)
+                {
+                    MessageBox.Show($"Product with ID {selectedProduct.Id} not found.", "Not Found", 
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // Show edit form (pass auth service for admin check)
+                var editForm = new EditProductForm(_repository, product, _authService);
+                if (editForm.ShowDialog(this) == DialogResult.OK && editForm.ProductUpdated)
+                {
+                    // Refresh dashboard to show updated data
+                    await LoadDashboardData();
+                }
+            }
+            catch (Exception ex)
+            {
+                GlobalExceptionHandler.ReportException(ex, "Edit Product");
+                MessageBox.Show($"Failed to edit product: {ex.Message}", ErrorTitle,
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// Handles the Delete Product context menu item click
+        /// </summary>
+        private async void DeleteProduct_Click(object? sender, EventArgs e)
+        {
+            ProductDashboardDto? selectedProduct = null;
+            
+            try
+            {
+                if (_gridInventory == null || _gridInventory.CurrentRow == null)
+                {
+                    MessageBox.Show("Please select a product row first.", "No Selection", 
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
+                selectedProduct = _gridInventory.CurrentRow.DataBoundItem as ProductDashboardDto;
+                if (selectedProduct == null)
+                {
+                    MessageBox.Show("Unable to get product information.", "Error", 
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // Confirm deletion (soft delete - hides from view but keeps in database)
+                var result = MessageBox.Show(
+                    $"Are you sure you want to hide '{selectedProduct.Name}' from the inventory?\n\n" +
+                    "The product will be hidden from the dashboard but will remain in the database to maintain data integrity. " +
+                    "All sales and order history will be preserved.",
+                    "Confirm Hide Product",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Warning);
+
+                if (result != DialogResult.Yes)
+                    return;
+
+                // Soft delete the product (set is_deleted flag)
+                var deleted = await _repository.DeleteAsync(selectedProduct.Id);
+                
+                if (deleted)
+                {
+                    MessageBox.Show($"Product '{selectedProduct.Name}' has been hidden from the inventory.", 
+                        "Product Hidden", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    
+                    // Refresh dashboard to show updated data
+                    await LoadDashboardData();
+                }
+                else
+                {
+                    MessageBox.Show($"Failed to hide product '{selectedProduct.Name}'. It may have already been hidden.", 
+                        "Hide Failed", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }
+            catch (Exception ex)
+            {
+                GlobalExceptionHandler.ReportException(ex, "Delete Product");
+                MessageBox.Show($"Failed to delete product: {ex.Message}", ErrorTitle,
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// Creates a menu item with optional shortcut key display
+        /// </summary>
+        private static ToolStripMenuItem CreateMenuItem(string text, string? shortcut, EventHandler onClick)
+        {
+            var item = new ToolStripMenuItem(text);
+            item.Click += onClick;
+
+            if (!string.IsNullOrEmpty(shortcut))
+            {
+                item.ShortcutKeyDisplayString = shortcut;
+
+                // Parse and set actual shortcut keys for common ones
+                if (shortcut == "F5")
+                    item.ShortcutKeys = Keys.F5;
+                else if (shortcut == "Ctrl+N")
+                    item.ShortcutKeys = Keys.Control | Keys.N;
+                else if (shortcut == "Ctrl+R")
+                    item.ShortcutKeys = Keys.Control | Keys.R;
+                else if (shortcut == "Ctrl+O")
+                    item.ShortcutKeys = Keys.Control | Keys.O;
+                else if (shortcut == "Ctrl+T")
+                    item.ShortcutKeys = Keys.Control | Keys.T;
+                else if (shortcut == "Ctrl+P")
+                    item.ShortcutKeys = Keys.Control | Keys.P;
+                else if (shortcut == "Ctrl+H")
+                    item.ShortcutKeys = Keys.Control | Keys.H;
+                else if (shortcut == "Ctrl+L")
+                    item.ShortcutKeys = Keys.Control | Keys.L;
+                else if (shortcut == "Ctrl+,")
+                    item.ShortcutKeys = Keys.Control | Keys.Oemcomma;
+                else if (shortcut == "Ctrl+Shift+L")
+                    item.ShortcutKeys = Keys.Control | Keys.Shift | Keys.L;
+            }
+
+            return item;
+        }
+
+        /// <summary>
+        /// Gets the status bar text including user info
+        /// </summary>
+        private string GetStatusBarText()
+        {
+            var userInfo = "";
+            if (_authService.CurrentUser != null)
+            {
+                var roleIcon = _authService.IsAdmin ? "👑" : "👤";
+                userInfo = $" | {roleIcon} {_authService.CurrentUser.FullName} ({_authService.CurrentUser.Role})";
+            }
+            return $"Ready{userInfo}";
         }
 
         protected override async void OnLoad(EventArgs e)
@@ -385,25 +461,33 @@ namespace TechnologyStore.Desktop
         {
             try
             {
-                if (_lblStatus != null) _lblStatus.Text = "Refreshing data...";
+                UpdateStatusBar("Refreshing data...");
 
                 var data = await _repository.GetDashboardDataAsync();
+
+                // Remove duplicate products based on product name (case-insensitive)
+                var uniqueData = RemoveDuplicateProducts(data).ToList();
 
                 if (_gridInventory != null)
                 {
                     if (_gridInventory.InvokeRequired)
                     {
-                        _gridInventory.Invoke(new Action(() => _gridInventory.DataSource = data));
+                        _gridInventory.Invoke(new Action(() => 
+                        {
+                            _gridInventory.DataSource = null; // Clear first
+                            _gridInventory.DataSource = uniqueData;
+                            ColorRows();
+                        }));
                     }
                     else
                     {
-                        _gridInventory.DataSource = data;
+                        _gridInventory.DataSource = null; // Clear first
+                        _gridInventory.DataSource = uniqueData;
+                        ColorRows();
                     }
-
-                    ColorRows();
                 }
 
-                if (_lblStatus != null) _lblStatus.Text = $"Last Updated: {DateTime.Now.ToShortTimeString()}";
+                UpdateStatusBar($"Last Updated: {DateTime.Now:HH:mm:ss}");
             }
             catch (Exception ex)
             {
@@ -411,6 +495,57 @@ namespace TechnologyStore.Desktop
                 MessageBox.Show($"Error loading data: {ex.Message}\n\nPlease check your database connection.",
                     "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        /// <summary>
+        /// Removes duplicate products from the data collection
+        /// Deduplicates by product name (case-insensitive), keeping the entry with the highest stock
+        /// </summary>
+        private static List<ProductDashboardDto> RemoveDuplicateProducts(IEnumerable<ProductDashboardDto> data)
+        {
+            if (data == null) return new List<ProductDashboardDto>();
+
+            var dataList = data.ToList();
+            var originalCount = dataList.Count;
+
+            // Group by product name (case-insensitive) and keep the one with highest stock
+            var grouped = dataList
+                .Where(item => !string.IsNullOrWhiteSpace(item.Name))
+                .GroupBy(item => item.Name.Trim(), StringComparer.OrdinalIgnoreCase)
+                .Select(group => 
+                {
+                    // If multiple entries with same name, keep the one with highest stock
+                    // If stock is equal, keep the one with highest ID
+                    return group.OrderByDescending(p => p.CurrentStock)
+                               .ThenByDescending(p => p.Id)
+                               .First();
+                })
+                .OrderBy(p => p.Name) // Sort for consistent display
+                .ToList();
+
+            // Log if duplicates were removed (for debugging)
+            if (originalCount > grouped.Count)
+            {
+                System.Diagnostics.Debug.WriteLine($"Removed {originalCount - grouped.Count} duplicate product(s) from dashboard");
+            }
+
+            return grouped;
+        }
+
+        /// <summary>
+        /// Updates the status bar with a message while preserving user info
+        /// </summary>
+        private void UpdateStatusBar(string message)
+        {
+            if (_lblStatus == null) return;
+
+            var userInfo = "";
+            if (_authService.CurrentUser != null)
+            {
+                var roleIcon = _authService.IsAdmin ? "👑" : "👤";
+                userInfo = $" | {roleIcon} {_authService.CurrentUser.FullName} ({_authService.CurrentUser.Role})";
+            }
+            _lblStatus.Text = $"{message}{userInfo}";
         }
 
         private void ColorRows()
@@ -460,9 +595,17 @@ namespace TechnologyStore.Desktop
                 if (MessageBox.Show($"Simulate new model launch for {selectedProduct.Name}?", "Confirm",
                         MessageBoxButtons.YesNo) == DialogResult.Yes)
                 {
+                    // Update the old product to LEGACY phase
                     await _repository.UpdateProductPhaseAsync(selectedProduct.Id, "LEGACY",
                         "Manual Simulation Triggered by User");
-                    await LoadDashboardData();
+                    
+                    // Show dialog to create new product
+                    var newProductForm = new NewProductForm(_repository, selectedProduct.Category);
+                    if (newProductForm.ShowDialog(this) == DialogResult.OK && newProductForm.ProductCreated)
+                    {
+                        // Refresh dashboard to show the new product
+                        await LoadDashboardData();
+                    }
                 }
             }
             catch (Exception ex)
@@ -496,8 +639,7 @@ namespace TechnologyStore.Desktop
         {
             try
             {
-                if (_lblStatus != null) _lblStatus.Text = "Running health checks...";
-                if (_btnHealthCheck != null) _btnHealthCheck.Enabled = false;
+                UpdateStatusBar("Running health checks...");
 
                 var report = await _healthCheckService.CheckAllAsync();
 
@@ -516,27 +658,20 @@ namespace TechnologyStore.Desktop
                     MessageBoxButtons.OK,
                     icon);
 
-                if (_lblStatus != null)
+                var statusIcon = report.OverallStatus switch
                 {
-                    var statusIcon = report.OverallStatus switch
-                    {
-                        HealthStatus.Healthy => "✅",
-                        HealthStatus.Degraded => "⚠️",
-                        HealthStatus.Unhealthy => "❌",
-                        _ => "❓"
-                    };
-                    _lblStatus.Text = $"Health: {statusIcon} {report.OverallStatus} | Last Updated: {DateTime.Now:HH:mm:ss}";
-                }
+                    HealthStatus.Healthy => "✅",
+                    HealthStatus.Degraded => "⚠️",
+                    HealthStatus.Unhealthy => "❌",
+                    _ => "❓"
+                };
+                UpdateStatusBar($"Health: {statusIcon} {report.OverallStatus} | Last Check: {DateTime.Now:HH:mm:ss}");
             }
             catch (Exception ex)
             {
                 GlobalExceptionHandler.ReportException(ex, "Health Check");
                 MessageBox.Show($"Health check failed: {ex.Message}", ErrorTitle,
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            finally
-            {
-                if (_btnHealthCheck != null) _btnHealthCheck.Enabled = true;
             }
         }
 

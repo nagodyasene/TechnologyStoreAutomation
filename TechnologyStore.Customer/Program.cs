@@ -86,8 +86,11 @@ internal static class Program
         var searchPaths = new[]
         {
             Path.Combine(AppContext.BaseDirectory, ".env"),
+            Path.Combine(AppContext.BaseDirectory, "Config", ".env"),
             Path.Combine(AppContext.BaseDirectory, "..", ".env"),
-            Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".env")
+            Path.Combine(AppContext.BaseDirectory, "..", "Config", ".env"),
+            Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".env"),
+            Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "Config", ".env")
         };
 
         return searchPaths.FirstOrDefault(File.Exists);

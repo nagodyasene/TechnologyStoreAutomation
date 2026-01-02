@@ -61,4 +61,19 @@ public interface IProductRepository
     /// Release reserved stock (e.g., on order cancellation)
     /// </summary>
     Task ReleaseStockAsync(int productId, int quantity);
+    
+    /// <summary>
+    /// Create a new product
+    /// </summary>
+    Task<Product> CreateAsync(Product product);
+    
+    /// <summary>
+    /// Update an existing product (name, category, stock, etc.)
+    /// </summary>
+    Task UpdateAsync(Product product);
+    
+    /// <summary>
+    /// Delete a product by ID
+    /// </summary>
+    Task<bool> DeleteAsync(int productId);
 }

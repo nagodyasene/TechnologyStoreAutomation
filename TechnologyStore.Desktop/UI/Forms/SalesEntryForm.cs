@@ -208,8 +208,26 @@ public partial class SalesEntryForm : Form
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Error loading products: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            // Show full error chain including inner exceptions
+            var errorMessage = GetFullErrorMessage(ex);
+            _logger.LogError(ex, "Error loading products");
+            MessageBox.Show($"Error loading products: {errorMessage}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
+    }
+
+    /// <summary>
+    /// Gets the full error message including inner exceptions
+    /// </summary>
+    private static string GetFullErrorMessage(Exception ex)
+    {
+        var messages = new List<string>();
+        var current = ex;
+        while (current != null)
+        {
+            messages.Add(current.Message);
+            current = current.InnerException;
+        }
+        return string.Join(" → ", messages);
     }
 
     private void CmbProduct_SelectedIndexChanged(object? sender, EventArgs e)

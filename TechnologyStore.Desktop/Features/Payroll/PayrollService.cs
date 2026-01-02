@@ -8,7 +8,7 @@ using Npgsql;
 using TechnologyStore.Desktop.Features.Leave; // for Employee
 using TechnologyStore.Desktop.Features.TimeTracking; // for ITimeTrackingRepository or Service
 using TechnologyStore.Shared.Models;
-using Microsoft.Extensions.Configuration;
+using TechnologyStore.Desktop.Config;
 
 namespace TechnologyStore.Desktop.Features.Payroll
 {
@@ -16,10 +16,17 @@ namespace TechnologyStore.Desktop.Features.Payroll
     {
         private readonly string _connectionString;
 
-        public PayrollService(IConfiguration config)
+        public PayrollService()
         {
-            _connectionString = config.GetConnectionString("DefaultConnection")
-                                ?? "Host=localhost;Database=techstore;Username=postgres;Password=password";
+            _connectionString = DatabaseConfig.BuildConnectionStringFromEnv();
+            if (string.IsNullOrWhiteSpace(_connectionString))
+            {
+                throw new InvalidOperationException(
+                    "Database connection string not configured. Please set one of the following environment variables:\n" +
+                    "1) DB_CONNECTION_STRING\n" +
+                    "2) DATABASE_URL\n" +
+                    "3) DB_HOST, DB_NAME, DB_USER, DB_PASSWORD (and optional DB_PORT)");
+            }
         }
 
         private IDbConnection CreateConnection() => new NpgsqlConnection(_connectionString);
@@ -33,11 +40,36 @@ namespace TechnologyStore.Desktop.Features.Payroll
             // Direct Dapper query is faster for this specific need.
 
             using var conn = CreateConnection();
-            var sqlEmployees = @"
-                SELECT e.*, u.full_name as FullName 
-                FROM employees e 
-                JOIN users u ON e.user_id = u.id 
-                WHERE u.is_active = true";
+            
+            // Check if hourly_rate column exists, if not use default value
+            var hasHourlyRateColumn = await CheckColumnExistsAsync(conn, "employees", "hourly_rate");
+            
+            string sqlEmployees;
+            if (hasHourlyRateColumn)
+            {
+                sqlEmployees = @"
+                    SELECT e.id, e.user_id as UserId, e.employee_code as EmployeeCode, 
+                           e.department, e.hire_date::timestamp as HireDate, 
+                           e.remaining_leave_days as RemainingLeaveDays, e.created_at as CreatedAt,
+                           e.hourly_rate as HourlyRate,
+                           u.full_name as FullName 
+                    FROM employees e 
+                    JOIN users u ON e.user_id = u.id 
+                    WHERE u.is_active = true";
+            }
+            else
+            {
+                // Column doesn't exist, use default value
+                sqlEmployees = @"
+                    SELECT e.id, e.user_id as UserId, e.employee_code as EmployeeCode, 
+                           e.department, e.hire_date::timestamp as HireDate, 
+                           e.remaining_leave_days as RemainingLeaveDays, e.created_at as CreatedAt,
+                           15.00 as HourlyRate,
+                           u.full_name as FullName 
+                    FROM employees e 
+                    JOIN users u ON e.user_id = u.id 
+                    WHERE u.is_active = true";
+            }
 
             var employees = await conn.QueryAsync<EmployeeDto>(sqlEmployees);
 
@@ -122,6 +154,22 @@ namespace TechnologyStore.Desktop.Features.Payroll
         {
             using var conn = CreateConnection();
             return (await conn.QueryAsync<PayrollRun>("SELECT * FROM payroll_runs ORDER BY created_at DESC")).ToList();
+        }
+
+        /// <summary>
+        /// Checks if a column exists in a table
+        /// </summary>
+        private async Task<bool> CheckColumnExistsAsync(IDbConnection conn, string tableName, string columnName)
+        {
+            const string sql = @"
+                SELECT EXISTS (
+                    SELECT 1 
+                    FROM information_schema.columns 
+                    WHERE table_name = @TableName 
+                    AND column_name = @ColumnName
+                )";
+            
+            return await conn.ExecuteScalarAsync<bool>(sql, new { TableName = tableName, ColumnName = columnName });
         }
 
         // Helper class for the join

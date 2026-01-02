@@ -13,5 +13,6 @@ public class ProductDashboardDto
     public int CurrentStock { get; init; }
     public int SalesLast7Days { get; init; }
     public int RunwayDays { get; init; }
+    public decimal UnitPrice { get; init; }
     public DateTime LastUpdated { get; init; } = DateTime.UtcNow;
 }

@@ -9,6 +9,7 @@ using TechnologyStore.Desktop.Services;
 using TechnologyStore.Shared.Models;
 using TechnologyStore.Desktop.Features.Auth; // For IAuthenticationService
 using TechnologyStore.Shared.Interfaces; // For IPayrollService (if defined there) or ensure IPayrollService is visible
+using TechnologyStore.Desktop.Config;
 
 // IPayrollService is in TechnologyStore.Desktop.Features.Payroll namespace
 using TechnologyStore.Desktop.Features.Payroll;
@@ -20,6 +21,7 @@ namespace TechnologyStore.Desktop.Features.Payroll.Forms
     {
         private readonly IPayrollService _payrollService;
         private readonly IAuthenticationService _authService;
+        private readonly string _connectionString;
 
         private DateTimePicker _dtStart;
         private DateTimePicker _dtEnd;
@@ -27,7 +29,9 @@ namespace TechnologyStore.Desktop.Features.Payroll.Forms
         // _btnPreview removed (local)
         private Button _btnCommit;
         private Button _btnExport;
+        private Button _btnManageRates;
         private Label _lblStatus;
+        private MenuStrip? _menuStrip;
 
         private List<PayrollEntry> _currentPreview = new List<PayrollEntry>();
 
@@ -35,6 +39,11 @@ namespace TechnologyStore.Desktop.Features.Payroll.Forms
         {
             _payrollService = payrollService;
             _authService = authService;
+            _connectionString = DatabaseConfig.BuildConnectionStringFromEnv();
+            if (string.IsNullOrWhiteSpace(_connectionString))
+            {
+                throw new InvalidOperationException("Database connection string not configured.");
+            }
             InitializeComponent();
         }
 
@@ -43,6 +52,15 @@ namespace TechnologyStore.Desktop.Features.Payroll.Forms
             this.Text = "Payroll Management";
             this.Size = new System.Drawing.Size(1000, 700);
             this.StartPosition = FormStartPosition.CenterScreen;
+
+            // Menu Strip
+            _menuStrip = new MenuStrip();
+            var toolsMenu = new ToolStripMenuItem("Tools");
+            var manageRatesMenuItem = new ToolStripMenuItem("Manage Hourly Rates...", null, (s, e) => OpenHourlyRateForm());
+            toolsMenu.DropDownItems.Add(manageRatesMenuItem);
+            _menuStrip.Items.Add(toolsMenu);
+            this.MainMenuStrip = _menuStrip;
+            this.Controls.Add(_menuStrip);
 
             var mainLayout = new TableLayoutPanel();
             mainLayout.Dock = DockStyle.Fill;
@@ -74,7 +92,10 @@ namespace TechnologyStore.Desktop.Features.Payroll.Forms
             _btnExport = new Button { Text = "Export CSV", AutoSize = true, Enabled = false };
             _btnExport.Click += (s, e) => ExportCsv();
 
-            pnlControls.Controls.AddRange(new Control[] { lblStart, _dtStart, lblEnd, _dtEnd, btnPreview, _btnCommit, _btnExport });
+            _btnManageRates = new Button { Text = "💰 Manage Hourly Rates", AutoSize = true };
+            _btnManageRates.Click += (s, e) => OpenHourlyRateForm();
+
+            pnlControls.Controls.AddRange(new Control[] { lblStart, _dtStart, lblEnd, _dtEnd, btnPreview, _btnCommit, _btnExport, _btnManageRates });
 
             // Grid
             _grid = new DataGridView();
@@ -162,6 +183,25 @@ namespace TechnologyStore.Desktop.Features.Payroll.Forms
                     System.IO.File.WriteAllText(sfd.FileName, sb.ToString());
                     MessageBox.Show("Export complete.");
                 }
+            }
+        }
+
+        private void OpenHourlyRateForm()
+        {
+            try
+            {
+                var form = new EmployeeHourlyRateForm(_connectionString);
+                form.ShowDialog(this);
+                
+                // If preview is loaded, refresh it to show updated rates
+                if (_currentPreview.Any())
+                {
+                    LoadPreviewAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error opening hourly rate form: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }

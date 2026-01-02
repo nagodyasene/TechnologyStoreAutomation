@@ -57,7 +57,10 @@ public class ProductRepository : IProductRepository
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException($"Operation '{operationName}' failed with non-transient error", ex);
+                _logger.LogError(ex, "Operation {Operation} failed with non-transient error: {Message}", 
+                    operationName, ex.Message);
+                throw new InvalidOperationException(
+                    $"Operation '{operationName}' failed: {ex.Message}", ex);
             }
         }
 
@@ -299,15 +302,34 @@ public class ProductRepository : IProductRepository
         {
             using (var db = CreateConnection())
             {
-                var sql = @"
-                    SELECT id as Id, name as Name, sku as Sku, category as Category, 
-                           unit_price as UnitPrice, current_stock as CurrentStock, 
-                           lifecycle_phase::text as LifecyclePhase, 
-                           successor_product_id as SuccessorProductId,
-                           supplier_id as SupplierId,
-                           created_at as CreatedAt, last_updated as LastUpdated
-                    FROM products
-                    ORDER BY name;";
+                // Check if supplier_id column exists (from purchasing module)
+                var checkSupplierColumnSql = @"
+                    SELECT EXISTS (
+                        SELECT 1 FROM information_schema.columns 
+                        WHERE table_name = 'products' AND column_name = 'supplier_id'
+                    );";
+                var hasSupplierColumn = await db.ExecuteScalarAsync<bool>(checkSupplierColumnSql).ConfigureAwait(false);
+
+                // Check if is_deleted column exists
+                var checkDeletedColumnSql = @"
+                    SELECT EXISTS (
+                        SELECT 1 FROM information_schema.columns 
+                        WHERE table_name = 'products' AND column_name = 'is_deleted'
+                    );";
+                var hasDeletedColumn = await db.ExecuteScalarAsync<bool>(checkDeletedColumnSql).ConfigureAwait(false);
+
+                var whereClause = hasDeletedColumn ? "WHERE is_deleted = FALSE" : "";
+                var supplierSelect = hasSupplierColumn ? "supplier_id as SupplierId," : "NULL as SupplierId,";
+
+                var sql = $@"SELECT id as Id, name as Name, sku as Sku, category as Category, 
+                              unit_price as UnitPrice, current_stock as CurrentStock, 
+                              lifecycle_phase::text as LifecyclePhase, 
+                              successor_product_id as SuccessorProductId,
+                              {supplierSelect}
+                              created_at as CreatedAt, last_updated as LastUpdated
+                       FROM products 
+                       {whereClause}
+                       ORDER BY name;";
 
                 return await db.QueryAsync<Product>(sql).ConfigureAwait(false);
             }
@@ -318,14 +340,32 @@ public class ProductRepository : IProductRepository
     {
         using (var db = CreateConnection())
         {
-            var productsSql = @"
-            SELECT id as Id, name as Name, sku as Sku, category as Category, 
-                   unit_price as UnitPrice, current_stock as CurrentStock, 
-                   lifecycle_phase::text as LifecyclePhase, 
-                   successor_product_id as SuccessorProductId,
-                   created_at as CreatedAt, last_updated as LastUpdated
-            FROM products 
-            ORDER BY category";
+            // Check if is_deleted column exists
+            var checkDeletedColumnSql = @"
+                SELECT EXISTS (
+                    SELECT 1 FROM information_schema.columns 
+                    WHERE table_name = 'products' AND column_name = 'is_deleted'
+                );";
+            var hasDeletedColumn = await db.ExecuteScalarAsync<bool>(checkDeletedColumnSql).ConfigureAwait(false);
+
+            var productsSql = hasDeletedColumn
+                ? @"
+                    SELECT id as Id, name as Name, sku as Sku, category as Category, 
+                           unit_price as UnitPrice, current_stock as CurrentStock, 
+                           lifecycle_phase::text as LifecyclePhase, 
+                           successor_product_id as SuccessorProductId,
+                           created_at as CreatedAt, last_updated as LastUpdated
+                    FROM products 
+                    WHERE is_deleted = FALSE
+                    ORDER BY category"
+                : @"
+                    SELECT id as Id, name as Name, sku as Sku, category as Category, 
+                           unit_price as UnitPrice, current_stock as CurrentStock, 
+                           lifecycle_phase::text as LifecyclePhase, 
+                           successor_product_id as SuccessorProductId,
+                           created_at as CreatedAt, last_updated as LastUpdated
+                    FROM products 
+                    ORDER BY category";
             var products = await db.QueryAsync<Product>(productsSql);
 
             var salesSql = @"
@@ -358,7 +398,8 @@ public class ProductRepository : IProductRepository
                     Recommendation = rec,
                     CurrentStock = product.CurrentStock,
                     SalesLast7Days = (int)Math.Round(analysis.DailySalesAverage * 7),
-                    RunwayDays = analysis.RunwayDays
+                    RunwayDays = analysis.RunwayDays,
+                    UnitPrice = product.UnitPrice
                 });
             }
 
@@ -387,7 +428,17 @@ public class ProductRepository : IProductRepository
     {
         using (var db = CreateConnection())
         {
-            var sql = @"
+            // Check if is_deleted column exists
+            var checkDeletedColumnSql = @"
+                SELECT EXISTS (
+                    SELECT 1 FROM information_schema.columns 
+                    WHERE table_name = 'products' AND column_name = 'is_deleted'
+                );";
+            var hasDeletedColumn = await db.ExecuteScalarAsync<bool>(checkDeletedColumnSql).ConfigureAwait(false);
+
+            var deletedFilter = hasDeletedColumn ? "AND is_deleted = FALSE" : "";
+
+            var sql = $@"
                 SELECT id as Id, name as Name, sku as Sku, category as Category, 
                        unit_price as UnitPrice, current_stock as CurrentStock, 
                        lifecycle_phase::text as LifecyclePhase, 
@@ -396,6 +447,7 @@ public class ProductRepository : IProductRepository
                 FROM products
                 WHERE lifecycle_phase IN ('ACTIVE', 'LEGACY')
                   AND current_stock > 0
+                  {deletedFilter}
                 ORDER BY category, name;";
 
             return await db.QueryAsync<Product>(sql);
@@ -439,5 +491,164 @@ public class ProductRepository : IProductRepository
             
             await db.ExecuteAsync(sql, new { ProductId = productId, Quantity = quantity });
         }
+    }
+
+    public async Task<Product> CreateAsync(Product product)
+    {
+        return await ExecuteWithRetryAsync(async () =>
+        {
+            using (var db = CreateConnection())
+            {
+                // Check if supplier_id column exists
+                var checkColumnSql = @"
+                    SELECT EXISTS (
+                        SELECT 1 FROM information_schema.columns 
+                        WHERE table_name = 'products' AND column_name = 'supplier_id'
+                    );";
+                var hasSupplierColumn = await db.ExecuteScalarAsync<bool>(checkColumnSql).ConfigureAwait(false);
+
+                var sql = hasSupplierColumn
+                    ? @"
+                        INSERT INTO products (name, sku, category, unit_price, current_stock, lifecycle_phase, successor_product_id, supplier_id)
+                        VALUES (@Name, @Sku, @Category, @UnitPrice, @CurrentStock, @LifecyclePhase::lifecycle_phase_type, @SuccessorProductId, @SupplierId)
+                        RETURNING id, created_at, last_updated;"
+                    : @"
+                        INSERT INTO products (name, sku, category, unit_price, current_stock, lifecycle_phase, successor_product_id)
+                        VALUES (@Name, @Sku, @Category, @UnitPrice, @CurrentStock, @LifecyclePhase::lifecycle_phase_type, @SuccessorProductId)
+                        RETURNING id, created_at, last_updated;";
+
+                var parameters = new
+                {
+                    product.Name,
+                    product.Sku,
+                    product.Category,
+                    product.UnitPrice,
+                    product.CurrentStock,
+                    LifecyclePhase = product.LifecyclePhase,
+                    product.SuccessorProductId,
+                    product.SupplierId
+                };
+
+                var result = await db.QuerySingleAsync<dynamic>(sql, parameters).ConfigureAwait(false);
+                
+                product.Id = result.id;
+                product.CreatedAt = result.created_at;
+                product.LastUpdated = result.last_updated;
+
+                _logger.LogInformation("Created product {ProductId}: {ProductName} (SKU: {Sku})", 
+                    product.Id, product.Name, product.Sku);
+
+                return product;
+            }
+        }, nameof(CreateAsync)).ConfigureAwait(false);
+    }
+
+    public async Task UpdateAsync(Product product)
+    {
+        if (product == null)
+            throw new ArgumentNullException(nameof(product));
+        
+        if (product.Id <= 0)
+            throw new ArgumentException("Product ID must be greater than 0", nameof(product));
+
+        await ExecuteWithRetryAsync(async () =>
+        {
+            using (var db = CreateConnection())
+            {
+                // Check if supplier_id column exists
+                var checkColumnSql = @"
+                    SELECT EXISTS (
+                        SELECT 1 FROM information_schema.columns 
+                        WHERE table_name = 'products' AND column_name = 'supplier_id'
+                    );";
+                var hasSupplierColumn = await db.ExecuteScalarAsync<bool>(checkColumnSql).ConfigureAwait(false);
+
+                var sql = hasSupplierColumn
+                    ? @"
+                        UPDATE products 
+                        SET name = @Name,
+                            category = @Category,
+                            current_stock = @CurrentStock,
+                            unit_price = @UnitPrice,
+                            last_updated = CURRENT_TIMESTAMP
+                        WHERE id = @Id;"
+                    : @"
+                        UPDATE products 
+                        SET name = @Name,
+                            category = @Category,
+                            current_stock = @CurrentStock,
+                            unit_price = @UnitPrice,
+                            last_updated = CURRENT_TIMESTAMP
+                        WHERE id = @Id;";
+
+                var parameters = new
+                {
+                    product.Id,
+                    product.Name,
+                    product.Category,
+                    product.CurrentStock,
+                    product.UnitPrice
+                };
+
+                var affectedRows = await db.ExecuteAsync(sql, parameters).ConfigureAwait(false);
+                
+                if (affectedRows == 0)
+                {
+                    throw new InvalidOperationException($"Product with ID {product.Id} not found");
+                }
+
+                _logger.LogInformation("Updated product {ProductId}: {ProductName} (Stock: {Stock}, Category: {Category})", 
+                    product.Id, product.Name, product.CurrentStock, product.Category ?? "N/A");
+
+                return true;
+            }
+        }, nameof(UpdateAsync)).ConfigureAwait(false);
+    }
+
+    public async Task<bool> DeleteAsync(int productId)
+    {
+        if (productId <= 0)
+            throw new ArgumentException("Product ID must be greater than 0", nameof(productId));
+
+        return await ExecuteWithRetryAsync(async () =>
+        {
+            using (var db = CreateConnection())
+            {
+                // Check if is_deleted column exists, if not, add it
+                var checkColumnSql = @"
+                    SELECT EXISTS (
+                        SELECT 1 FROM information_schema.columns 
+                        WHERE table_name = 'products' AND column_name = 'is_deleted'
+                    );";
+                var hasDeletedColumn = await db.ExecuteScalarAsync<bool>(checkColumnSql).ConfigureAwait(false);
+                
+                if (!hasDeletedColumn)
+                {
+                    // Add is_deleted column
+                    var addColumnSql = @"
+                        ALTER TABLE products 
+                        ADD COLUMN is_deleted BOOLEAN NOT NULL DEFAULT FALSE;";
+                    await db.ExecuteAsync(addColumnSql).ConfigureAwait(false);
+                    _logger.LogInformation("Added is_deleted column to products table");
+                }
+
+                // Soft delete: set is_deleted flag instead of actually deleting
+                // This maintains data integrity while hiding the product from views
+                var sql = @"
+                    UPDATE products 
+                    SET is_deleted = TRUE, 
+                        last_updated = CURRENT_TIMESTAMP 
+                    WHERE id = @ProductId AND is_deleted = FALSE;";
+                var affectedRows = await db.ExecuteAsync(sql, new { ProductId = productId }).ConfigureAwait(false);
+                
+                if (affectedRows > 0)
+                {
+                    _logger.LogInformation("Soft deleted product {ProductId} (marked as deleted)", productId);
+                    return true;
+                }
+                
+                return false;
+            }
+        }, nameof(DeleteAsync)).ConfigureAwait(false);
     }
 }

@@ -49,7 +49,7 @@ public partial class OrderManagementForm : Form
         var headerPanel = new Panel
         {
             Dock = DockStyle.Top,
-            Height = 60,
+            Height = 45,
             BackColor = Color.FromArgb(0, 120, 212),
             Padding = new Padding(15, 0, 15, 0)
         };
@@ -58,9 +58,9 @@ public partial class OrderManagementForm : Form
         var lblTitle = new Label
         {
             Text = "📦 Order Management",
-            Location = new Point(20, 15),
+            Location = new Point(20, 10),
             AutoSize = true,
-            Font = new Font(UiConstants.DefaultFontFamily, 18, FontStyle.Bold),
+            Font = new Font(UiConstants.DefaultFontFamily, 16, FontStyle.Bold),
             ForeColor = Color.White
         };
         headerPanel.Controls.Add(lblTitle);
@@ -143,12 +143,18 @@ public partial class OrderManagementForm : Form
         {
             Dock = DockStyle.Fill,
             Orientation = Orientation.Horizontal,
-            SplitterDistance = 350,
+            SplitterDistance = 250,
             BackColor = Color.FromArgb(220, 220, 220),
             Panel1MinSize = 200,
-            Panel2MinSize = 150
+            Panel2MinSize = 150,
+            AutoScroll = true
         };
+        splitContainer.Panel1.AutoScroll = true;
+        splitContainer.Panel2.AutoScroll = true;
         this.Controls.Add(splitContainer);
+        
+        // Ensure proper z-order: header and filter on top, then split container
+        splitContainer.BringToFront();
 
         // Orders grid (top panel)
         _gridOrders = new DataGridView
@@ -163,7 +169,8 @@ public partial class OrderManagementForm : Form
             AllowUserToAddRows = false,
             AllowUserToDeleteRows = false,
             RowHeadersVisible = false,
-            AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
+            AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
+            ScrollBars = ScrollBars.Both
         };
 
         _gridOrders.Columns.Add(new DataGridViewTextBoxColumn { Name = "Id", Visible = false });
@@ -220,7 +227,8 @@ public partial class OrderManagementForm : Form
             ReadOnly = true,
             AllowUserToAddRows = false,
             RowHeadersVisible = false,
-            AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
+            AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
+            ScrollBars = ScrollBars.Both
         };
 
         _gridOrderItems.Columns.Add(new DataGridViewTextBoxColumn { Name = "ProductName", HeaderText = "Product", FillWeight = 150 });

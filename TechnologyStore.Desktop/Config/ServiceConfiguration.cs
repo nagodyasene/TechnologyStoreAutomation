@@ -199,7 +199,24 @@ public static class ServiceConfiguration
         });
 
         // Register email service (Shared service) - must be before PurchaseOrderService
-        services.AddSingleton<TechnologyStore.Shared.Interfaces.IEmailService, TechnologyStore.Shared.Services.GmailEmailService>();
+        // Map Desktop EmailSettings to Shared EmailSettings for GmailEmailService
+        services.AddSingleton<TechnologyStore.Shared.Config.EmailSettings>(sp =>
+        {
+            var desktopEmailSettings = sp.GetRequiredService<EmailSettings>();
+            return new TechnologyStore.Shared.Config.EmailSettings
+            {
+                TestMode = desktopEmailSettings.TestMode,
+                SenderEmail = desktopEmailSettings.SenderEmail,
+                GmailCredentialsPath = desktopEmailSettings.GmailCredentialsPath,
+                TokenStorePath = desktopEmailSettings.TokenStorePath
+            };
+        });
+        
+        services.AddSingleton<TechnologyStore.Shared.Interfaces.IEmailService>(sp =>
+        {
+            var sharedEmailSettings = sp.GetRequiredService<TechnologyStore.Shared.Config.EmailSettings>();
+            return new TechnologyStore.Shared.Services.GmailEmailService(sharedEmailSettings);
+        });
 
         services.AddSingleton<TechnologyStore.Shared.Interfaces.IPurchaseOrderService>(sp =>
         {

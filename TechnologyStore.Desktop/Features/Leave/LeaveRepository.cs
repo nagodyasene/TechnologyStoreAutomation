@@ -61,7 +61,7 @@ public class LeaveRepository : ILeaveRepository
     {
         const string sql = @"
             SELECT e.id, e.user_id as UserId, e.employee_code as EmployeeCode, 
-                   e.department, e.hire_date as HireDate, 
+                   e.department, e.hire_date::timestamp as HireDate, 
                    e.remaining_leave_days as RemainingLeaveDays, e.created_at as CreatedAt,
                    u.full_name as FullName
             FROM employees e
@@ -77,7 +77,7 @@ public class LeaveRepository : ILeaveRepository
     {
         const string sql = @"
             SELECT e.id, e.user_id as UserId, e.employee_code as EmployeeCode, 
-                   e.department, e.hire_date as HireDate, 
+                   e.department, e.hire_date::timestamp as HireDate, 
                    e.remaining_leave_days as RemainingLeaveDays, e.created_at as CreatedAt,
                    u.full_name as FullName
             FROM employees e
@@ -135,7 +135,7 @@ public class LeaveRepository : ILeaveRepository
     {
         const string sql = @"
             SELECT lr.id, lr.employee_id as EmployeeId, lr.leave_type::text as LeaveType,
-                   lr.start_date as StartDate, lr.end_date as EndDate, lr.total_days as TotalDays,
+                   lr.start_date::timestamp as StartDate, lr.end_date::timestamp as EndDate, lr.total_days as TotalDays,
                    lr.reason, lr.status::text as Status, lr.reviewed_by as ReviewedBy,
                    lr.review_comment as ReviewComment, lr.created_at as CreatedAt, lr.reviewed_at as ReviewedAt,
                    u.full_name as ReviewerName
@@ -160,7 +160,7 @@ public class LeaveRepository : ILeaveRepository
     {
         var sql = @"
             SELECT lr.id, lr.employee_id as EmployeeId, lr.leave_type::text as LeaveType,
-                   lr.start_date as StartDate, lr.end_date as EndDate, lr.total_days as TotalDays,
+                   lr.start_date::timestamp as StartDate, lr.end_date::timestamp as EndDate, lr.total_days as TotalDays,
                    lr.reason, lr.status::text as Status, lr.reviewed_by as ReviewedBy,
                    lr.review_comment as ReviewComment, lr.created_at as CreatedAt, lr.reviewed_at as ReviewedAt,
                    e_user.full_name as EmployeeName, r_user.full_name as ReviewerName
@@ -261,7 +261,7 @@ public class LeaveRepository : ILeaveRepository
     {
         const string sql = @"
             SELECT lr.id, lr.employee_id as EmployeeId, lr.leave_type::text as LeaveType,
-                   lr.start_date as StartDate, lr.end_date as EndDate, lr.total_days as TotalDays,
+                   lr.start_date::timestamp as StartDate, lr.end_date::timestamp as EndDate, lr.total_days as TotalDays,
                    lr.reason, lr.status::text as Status, lr.reviewed_by as ReviewedBy,
                    lr.review_comment as ReviewComment, lr.created_at as CreatedAt, lr.reviewed_at as ReviewedAt,
                    e_user.full_name as EmployeeName, r_user.full_name as ReviewerName
