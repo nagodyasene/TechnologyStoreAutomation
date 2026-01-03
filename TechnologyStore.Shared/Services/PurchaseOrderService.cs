@@ -37,6 +37,20 @@ public class PurchaseOrderService : IPurchaseOrderService
     /// <inheritdoc />
     public async Task<IEnumerable<PurchaseOrder>> GeneratePurchaseOrdersForLowStockAsync()
     {
+        return await GeneratePurchaseOrdersByRunwayThresholdAsync(
+            runwayDaysThreshold: _businessRules.ReorderRunwayDays,
+            label: "low stock");
+    }
+
+    public async Task<IEnumerable<PurchaseOrder>> GeneratePurchaseOrdersForCriticalStockAsync()
+    {
+        return await GeneratePurchaseOrdersByRunwayThresholdAsync(
+            runwayDaysThreshold: _businessRules.CriticalRunwayDays,
+            label: "critical stock");
+    }
+
+    private async Task<IEnumerable<PurchaseOrder>> GeneratePurchaseOrdersByRunwayThresholdAsync(int runwayDaysThreshold, string label)
+    {
         var generatedOrders = new List<PurchaseOrder>();
 
         try
@@ -44,46 +58,53 @@ public class PurchaseOrderService : IPurchaseOrderService
             // Get dashboard data which includes RunwayDays calculation
             var dashboardData = await _productRepository.GetDashboardDataAsync();
 
-            // Filter products with low stock (RunwayDays <= ReorderRunwayDays) that are ACTIVE
-            var lowStockProducts = dashboardData
-                .Where(p => p.RunwayDays <= _businessRules.ReorderRunwayDays && p.Phase == "ACTIVE")
+            // Filter products that are ACTIVE and below threshold
+            var matchingProducts = dashboardData
+                .Where(p => p.RunwayDays <= runwayDaysThreshold && p.Phase == "ACTIVE")
                 .ToList();
 
-            if (!lowStockProducts.Any())
+            if (!matchingProducts.Any())
             {
-                _logger.LogInformation("No low-stock products found requiring purchase orders");
+                _logger.LogInformation("No {Label} products found requiring purchase orders", label);
                 return generatedOrders;
             }
 
-            _logger.LogInformation("Found {Count} low-stock products requiring reorder", lowStockProducts.Count);
+            _logger.LogInformation("Found {Count} {Label} products requiring reorder", matchingProducts.Count, label);
 
             // Get full product details to access SupplierId
             var products = await _productRepository.GetAllAsync();
             var productDict = products.ToDictionary(p => p.Id);
 
-            // Group by supplier
-            var productsBySupplier = lowStockProducts
+            // Group by supplier (only those with SupplierId)
+            var productsBySupplier = matchingProducts
                 .Where(p => productDict.ContainsKey(p.Id) && productDict[p.Id].SupplierId.HasValue)
                 .GroupBy(p => productDict[p.Id].SupplierId!.Value)
                 .ToList();
 
             foreach (var supplierGroup in productsBySupplier)
             {
-                var supplier = await _supplierRepository.GetByIdAsync(supplierGroup.Key);
+                var supplierId = supplierGroup.Key;
+                var supplier = await _supplierRepository.GetByIdAsync(supplierId);
                 if (supplier == null || !supplier.IsActive)
                 {
-                    _logger.LogWarning("Supplier {SupplierId} not found or inactive, skipping", supplierGroup.Key);
+                    _logger.LogWarning("Supplier {SupplierId} not found or inactive, skipping", supplierId);
                     continue;
                 }
+
+                // Prevent duplicates: skip products already on an open PO for this supplier
+                var openProductIds = await _purchaseOrderRepository.GetOpenProductIdsForSupplierAsync(supplierId);
 
                 // Calculate reorder quantities based on runway days
                 var items = new List<PurchaseOrderItem>();
                 foreach (var dashboardProduct in supplierGroup)
                 {
                     var product = productDict[dashboardProduct.Id];
+                    if (openProductIds.Contains(product.Id))
+                    {
+                        continue;
+                    }
 
-                    // Calculate quantity to order: enough for ReorderRunwayDays worth of stock
-                    // Based on SalesLast7Days, estimate daily sales
+                    // Estimate daily sales from last 7 days and order up to AdequateRunwayDays of stock
                     var dailySales = dashboardProduct.SalesLast7Days / 7.0;
                     var targetStock = (int)Math.Ceiling(dailySales * _businessRules.AdequateRunwayDays);
                     var orderQuantity = Math.Max(10, targetStock - dashboardProduct.CurrentStock);
@@ -98,6 +119,11 @@ public class PurchaseOrderService : IPurchaseOrderService
                     });
                 }
 
+                if (items.Count == 0)
+                {
+                    continue;
+                }
+
                 // Create the purchase order
                 var orderNumber = await _purchaseOrderRepository.GenerateOrderNumberAsync();
                 var order = new PurchaseOrder
@@ -105,10 +131,10 @@ public class PurchaseOrderService : IPurchaseOrderService
                     OrderNumber = orderNumber,
                     SupplierId = supplier.Id,
                     Supplier = supplier,
-                    Status = PurchaseOrderStatus.Pending,
+                    Status = PurchaseOrderStatus.Pending, // admin must approve
                     TotalAmount = items.Sum(i => i.Quantity * i.UnitCost),
                     Items = items,
-                    Notes = $"Auto-generated due to low stock levels. Generated on {DateTime.UtcNow:yyyy-MM-dd HH:mm} UTC.",
+                    Notes = $"Auto-generated due to {label} levels (RunwayDays <= {runwayDaysThreshold}). Generated on {DateTime.UtcNow:yyyy-MM-dd HH:mm} UTC.",
                     ExpectedDeliveryDate = DateTime.UtcNow.AddDays(supplier.LeadTimeDays)
                 };
 
@@ -120,21 +146,22 @@ public class PurchaseOrderService : IPurchaseOrderService
             }
 
             // Log products without suppliers
-            var productsWithoutSupplier = lowStockProducts
+            var productsWithoutSupplier = matchingProducts
                 .Where(p => !productDict.ContainsKey(p.Id) || !productDict[p.Id].SupplierId.HasValue)
                 .ToList();
 
             if (productsWithoutSupplier.Any())
             {
-                _logger.LogWarning("{Count} low-stock products have no assigned supplier: {Products}",
+                _logger.LogWarning("{Count} {Label} products have no assigned supplier: {Products}",
                     productsWithoutSupplier.Count,
+                    label,
                     string.Join(", ", productsWithoutSupplier.Select(p => p.Name)));
             }
         }
         catch (Exception ex)
         {
             // Don't log and rethrow (S2139) - let caller handle
-            throw new InvalidOperationException("Error generating purchase orders for low-stock products", ex);
+            throw new InvalidOperationException($"Error generating purchase orders for {label} products", ex);
         }
 
         return generatedOrders;
@@ -250,6 +277,17 @@ public class PurchaseOrderService : IPurchaseOrderService
             if (supplier == null)
                 return PurchaseOrderResult.Failed("Supplier not found.");
 
+            var emailConfigured = await _emailService.IsConfiguredAsync();
+            
+            if (!emailConfigured)
+            {
+                return PurchaseOrderResult.Failed(
+                    "Email service is not configured.\n\n" +
+                    "To enable sending:\n" +
+                    "- Put Gmail OAuth credentials at 'credentials.json' (in the app working directory), OR\n" +
+                    "- Enable Email Test Mode in Tools → Settings (logs email instead of sending).");
+            }
+
             // Generate email content
             var emailHtml = GeneratePurchaseOrderEmailHtml(order, supplier);
             var subject = $"Purchase Order {order.OrderNumber} from TechTrend Store";
@@ -259,6 +297,12 @@ public class PurchaseOrderService : IPurchaseOrderService
             if (!emailSent)
             {
                 _logger.LogWarning("Failed to send PO email to {Email}", supplier.Email);
+                if (_emailService is TechnologyStore.Shared.Interfaces.IEmailServiceDiagnostics diag &&
+                    !string.IsNullOrWhiteSpace(diag.LastErrorMessage))
+                {
+                    return PurchaseOrderResult.Failed(diag.LastErrorMessage);
+                }
+
                 return PurchaseOrderResult.Failed("Failed to send email to supplier.");
             }
 

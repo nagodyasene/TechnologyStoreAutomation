@@ -89,6 +89,12 @@ public class SalesReportService : ISalesReportService
             throw new ArgumentException("Start date cannot be later than end date.", nameof(startDate));
         }
 
+        var today = DateTime.Today;
+        if (startDate.Date > today || endDate.Date > today)
+        {
+            throw new ArgumentException("Date ranges cannot include future dates.");
+        }
+
         _logger.LogInformation("Generating sales report for {StartDate} to {EndDate}", startDate, endDate);
 
         const string summarySql = @"

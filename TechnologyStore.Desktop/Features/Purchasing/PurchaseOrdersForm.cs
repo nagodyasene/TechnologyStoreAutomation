@@ -421,7 +421,7 @@ internal class PurchaseOrderViewModel
         SupplierName = order.Supplier?.Name ?? $"Supplier #{order.SupplierId}";
         Status = order.Status;
         TotalAmount = order.TotalAmount;
-        ItemCount = order.Items?.Count ?? 0;
+        ItemCount = order.Items?.Count ?? order.ItemCount;
         CreatedAt = order.CreatedAt;
         ExpectedDelivery = order.ExpectedDeliveryDate;
     }

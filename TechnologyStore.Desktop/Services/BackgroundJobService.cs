@@ -9,13 +9,14 @@ namespace TechnologyStore.Desktop.Services;
 /// <summary>
 /// Configures and manages background jobs for automated system tasks
 /// </summary>
-public class BackgroundJobService : IBackgroundJobService
+public class BackgroundJobService : IBackgroundJobService, IDisposable
 {
     private readonly string _connectionString;
     private readonly IProductRepository _repository;
     private readonly ILifecycleSentinel _lifecycleSentinel;
     private readonly IPurchaseOrderService? _purchaseOrderService;
     private readonly ILogger<BackgroundJobService> _logger;
+    private BackgroundJobServer? _server;
 
     public BackgroundJobService(
         string connectionString,
@@ -51,6 +52,14 @@ public class BackgroundJobService : IBackgroundJobService
 
             // Schedule recurring jobs
             ScheduleRecurringJobs();
+
+            // Start a background processing server (required for recurring jobs to actually execute).
+            // In a desktop app we run an in-process server.
+            _server = new BackgroundJobServer(new BackgroundJobServerOptions
+            {
+                Queues = new[] { "default", "maintenance" }
+            });
+            _logger.LogInformation("Hangfire BackgroundJobServer started");
 
             _logger.LogInformation("All background jobs scheduled successfully");
         }
@@ -90,6 +99,13 @@ public class BackgroundJobService : IBackgroundJobService
                 "low-stock-po-generation",
                 () => GenerateLowStockPurchaseOrders(),
                 Cron.Daily(3)); // 3:00 AM
+
+            // Job 5: Check frequently for critical stock and generate purchase orders (pending approval)
+            // Runs every 5 minutes.
+            RecurringJob.AddOrUpdate(
+                "critical-stock-po-generation",
+                () => GenerateCriticalStockPurchaseOrders(),
+                "*/5 * * * *");
         }
 
         _logger.LogInformation("Scheduled recurring jobs: Daily snapshot at 1:00 AM, Lifecycle audit at 2:00 AM, Low-stock PO at 3:00 AM, Weekly cleanup Sunday at 3:00 AM");
@@ -241,5 +257,37 @@ public class BackgroundJobService : IBackgroundJobService
             _logger.LogError(ex, "Failed to generate low-stock purchase orders");
             throw new InvalidOperationException("Failed to generate low-stock purchase orders", ex);
         }
+    }
+
+    [Queue("default")]
+    public async Task GenerateCriticalStockPurchaseOrders()
+    {
+        if (_purchaseOrderService == null)
+        {
+            _logger.LogWarning("PurchaseOrderService not configured, skipping critical-stock PO generation");
+            return;
+        }
+
+        try
+        {
+            var generatedOrders = await _purchaseOrderService.GeneratePurchaseOrdersForCriticalStockAsync();
+            var orderCount = generatedOrders.Count();
+
+            if (orderCount > 0)
+            {
+                _logger.LogInformation("Generated {Count} purchase orders for critical-stock products", orderCount);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to generate critical-stock purchase orders");
+            throw new InvalidOperationException("Failed to generate critical-stock purchase orders", ex);
+        }
+    }
+
+    public void Dispose()
+    {
+        _server?.Dispose();
+        _server = null;
     }
 }

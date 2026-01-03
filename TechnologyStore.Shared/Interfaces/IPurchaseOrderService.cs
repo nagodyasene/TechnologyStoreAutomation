@@ -26,6 +26,13 @@ public interface IPurchaseOrderService
     /// </summary>
     /// <returns>List of generated purchase orders</returns>
     Task<IEnumerable<PurchaseOrder>> GeneratePurchaseOrdersForLowStockAsync();
+
+    /// <summary>
+    /// Scans all products for critical stock (RunwayDays &lt;= CriticalRunwayDays)
+    /// and generates purchase orders for products with assigned suppliers.
+    /// Intended to run frequently so managers/admins can approve promptly.
+    /// </summary>
+    Task<IEnumerable<PurchaseOrder>> GeneratePurchaseOrdersForCriticalStockAsync();
     
     /// <summary>
     /// Creates a manual purchase order for specific products

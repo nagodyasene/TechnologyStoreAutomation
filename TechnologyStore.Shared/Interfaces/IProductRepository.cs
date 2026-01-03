@@ -61,4 +61,9 @@ public interface IProductRepository
     /// Release reserved stock (e.g., on order cancellation)
     /// </summary>
     Task ReleaseStockAsync(int productId, int quantity);
+
+    /// <summary>
+    /// Assigns a supplier to one or more products (sets products.supplier_id).
+    /// </summary>
+    Task AssignSupplierAsync(IEnumerable<int> productIds, int supplierId);
 }

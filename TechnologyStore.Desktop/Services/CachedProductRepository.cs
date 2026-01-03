@@ -212,6 +212,13 @@ public class CachedProductRepository : IProductRepository
         _logger.LogDebug("Stock released and caches invalidated for product {ProductId}", productId);
     }
 
+    public async Task AssignSupplierAsync(IEnumerable<int> productIds, int supplierId)
+    {
+        await _innerRepository.AssignSupplierAsync(productIds, supplierId);
+        InvalidateProductCaches();
+        _logger.LogDebug("Supplier {SupplierId} assigned to products and caches invalidated", supplierId);
+    }
+
     #region Cache Invalidation
 
     /// <summary>

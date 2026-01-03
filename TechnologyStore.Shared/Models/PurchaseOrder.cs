@@ -67,6 +67,11 @@ public class PurchaseOrder
     /// Line items in this purchase order
     /// </summary>
     public List<PurchaseOrderItem> Items { get; set; } = new();
+
+    /// <summary>
+    /// Optional item count for list views when items are not loaded.
+    /// </summary>
+    public int ItemCount { get; set; }
 }
 
 /// <summary>

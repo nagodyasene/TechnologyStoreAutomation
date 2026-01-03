@@ -90,7 +90,8 @@ public partial class SalesReportForm : Form
             Location = new Point(130, yPos),
             Width = 150,
             Format = DateTimePickerFormat.Short,
-            Value = DateTime.Today
+            Value = DateTime.Today,
+            MaxDate = DateTime.Today
         };
         this.Controls.Add(_dtpStartDate);
 
@@ -104,6 +105,7 @@ public partial class SalesReportForm : Form
             Width = 150,
             Format = DateTimePickerFormat.Short,
             Value = DateTime.Today,
+            MaxDate = DateTime.Today,
             Enabled = false // Only enabled for custom range
         };
         this.Controls.Add(_dtpEndDate);
@@ -196,10 +198,54 @@ public partial class SalesReportForm : Form
 
     private void CmbReportType_SelectedIndexChanged(object? sender, EventArgs e)
     {
-        // Enable end date only for custom range
-        if (_dtpEndDate != null && _cmbReportType != null)
+        ApplyReportTypeDateBehavior();
+    }
+
+    private void ApplyReportTypeDateBehavior()
+    {
+        if (_dtpStartDate == null || _dtpEndDate == null || _cmbReportType == null) return;
+
+        var today = DateTime.Today;
+        _dtpStartDate.MaxDate = today;
+        _dtpEndDate.MaxDate = today;
+
+        var reportType = _cmbReportType.SelectedItem?.ToString();
+
+        switch (reportType)
         {
-            _dtpEndDate.Enabled = _cmbReportType.SelectedItem?.ToString() == CustomRangeOption;
+            case "Weekly":
+                // Rolling last 7 days ending today (inclusive)
+                _dtpStartDate.Value = today.AddDays(-6);
+                _dtpEndDate.Value = today;
+                _dtpStartDate.Enabled = false;
+                _dtpEndDate.Enabled = false;
+                break;
+
+            case "Monthly":
+                // Rolling last 30 days ending today (inclusive)
+                _dtpStartDate.Value = today.AddDays(-29);
+                _dtpEndDate.Value = today;
+                _dtpStartDate.Enabled = false;
+                _dtpEndDate.Enabled = false;
+                break;
+
+            case CustomRangeOption:
+                // Allow manual range selection, but never allow future dates
+                _dtpStartDate.Enabled = true;
+                _dtpEndDate.Enabled = true;
+
+                if (_dtpStartDate.Value.Date > today) _dtpStartDate.Value = today;
+                if (_dtpEndDate.Value.Date > today) _dtpEndDate.Value = today;
+                if (_dtpEndDate.Value.Date < _dtpStartDate.Value.Date) _dtpEndDate.Value = _dtpStartDate.Value.Date;
+                break;
+
+            default:
+                // Daily (and fallback): pick a single date (no future)
+                _dtpStartDate.Enabled = true;
+                _dtpEndDate.Enabled = false;
+                _dtpEndDate.Value = _dtpStartDate.Value.Date > today ? today : _dtpStartDate.Value.Date;
+                if (_dtpStartDate.Value.Date > today) _dtpStartDate.Value = today;
+                break;
         }
     }
 
@@ -213,15 +259,52 @@ public partial class SalesReportForm : Form
         try
         {
             var reportType = _cmbReportType.SelectedItem?.ToString();
+            var today = DateTime.Today;
+
+            // Determine the actual query range (and prevent future dates).
+            DateTime startDate;
+            DateTime endDate;
+
+            switch (reportType)
+            {
+                case "Weekly":
+                    endDate = today;
+                    startDate = today.AddDays(-6);
+                    break;
+                case "Monthly":
+                    endDate = today;
+                    startDate = today.AddDays(-29);
+                    break;
+                case CustomRangeOption:
+                    startDate = _dtpStartDate.Value.Date;
+                    endDate = _dtpEndDate.Value.Date;
+                    if (startDate > today || endDate > today)
+                        throw new ArgumentException("Date ranges cannot include future dates.");
+                    if (startDate > endDate)
+                        throw new ArgumentException("Start date cannot be later than end date.");
+                    break;
+                default:
+                    startDate = _dtpStartDate.Value.Date;
+                    if (startDate > today)
+                        throw new ArgumentException("Date cannot be in the future.");
+                    endDate = startDate;
+                    break;
+            }
 
             _currentReport = reportType switch
             {
-                "Daily" => await _reportService.GetDailyReportAsync(_dtpStartDate.Value.Date),
-                "Weekly" => await _reportService.GetWeeklyReportAsync(_dtpStartDate.Value.Date),
-                "Monthly" => await _reportService.GetMonthlyReportAsync(_dtpStartDate.Value.Year, _dtpStartDate.Value.Month),
-                CustomRangeOption => await _reportService.GetCustomRangeReportAsync(_dtpStartDate.Value.Date, _dtpEndDate.Value.Date),
-                _ => await _reportService.GetDailyReportAsync(_dtpStartDate.Value.Date)
+                // Always drive via explicit date ranges so behavior is unambiguous.
+                "Weekly" => await _reportService.GetCustomRangeReportAsync(startDate, endDate),
+                "Monthly" => await _reportService.GetCustomRangeReportAsync(startDate, endDate),
+                CustomRangeOption => await _reportService.GetCustomRangeReportAsync(startDate, endDate),
+                _ => await _reportService.GetDailyReportAsync(startDate)
             };
+
+            // Ensure report type label matches UI selection
+            if (_currentReport != null && reportType is "Weekly" or "Monthly")
+            {
+                _currentReport.ReportType = reportType!;
+            }
 
             DisplayReport(_currentReport);
 
@@ -302,9 +385,10 @@ public partial class SalesReportForm : Form
     private void SetFormEnabled(bool enabled)
     {
         if (_cmbReportType != null) _cmbReportType.Enabled = enabled;
-        if (_dtpStartDate != null) _dtpStartDate.Enabled = enabled;
-        if (_dtpEndDate != null && _cmbReportType?.SelectedItem?.ToString() == CustomRangeOption)
-            _dtpEndDate.Enabled = enabled;
+        if (enabled)
+        {
+            ApplyReportTypeDateBehavior();
+        }
         if (_btnGenerate != null)
         {
             _btnGenerate.Enabled = enabled;

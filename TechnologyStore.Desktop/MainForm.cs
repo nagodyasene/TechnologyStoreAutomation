@@ -45,6 +45,7 @@ namespace TechnologyStore.Desktop
         private ToolStripStatusLabel? _lblStatus;
         private ToolStripStatusLabel? _lblUser;
         private MenuStrip? _mainMenuStrip;
+        private ToolStripMenuItem? _assignSupplierMenuItem;
 
         private const string ErrorTitle = "Error";
 
@@ -149,6 +150,7 @@ namespace TechnologyStore.Desktop
             _gridInventory.Dock = DockStyle.Fill;
             _gridInventory.AutoGenerateColumns = false;
             _gridInventory.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            _gridInventory.MultiSelect = true;
             _gridInventory.ReadOnly = true;
             _gridInventory.AllowUserToAddRows = false;
             _gridInventory.RowHeadersVisible = false;
@@ -191,6 +193,111 @@ namespace TechnologyStore.Desktop
             this.Controls.Add(_gridInventory);
             this.MainMenuStrip = _mainMenuStrip;
             this.Controls.Add(_mainMenuStrip);
+
+            // Admin-only: allow selecting products and assigning supplier
+            if (_authService.IsAdmin)
+            {
+                AttachInventoryContextMenu();
+            }
+        }
+
+        private void AttachInventoryContextMenu()
+        {
+            if (_gridInventory == null) return;
+
+            var ctx = new ContextMenuStrip();
+            _assignSupplierMenuItem = new ToolStripMenuItem("Assign Supplier…", null,
+                async (_, _) => await AssignSupplierToSelectedProductsAsync());
+            ctx.Items.Add(_assignSupplierMenuItem);
+
+            ctx.Opening += (_, e) =>
+            {
+                var hasSelection = _gridInventory.SelectedRows.Count > 0;
+                if (_assignSupplierMenuItem != null) _assignSupplierMenuItem.Enabled = hasSelection;
+                e.Cancel = !hasSelection;
+            };
+
+            _gridInventory.ContextMenuStrip = ctx;
+        }
+
+        private async Task AssignSupplierToSelectedProductsAsync()
+        {
+            if (_gridInventory == null) return;
+
+            var selectedProductIds = _gridInventory.SelectedRows
+                .Cast<DataGridViewRow>()
+                .Select(r => r.DataBoundItem as ProductDashboardDto)
+                .Where(dto => dto != null)
+                .Select(dto => dto!.Id)
+                .Distinct()
+                .ToList();
+
+            if (selectedProductIds.Count == 0)
+            {
+                MessageBox.Show("Please select one or more products first.", "Assign Supplier",
+                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            var suppliers = (await _supplierRepository.GetAllAsync(activeOnly: true)).ToList();
+            if (suppliers.Count == 0)
+            {
+                MessageBox.Show("No active suppliers found. Please create a supplier first.", "Assign Supplier",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            using var dialog = new SupplierPickerDialog(suppliers, selectedProductIds.Count);
+            if (dialog.ShowDialog(this) != DialogResult.OK) return;
+
+            var supplierId = dialog.SelectedSupplierId;
+            if (!supplierId.HasValue) return;
+
+            await _repository.AssignSupplierAsync(selectedProductIds, supplierId.Value);
+            await LoadDashboardData();
+
+            MessageBox.Show($"Assigned supplier to {selectedProductIds.Count} product(s).", "Assign Supplier",
+                MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private sealed class SupplierPickerDialog : Form
+        {
+            private readonly ComboBox _cmbSuppliers = new();
+            public int? SelectedSupplierId => _cmbSuppliers.SelectedValue is int id ? id : null;
+
+            public SupplierPickerDialog(IReadOnlyList<Supplier> suppliers, int selectedProductCount)
+            {
+                Text = "Assign Supplier";
+                StartPosition = FormStartPosition.CenterParent;
+                FormBorderStyle = FormBorderStyle.FixedDialog;
+                MaximizeBox = false;
+                MinimizeBox = false;
+                Width = 420;
+                Height = 180;
+
+                var lbl = new Label
+                {
+                    Text = $"Assign supplier to {selectedProductCount} selected product(s):",
+                    AutoSize = true,
+                    Left = 15,
+                    Top = 15
+                };
+
+                _cmbSuppliers.DropDownStyle = ComboBoxStyle.DropDownList;
+                _cmbSuppliers.Left = 15;
+                _cmbSuppliers.Top = 45;
+                _cmbSuppliers.Width = 370;
+                _cmbSuppliers.DataSource = suppliers.ToList();
+                _cmbSuppliers.DisplayMember = "Name";
+                _cmbSuppliers.ValueMember = "Id";
+
+                var btnOk = new Button { Text = "OK", DialogResult = DialogResult.OK, Width = 90, Left = 205, Top = 85 };
+                var btnCancel = new Button { Text = "Cancel", DialogResult = DialogResult.Cancel, Width = 90, Left = 295, Top = 85 };
+
+                Controls.AddRange(new Control[] { lbl, _cmbSuppliers, btnOk, btnCancel });
+                AcceptButton = btnOk;
+                CancelButton = btnCancel;
+            }
         }
 
         private void SetupMenuStrip()
@@ -219,6 +326,10 @@ namespace TechnologyStore.Desktop
             {
                 var purchaseOrdersItem = new ToolStripMenuItem("&Purchase Orders", null, BtnPurchaseOrders_Click);
                 ordersMenu.DropDownItems.Add(purchaseOrdersItem);
+
+                ordersMenu.DropDownItems.Add(new ToolStripSeparator());
+                var generateCriticalPosItem = new ToolStripMenuItem("Generate &Critical POs Now", null, BtnGenerateCriticalPurchaseOrders_Click);
+                ordersMenu.DropDownItems.Add(generateCriticalPosItem);
             }
 
             // Suppliers Menu (Admin only)
@@ -285,16 +396,17 @@ namespace TechnologyStore.Desktop
                 if (_lblStatus != null) _lblStatus.Text = "Refreshing data...";
 
                 var data = await _repository.GetDashboardDataAsync();
+                var dedupedData = DeduplicateDashboardRows(data);
 
                 if (_gridInventory != null)
                 {
                     if (_gridInventory.InvokeRequired)
                     {
-                        _gridInventory.Invoke(new Action(() => _gridInventory.DataSource = data));
+                        _gridInventory.Invoke(new Action(() => _gridInventory.DataSource = dedupedData));
                     }
                     else
                     {
-                        _gridInventory.DataSource = data;
+                        _gridInventory.DataSource = dedupedData;
                     }
 
                     ColorRows();
@@ -308,6 +420,26 @@ namespace TechnologyStore.Desktop
                 MessageBox.Show($"Error loading data: {ex.Message}\n\nPlease check your database connection.",
                     "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private static List<ProductDashboardDto> DeduplicateDashboardRows(IEnumerable<ProductDashboardDto> data)
+        {
+            // The DB can contain multiple product rows with the same display name/category/phase
+            // (e.g., duplicated seed data). The dashboard grid doesn't show SKU/ID, so collapse those
+            // duplicates to a single visible row to avoid confusing users.
+            //
+            // We keep the row with the highest stock (then highest 7-day sales) to make the result stable.
+            static string Norm(string? s) => (s ?? string.Empty).Trim();
+
+            return data
+                .GroupBy(d => (Name: Norm(d.Name), Category: Norm(d.Category), Phase: Norm(d.Phase)))
+                .Select(g => g
+                    .OrderByDescending(x => x.CurrentStock)
+                    .ThenByDescending(x => x.SalesLast7Days)
+                    .First())
+                .OrderBy(d => d.Category)
+                .ThenBy(d => d.Name)
+                .ToList();
         }
 
         private void ColorRows()
@@ -610,6 +742,50 @@ namespace TechnologyStore.Desktop
             {
                 GlobalExceptionHandler.ReportException(ex, "Supplier Management");
                 MessageBox.Show($"Error opening supplier management: {ex.Message}", ErrorTitle,
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private async void BtnGenerateCriticalPurchaseOrders_Click(object? sender, EventArgs e)
+        {
+            if (!_authService.IsAdmin)
+            {
+                MessageBox.Show("Only administrators can access this feature.", "Access Denied",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            try
+            {
+                if (_lblStatus != null) _lblStatus.Text = "Generating critical purchase orders...";
+
+                var generated = (await _purchaseOrderService.GeneratePurchaseOrdersForCriticalStockAsync()).ToList();
+
+                if (_lblStatus != null) _lblStatus.Text = "Ready";
+
+                if (generated.Count == 0)
+                {
+                    MessageBox.Show("No critical-stock products required new purchase orders right now.",
+                        "Generate Critical POs", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
+                var openNow = MessageBox.Show(
+                    $"Generated {generated.Count} purchase order(s) (Pending approval).\n\nOpen Purchase Orders now?",
+                    "Generate Critical POs",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Information);
+
+                if (openNow == DialogResult.Yes)
+                {
+                    var poForm = new PurchaseOrdersForm(_purchaseOrderService, _authService);
+                    poForm.ShowDialog();
+                }
+            }
+            catch (Exception ex)
+            {
+                GlobalExceptionHandler.ReportException(ex, "Generate Critical Purchase Orders");
+                MessageBox.Show($"Failed to generate critical purchase orders: {ex.Message}", ErrorTitle,
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }

@@ -56,4 +56,10 @@ public interface IPurchaseOrderRepository
     /// Generates a unique purchase order number (e.g., "PO-2024-00001")
     /// </summary>
     Task<string> GenerateOrderNumberAsync();
+
+    /// <summary>
+    /// Returns product IDs that are already part of an "open" purchase order for the supplier
+    /// (PENDING/APPROVED/SENT). Used to prevent generating duplicate orders.
+    /// </summary>
+    Task<HashSet<int>> GetOpenProductIdsForSupplierAsync(int supplierId);
 }

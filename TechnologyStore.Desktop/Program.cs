@@ -66,6 +66,14 @@ namespace TechnologyStore.Desktop
 
             // Initialize background job service
             InitializeBackgroundJobs(serviceProvider);
+            // Ensure background job server is disposed on application exit
+            Application.ApplicationExit += (_, _) =>
+            {
+                if (serviceProvider is IDisposable disposable)
+                {
+                    disposable.Dispose();
+                }
+            };
 
             // Start the Windows Forms application
             ApplicationConfiguration.Initialize();

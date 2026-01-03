@@ -89,8 +89,8 @@ public class PurchaseOrderRepository : IPurchaseOrderRepository
                    po.created_at as CreatedAt, po.approved_at as ApprovedAt, 
                    po.approved_by_user_id as ApprovedByUserId,
                    po.sent_at as SentAt, po.received_at as ReceivedAt,
-                   po.expected_delivery_date as ExpectedDeliveryDate,
-                   s.id as Id, s.name as Name, s.email as Email, s.phone as Phone,
+                   po.expected_delivery_date::timestamp as ExpectedDeliveryDate,
+                   s.id as SupplierId, s.name as Name, s.email as Email, s.phone as Phone,
                    s.contact_person as ContactPerson
             FROM purchase_orders po
             LEFT JOIN suppliers s ON po.supplier_id = s.id
@@ -107,7 +107,7 @@ public class PurchaseOrderRepository : IPurchaseOrderRepository
                 return order;
             },
             new { Id = id },
-            splitOn: "Id");
+            splitOn: "SupplierId");
 
         if (!orderDict.TryGetValue(id, out var purchaseOrder))
             return null;
@@ -145,8 +145,15 @@ public class PurchaseOrderRepository : IPurchaseOrderRepository
                    po.status::text as StatusText, po.total_amount as TotalAmount, po.notes as Notes,
                    po.created_at as CreatedAt, po.approved_at as ApprovedAt, 
                    po.sent_at as SentAt, po.received_at as ReceivedAt,
+                   po.expected_delivery_date::timestamp as ExpectedDeliveryDate,
+                   COALESCE(poi_counts.ItemCount, 0) as ItemCount,
                    s.name as SupplierName
             FROM purchase_orders po
+            LEFT JOIN (
+                SELECT purchase_order_id, COUNT(*)::int as ItemCount
+                FROM purchase_order_items
+                GROUP BY purchase_order_id
+            ) poi_counts ON poi_counts.purchase_order_id = po.id
             LEFT JOIN suppliers s ON po.supplier_id = s.id";
 
         if (statusFilter.HasValue)
@@ -156,23 +163,50 @@ public class PurchaseOrderRepository : IPurchaseOrderRepository
 
         sql += " ORDER BY po.created_at DESC";
 
-        var results = await db.QueryAsync<dynamic>(sql, 
+        var results = await db.QueryAsync<PurchaseOrderListRow>(sql,
             statusFilter.HasValue ? new { Status = statusFilter.Value.ToString().ToUpper() } : null);
 
-        return results.Select(r => new PurchaseOrder
+        return results.Select(r =>
         {
-            Id = r.Id,
-            OrderNumber = r.OrderNumber,
-            SupplierId = r.SupplierId,
-            Status = Enum.Parse<PurchaseOrderStatus>(r.StatusText, ignoreCase: true),
-            TotalAmount = r.TotalAmount,
-            Notes = r.Notes,
-            CreatedAt = r.CreatedAt,
-            ApprovedAt = r.ApprovedAt,
-            SentAt = r.SentAt,
-            ReceivedAt = r.ReceivedAt,
-            Supplier = new Supplier { Id = r.SupplierId, Name = r.SupplierName ?? "", Email = "" }
+            // Defensive: some environments may have legacy rows with NULL supplier_id.
+            // Don't crash the UI; show them as unassigned.
+            var supplierId = r.SupplierId ?? 0;
+            return new PurchaseOrder
+            {
+                Id = r.Id,
+                OrderNumber = r.OrderNumber ?? string.Empty,
+                SupplierId = supplierId,
+                Status = Enum.TryParse<PurchaseOrderStatus>(r.StatusText ?? "PENDING", true, out var st) ? st : PurchaseOrderStatus.Pending,
+                TotalAmount = r.TotalAmount,
+                Notes = r.Notes,
+                CreatedAt = r.CreatedAt,
+                ApprovedAt = r.ApprovedAt,
+                SentAt = r.SentAt,
+                ReceivedAt = r.ReceivedAt,
+                ExpectedDeliveryDate = r.ExpectedDeliveryDate,
+                ItemCount = r.ItemCount,
+                Supplier = supplierId > 0
+                    ? new Supplier { Id = supplierId, Name = r.SupplierName ?? string.Empty, Email = string.Empty }
+                    : null
+            };
         }).ToList();
+    }
+
+    private sealed class PurchaseOrderListRow
+    {
+        public int Id { get; init; }
+        public string? OrderNumber { get; init; }
+        public int? SupplierId { get; init; }
+        public string? StatusText { get; init; }
+        public decimal TotalAmount { get; init; }
+        public string? Notes { get; init; }
+        public DateTime CreatedAt { get; init; }
+        public DateTime? ApprovedAt { get; init; }
+        public DateTime? SentAt { get; init; }
+        public DateTime? ReceivedAt { get; init; }
+        public DateTime? ExpectedDeliveryDate { get; init; }
+        public int ItemCount { get; init; }
+        public string? SupplierName { get; init; }
     }
 
     /// <inheritdoc />
@@ -315,5 +349,24 @@ public class PurchaseOrderRepository : IPurchaseOrderRepository
         var sequence = await db.ExecuteScalarAsync<long>(sql);
 
         return $"PO-{DateTime.UtcNow:yyyy}-{sequence:D5}";
+    }
+
+    public async Task<HashSet<int>> GetOpenProductIdsForSupplierAsync(int supplierId)
+    {
+        using var db = CreateConnection();
+
+        const string sql = @"
+            SELECT DISTINCT poi.product_id
+            FROM purchase_order_items poi
+            JOIN purchase_orders po ON po.id = poi.purchase_order_id
+            WHERE po.supplier_id = @SupplierId
+              AND po.status IN (
+                'PENDING'::purchase_order_status,
+                'APPROVED'::purchase_order_status,
+                'SENT'::purchase_order_status
+              )";
+
+        var ids = await db.QueryAsync<int>(sql, new { SupplierId = supplierId });
+        return ids.ToHashSet();
     }
 }

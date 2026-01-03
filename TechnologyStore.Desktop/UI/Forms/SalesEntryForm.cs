@@ -197,11 +197,17 @@ public partial class SalesEntryForm : Form
         try
         {
             var products = await _repository.GetAllProductsAsync();
-            var activeProducts = products.Where(p => p.LifecyclePhase == "ACTIVE" || p.LifecyclePhase == "LEGACY").ToList();
+            var activeProducts = products
+                .Where(p => p.LifecyclePhase == "ACTIVE" || p.LifecyclePhase == "LEGACY")
+                .ToList();
+
+            // De-dupe by display name so the dropdown doesn't show repeated items when the DB contains duplicates.
+            // Keep the "best" candidate deterministically (highest stock, then most recently updated).
+            var dedupedProducts = DeduplicateProductsForDropdown(activeProducts);
 
             if (_cmbProduct != null)
             {
-                _cmbProduct.DataSource = activeProducts;
+                _cmbProduct.DataSource = dedupedProducts;
                 _cmbProduct.DisplayMember = "Name";
                 _cmbProduct.ValueMember = "Id";
             }
@@ -210,6 +216,20 @@ public partial class SalesEntryForm : Form
         {
             MessageBox.Show($"Error loading products: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
+    }
+
+    private static List<Product> DeduplicateProductsForDropdown(IEnumerable<Product> products)
+    {
+        static string Norm(string? s) => (s ?? string.Empty).Trim();
+
+        return products
+            .GroupBy(p => Norm(p.Name))
+            .Select(g => g
+                .OrderByDescending(x => x.CurrentStock)
+                .ThenByDescending(x => x.LastUpdated)
+                .First())
+            .OrderBy(p => p.Name)
+            .ToList();
     }
 
     private void CmbProduct_SelectedIndexChanged(object? sender, EventArgs e)

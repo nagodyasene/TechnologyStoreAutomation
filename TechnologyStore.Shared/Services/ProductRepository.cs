@@ -440,4 +440,28 @@ public class ProductRepository : IProductRepository
             await db.ExecuteAsync(sql, new { ProductId = productId, Quantity = quantity });
         }
     }
+
+    public async Task AssignSupplierAsync(IEnumerable<int> productIds, int supplierId)
+    {
+        if (productIds == null) throw new ArgumentNullException(nameof(productIds));
+        var ids = productIds.Distinct().ToArray();
+        if (ids.Length == 0) return;
+        if (supplierId <= 0) throw new ArgumentOutOfRangeException(nameof(supplierId), "Supplier ID must be a positive integer.");
+
+        await ExecuteWithRetryAsync(async () =>
+        {
+            using (var db = CreateConnection())
+            {
+                const string sql = @"
+                    UPDATE products
+                    SET supplier_id = @SupplierId,
+                        last_updated = CURRENT_TIMESTAMP
+                    WHERE id = ANY(@ProductIds);";
+
+                await db.ExecuteAsync(sql, new { SupplierId = supplierId, ProductIds = ids }).ConfigureAwait(false);
+                _logger.LogInformation("Assigned supplier {SupplierId} to {Count} product(s)", supplierId, ids.Length);
+                return true;
+            }
+        }, nameof(AssignSupplierAsync)).ConfigureAwait(false);
+    }
 }
