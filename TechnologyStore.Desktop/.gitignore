@@ -1,4 +1,7 @@
 /TechnologyStoreAutomation/bin/
 /TechnologyStoreAutomation/obj/
 .env
-
+./vsCode/
+./vs/*
+.vs/
+.vs/*

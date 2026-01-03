@@ -29,7 +29,17 @@ public class TimeTrackingRepository : ITimeTrackingRepository
             RETURNING id, created_at";
 
         using var connection = CreateConnection();
-        var result = await connection.QuerySingleAsync<dynamic>(sql, entry);
+        // Dapper sends enums as integers by default; Postgres time_entry_type is an enum of TEXT values.
+        // Always pass the enum as its upper-case string name so `@EventType::time_entry_type` casts correctly.
+        var args = new
+        {
+            entry.UserId,
+            EventType = ToDbEventType(entry.EventType),
+            entry.Timestamp,
+            entry.Notes,
+            entry.IsManualEntry
+        };
+        var result = await connection.QuerySingleAsync<dynamic>(sql, args);
 
         entry.Id = result.id;
         entry.CreatedAt = result.created_at;
@@ -45,7 +55,21 @@ public class TimeTrackingRepository : ITimeTrackingRepository
         var end = start.AddDays(1);
 
         const string sql = @"
-            SELECT * FROM time_entries
+            SELECT
+                id as Id,
+                user_id as UserId,
+                CASE event_type::text
+                    WHEN 'CLOCK_IN' THEN 'ClockIn'
+                    WHEN 'CLOCK_OUT' THEN 'ClockOut'
+                    WHEN 'START_LUNCH' THEN 'StartLunch'
+                    WHEN 'END_LUNCH' THEN 'EndLunch'
+                    ELSE 'ClockIn'
+                END as EventType,
+                timestamp as Timestamp,
+                notes as Notes,
+                is_manual_entry as IsManualEntry,
+                created_at as CreatedAt
+            FROM time_entries
             WHERE user_id = @UserId 
             AND timestamp >= @Start AND timestamp < @End
             ORDER BY timestamp";
@@ -57,7 +81,21 @@ public class TimeTrackingRepository : ITimeTrackingRepository
     public async Task<IEnumerable<TimeEntry>> GetHistoryAsync(int userId, DateTime startDate, DateTime endDate)
     {
         const string sql = @"
-            SELECT * FROM time_entries
+            SELECT
+                id as Id,
+                user_id as UserId,
+                CASE event_type::text
+                    WHEN 'CLOCK_IN' THEN 'ClockIn'
+                    WHEN 'CLOCK_OUT' THEN 'ClockOut'
+                    WHEN 'START_LUNCH' THEN 'StartLunch'
+                    WHEN 'END_LUNCH' THEN 'EndLunch'
+                    ELSE 'ClockIn'
+                END as EventType,
+                timestamp as Timestamp,
+                notes as Notes,
+                is_manual_entry as IsManualEntry,
+                created_at as CreatedAt
+            FROM time_entries
             WHERE user_id = @UserId 
             AND timestamp BETWEEN @StartDate AND @EndDate
             ORDER BY timestamp DESC";
@@ -69,7 +107,21 @@ public class TimeTrackingRepository : ITimeTrackingRepository
     public async Task<TimeEntry?> GetLastEventAsync(int userId)
     {
         const string sql = @"
-            SELECT * FROM time_entries
+            SELECT
+                id as Id,
+                user_id as UserId,
+                CASE event_type::text
+                    WHEN 'CLOCK_IN' THEN 'ClockIn'
+                    WHEN 'CLOCK_OUT' THEN 'ClockOut'
+                    WHEN 'START_LUNCH' THEN 'StartLunch'
+                    WHEN 'END_LUNCH' THEN 'EndLunch'
+                    ELSE 'ClockIn'
+                END as EventType,
+                timestamp as Timestamp,
+                notes as Notes,
+                is_manual_entry as IsManualEntry,
+                created_at as CreatedAt
+            FROM time_entries
             WHERE user_id = @UserId
             ORDER BY timestamp DESC
             LIMIT 1";
@@ -89,6 +141,24 @@ public class TimeTrackingRepository : ITimeTrackingRepository
             WHERE id = @Id";
 
         using var connection = CreateConnection();
-        await connection.ExecuteAsync(sql, entry);
+        var args = new
+        {
+            entry.Id,
+            entry.Timestamp,
+            EventType = ToDbEventType(entry.EventType),
+            entry.Notes,
+            entry.IsManualEntry
+        };
+        await connection.ExecuteAsync(sql, args);
     }
+
+    private static string ToDbEventType(TimeEntryType type) =>
+        type switch
+        {
+            TimeEntryType.ClockIn => "CLOCK_IN",
+            TimeEntryType.ClockOut => "CLOCK_OUT",
+            TimeEntryType.StartLunch => "START_LUNCH",
+            TimeEntryType.EndLunch => "END_LUNCH",
+            _ => throw new ArgumentOutOfRangeException(nameof(type), type, "Unsupported time entry type")
+        };
 }

@@ -77,7 +77,23 @@ public static class ServiceConfiguration
         services.AddSingleton(appSettings.BusinessRules);
         services.AddSingleton(appSettings.VisitorPrediction);
         services.AddSingleton(appSettings.Application);
+        
+        // Register Desktop EmailSettings for SettingsForm and other Desktop components
         services.AddSingleton(appSettings.Email);
+        
+        // Register Shared EmailSettings for GmailEmailService (map from Desktop settings)
+        // This creates a synchronized mapping so changes to Desktop settings are reflected in Shared settings
+        services.AddSingleton<TechnologyStore.Shared.Config.EmailSettings>(sp =>
+        {
+            var desktopEmailSettings = sp.GetRequiredService<EmailSettings>();
+            return new TechnologyStore.Shared.Config.EmailSettings
+            {
+                TestMode = desktopEmailSettings.TestMode,
+                SenderEmail = desktopEmailSettings.SenderEmail,
+                GmailCredentialsPath = desktopEmailSettings.GmailCredentialsPath,
+                TokenStorePath = desktopEmailSettings.TokenStorePath
+            };
+        });
 
         // Register logging from configuration
         services.AddLogging(builder =>

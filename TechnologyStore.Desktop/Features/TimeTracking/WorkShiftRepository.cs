@@ -29,7 +29,18 @@ public class WorkShiftRepository : IWorkShiftRepository
             RETURNING id, created_at";
 
         using var connection = CreateConnection();
-        var result = await connection.QuerySingleAsync<dynamic>(sql, shift);
+        // Dapper sends enums as integers by default; Postgres shift_status is an enum of TEXT values.
+        // Always pass the enum as its upper-case string name so `@Status::shift_status` casts correctly.
+        var args = new
+        {
+            shift.UserId,
+            shift.StartTime,
+            shift.EndTime,
+            Status = shift.Status.ToString().ToUpperInvariant(),
+            shift.Notes,
+            shift.CreatedBy
+        };
+        var result = await connection.QuerySingleAsync<dynamic>(sql, args);
 
         shift.Id = result.id;
         shift.CreatedAt = result.created_at;
@@ -41,7 +52,16 @@ public class WorkShiftRepository : IWorkShiftRepository
     public async Task<WorkShift?> GetByIdAsync(int id)
     {
         const string sql = @"
-            SELECT ws.*, u.full_name as EmployeeName
+            SELECT
+                ws.id as Id,
+                ws.user_id as UserId,
+                ws.start_time as StartTime,
+                ws.end_time as EndTime,
+                ws.status::text as Status,
+                ws.notes as Notes,
+                ws.created_at as CreatedAt,
+                ws.created_by as CreatedBy,
+                u.full_name as EmployeeName
             FROM work_shifts ws
             JOIN users u ON ws.user_id = u.id
             WHERE ws.id = @Id";
@@ -53,7 +73,16 @@ public class WorkShiftRepository : IWorkShiftRepository
     public async Task<IEnumerable<WorkShift>> GetByUserAsync(int userId, DateTime startDate, DateTime endDate)
     {
         const string sql = @"
-            SELECT ws.*, u.full_name as EmployeeName
+            SELECT
+                ws.id as Id,
+                ws.user_id as UserId,
+                ws.start_time as StartTime,
+                ws.end_time as EndTime,
+                ws.status::text as Status,
+                ws.notes as Notes,
+                ws.created_at as CreatedAt,
+                ws.created_by as CreatedBy,
+                u.full_name as EmployeeName
             FROM work_shifts ws
             JOIN users u ON ws.user_id = u.id
             WHERE ws.user_id = @UserId 
@@ -67,7 +96,16 @@ public class WorkShiftRepository : IWorkShiftRepository
     public async Task<IEnumerable<WorkShift>> GetAllAsync(DateTime startDate, DateTime endDate)
     {
         const string sql = @"
-            SELECT ws.*, u.full_name as EmployeeName
+            SELECT
+                ws.id as Id,
+                ws.user_id as UserId,
+                ws.start_time as StartTime,
+                ws.end_time as EndTime,
+                ws.status::text as Status,
+                ws.notes as Notes,
+                ws.created_at as CreatedAt,
+                ws.created_by as CreatedBy,
+                u.full_name as EmployeeName
             FROM work_shifts ws
             JOIN users u ON ws.user_id = u.id
             WHERE ws.start_time BETWEEN @StartDate AND @EndDate
@@ -88,7 +126,15 @@ public class WorkShiftRepository : IWorkShiftRepository
             WHERE id = @Id";
 
         using var connection = CreateConnection();
-        await connection.ExecuteAsync(sql, shift);
+        var args = new
+        {
+            shift.Id,
+            shift.StartTime,
+            shift.EndTime,
+            Status = shift.Status.ToString().ToUpperInvariant(),
+            shift.Notes
+        };
+        await connection.ExecuteAsync(sql, args);
     }
 
     public async Task DeleteAsync(int id)

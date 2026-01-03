@@ -41,19 +41,10 @@ namespace TechnologyStore.Desktop
         private readonly IPayrollService _payrollService;
         private readonly Timer _refreshTimer;
         private DataGridView? _gridInventory;
-        private Label? _lblStatus;
-        private Label? _lblUser;
-        private Button? _btnSimulate;
-        private Button? _btnRecordSale;
-        private Button? _btnHealthCheck;
-        private Button? _btnLogout;
-        private Button? _btnLeaveRequest;
-        private Button? _btnLeaveApproval;
-        private Button? _btnReports;
-        private Button? _btnOrders;
-        private Button? _btnSuppliers;
-        private Button? _btnPurchaseOrders;
-        private Button? _btnSettings;
+        private StatusStrip? _statusStrip;
+        private ToolStripStatusLabel? _lblStatus;
+        private ToolStripStatusLabel? _lblUser;
+        private MenuStrip? _mainMenuStrip;
 
         private const string ErrorTitle = "Error";
 
@@ -131,199 +122,27 @@ namespace TechnologyStore.Desktop
             this.Size = new Size(_uiSettings.WindowWidth, _uiSettings.WindowHeight);
             this.Text = _appSettings.Name;
 
-            // Status Label
-            _lblStatus = new Label();
-            _lblStatus.Dock = DockStyle.Bottom;
-            _lblStatus.Height = _uiSettings.StatusBarHeight;
-            _lblStatus.Text = "Ready";
-            this.Controls.Add(_lblStatus);
+            // Create StatusStrip
+            _statusStrip = new StatusStrip();
+            _lblStatus = new ToolStripStatusLabel("Ready");
+            _lblStatus.Spring = true;
+            _lblStatus.TextAlign = ContentAlignment.MiddleLeft;
+            _statusStrip.Items.Add(_lblStatus);
 
-            // Toolbar Panel (create now but add later so docking layout is correct)
-            var toolbar = new Panel();
-            toolbar.Dock = DockStyle.Top;
-            toolbar.Height = _uiSettings.ToolbarHeight;
-            toolbar.BackColor = Color.FromArgb(240, 240, 240);
-            // DO NOT add to Controls yet - add after grid so docking/layout places header below toolbar
-
-            // Record Sale Button
-            _btnRecordSale = new Button();
-            _btnRecordSale.Text = "📝 Record Sale";
-            _btnRecordSale.Location = new Point(10, 8);
-            _btnRecordSale.Size = new Size(140, 35);
-            _btnRecordSale.BackColor = Color.FromArgb(76, 175, 80);
-            _btnRecordSale.ForeColor = Color.White;
-            _btnRecordSale.FlatStyle = FlatStyle.Flat;
-            _btnRecordSale.Click += BtnRecordSale_Click;
-            toolbar.Controls.Add(_btnRecordSale);
-
-            // Simulation Button
-            _btnSimulate = new Button();
-            _btnSimulate.Text = "🚀 Simulate Launch Event";
-            _btnSimulate.Location = new Point(160, 8);
-            _btnSimulate.Size = new Size(180, 35);
-            _btnSimulate.BackColor = Color.FromArgb(33, 150, 243);
-            _btnSimulate.ForeColor = Color.White;
-            _btnSimulate.FlatStyle = FlatStyle.Flat;
-            _btnSimulate.Click += btnSimulateLaunch_Click;
-            toolbar.Controls.Add(_btnSimulate);
-
-            // Refresh Button
-            var btnRefresh = new Button();
-            btnRefresh.Text = "🔄 Refresh";
-            btnRefresh.Location = new Point(350, 8);
-            btnRefresh.Size = new Size(100, 35);
-            btnRefresh.FlatStyle = FlatStyle.Flat;
-            btnRefresh.Click += OnRefreshButtonClick;
-            toolbar.Controls.Add(btnRefresh);
-
-            // Health Check Button
-            _btnHealthCheck = new Button();
-            _btnHealthCheck.Text = "🏥 Health";
-            _btnHealthCheck.Location = new Point(460, 8);
-            _btnHealthCheck.Size = new Size(90, 35);
-            _btnHealthCheck.FlatStyle = FlatStyle.Flat;
-            _btnHealthCheck.Click += BtnHealthCheck_Click;
-            toolbar.Controls.Add(_btnHealthCheck);
-
-            // Logout Button (right-aligned)
-            _btnLogout = new Button();
-            _btnLogout.Text = "🚪 Logout";
-            _btnLogout.Location = new Point(560, 8);
-            _btnLogout.Size = new Size(90, 35);
-            _btnLogout.FlatStyle = FlatStyle.Flat;
-            _btnLogout.BackColor = Color.FromArgb(244, 67, 54);
-            _btnLogout.ForeColor = Color.White;
-            _btnLogout.FlatAppearance.BorderSize = 0;
-            _btnLogout.Click += BtnLogout_Click;
-            toolbar.Controls.Add(_btnLogout);
-
-            // Leave Request Button (visible to all)
-            _btnLeaveRequest = new Button();
-            _btnLeaveRequest.Text = "📅 Leave";
-            _btnLeaveRequest.Location = new Point(660, 8);
-            _btnLeaveRequest.Size = new Size(80, 35);
-            _btnLeaveRequest.FlatStyle = FlatStyle.Flat;
-            _btnLeaveRequest.BackColor = Color.FromArgb(156, 39, 176);
-            _btnLeaveRequest.ForeColor = Color.White;
-            _btnLeaveRequest.FlatAppearance.BorderSize = 0;
-            _btnLeaveRequest.Click += BtnLeaveRequest_Click;
-            toolbar.Controls.Add(_btnLeaveRequest);
-
-            // Leave Approval Button (admin only)
-            if (_authService.IsAdmin)
-            {
-                _btnLeaveApproval = new Button();
-                _btnLeaveApproval.Text = "✅ Approvals";
-                _btnLeaveApproval.Location = new Point(750, 8);
-                _btnLeaveApproval.Size = new Size(100, 35);
-                _btnLeaveApproval.FlatStyle = FlatStyle.Flat;
-                _btnLeaveApproval.BackColor = Color.FromArgb(255, 152, 0);
-                _btnLeaveApproval.ForeColor = Color.White;
-                _btnLeaveApproval.FlatAppearance.BorderSize = 0;
-                _btnLeaveApproval.Click += BtnLeaveApproval_Click;
-                toolbar.Controls.Add(_btnLeaveApproval);
-            }
-
-            // Reports Button
-            _btnReports = new Button();
-            _btnReports.Text = "📊 Reports";
-            _btnReports.Location = new Point(_authService.IsAdmin ? 860 : 750, 8);
-            _btnReports.Size = new Size(90, 35);
-            _btnReports.FlatStyle = FlatStyle.Flat;
-            _btnReports.BackColor = Color.FromArgb(96, 125, 139);
-            _btnReports.ForeColor = Color.White;
-            _btnReports.FlatAppearance.BorderSize = 0;
-            _btnReports.Click += BtnReports_Click;
-            toolbar.Controls.Add(_btnReports);
-
-            // Orders Button
-            _btnOrders = new Button();
-            _btnOrders.Text = "📦 Orders";
-            _btnOrders.Location = new Point(_authService.IsAdmin ? 960 : 850, 8);
-            _btnOrders.Size = new Size(90, 35);
-            _btnOrders.FlatStyle = FlatStyle.Flat;
-            _btnOrders.BackColor = Color.FromArgb(103, 58, 183);
-            _btnOrders.ForeColor = Color.White;
-            _btnOrders.FlatAppearance.BorderSize = 0;
-            _btnOrders.Click += BtnOrders_Click;
-            toolbar.Controls.Add(_btnOrders);
-
-            // Suppliers Button (admin only)
-            if (_authService.IsAdmin)
-            {
-                _btnSuppliers = new Button();
-                _btnSuppliers.Text = "🏭 Suppliers";
-                _btnSuppliers.Location = new Point(1060, 8);
-                _btnSuppliers.Size = new Size(100, 35);
-                _btnSuppliers.FlatStyle = FlatStyle.Flat;
-                _btnSuppliers.BackColor = Color.FromArgb(0, 150, 136);
-                _btnSuppliers.ForeColor = Color.White;
-                _btnSuppliers.FlatAppearance.BorderSize = 0;
-                _btnSuppliers.Click += BtnSuppliers_Click;
-                toolbar.Controls.Add(_btnSuppliers);
-
-                _btnPurchaseOrders = new Button();
-                _btnPurchaseOrders.Text = "📋 POs";
-                _btnPurchaseOrders.Location = new Point(1170, 8);
-                _btnPurchaseOrders.Size = new Size(80, 35);
-                _btnPurchaseOrders.FlatStyle = FlatStyle.Flat;
-                _btnPurchaseOrders.BackColor = Color.FromArgb(255, 87, 34);
-                _btnPurchaseOrders.ForeColor = Color.White;
-                _btnPurchaseOrders.FlatAppearance.BorderSize = 0;
-                _btnPurchaseOrders.Click += BtnPurchaseOrders_Click;
-                toolbar.Controls.Add(_btnPurchaseOrders);
-            }
-
-            // Settings Button
-            _btnSettings = new Button();
-            _btnSettings.Text = "⚙️ Settings";
-            _btnSettings.Location = new Point(_authService.IsAdmin ? 1260 : 950, 8);
-            _btnSettings.Size = new Size(90, 35);
-            _btnSettings.FlatStyle = FlatStyle.Flat;
-            _btnSettings.BackColor = Color.FromArgb(117, 117, 117);
-            _btnSettings.ForeColor = Color.White;
-            _btnSettings.FlatAppearance.BorderSize = 0;
-            _btnSettings.Click += BtnSettings_Click;
-            toolbar.Controls.Add(_btnSettings);
-
-            // Time Clock Button (visible to all)
-            var btnTimeClock = new Button();
-            btnTimeClock.Text = "⏱️ Time Clock";
-            btnTimeClock.Location = new Point(1360, 8);
-            btnTimeClock.Size = new Size(110, 35);
-            btnTimeClock.FlatStyle = FlatStyle.Flat;
-            btnTimeClock.BackColor = Color.FromArgb(0, 188, 212); // Cyan
-            btnTimeClock.ForeColor = Color.White;
-            btnTimeClock.FlatAppearance.BorderSize = 0;
-            btnTimeClock.Click += BtnTimeClock_Click;
-            toolbar.Controls.Add(btnTimeClock);
-
-            // Shift Management (Admin Only)
-            if (_authService.IsAdmin)
-            {
-                var btnShifts = new Button();
-                btnShifts.Text = "📅 Shifts";
-                btnShifts.Location = new Point(1480, 8);
-                btnShifts.Size = new Size(90, 35);
-                btnShifts.FlatStyle = FlatStyle.Flat;
-                btnShifts.BackColor = Color.FromArgb(63, 81, 181); // Indigo
-                btnShifts.ForeColor = Color.White;
-                btnShifts.FlatAppearance.BorderSize = 0;
-                btnShifts.Click += BtnShiftManagement_Click;
-                toolbar.Controls.Add(btnShifts);
-            }
-
-            // User Info Label (right side of toolbar)
-            _lblUser = new Label();
-            _lblUser.Location = new Point(1060, 15);
-            _lblUser.Size = new Size(300, 20);
-            _lblUser.TextAlign = ContentAlignment.MiddleRight;
+            // User Info Label (right side of status bar)
+            _lblUser = new ToolStripStatusLabel();
             if (_authService.CurrentUser != null)
             {
                 var roleIcon = _authService.IsAdmin ? "👑" : "👤";
                 _lblUser.Text = $"{roleIcon} {_authService.CurrentUser.FullName} ({_authService.CurrentUser.Role})";
             }
-            toolbar.Controls.Add(_lblUser);
+            _lblUser.TextAlign = ContentAlignment.MiddleRight;
+            _statusStrip.Items.Add(_lblUser);
+            this.Controls.Add(_statusStrip);
+
+            // Create MenuStrip
+            _mainMenuStrip = new MenuStrip();
+            SetupMenuStrip();
 
             // Grid
             _gridInventory = new DataGridView();
@@ -368,11 +187,89 @@ namespace TechnologyStore.Desktop
             _gridInventory.Columns.Add(new DataGridViewTextBoxColumn
             { HeaderText = "AI Recommendation", DataPropertyName = "Recommendation", FillWeight = 28 });
 
-            // Add grid first, then toolbar so dock layout places the toolbar at the top and grid fills remaining area
+            // Add grid and menu strip
             this.Controls.Add(_gridInventory);
-            this.Controls.Add(toolbar);
+            this.MainMenuStrip = _mainMenuStrip;
+            this.Controls.Add(_mainMenuStrip);
+        }
 
-            // No explicit BringToFront required; docking order now correct
+        private void SetupMenuStrip()
+        {
+            if (_mainMenuStrip == null) return;
+
+            // File Menu
+            var fileMenu = new ToolStripMenuItem("&File");
+            var recordSaleItem = new ToolStripMenuItem("&Record Sale", null, BtnRecordSale_Click);
+            var refreshItem = new ToolStripMenuItem("&Refresh", null, OnRefreshButtonClick);
+            var separator1 = new ToolStripSeparator();
+            var logoutItem = new ToolStripMenuItem("&Logout", null, BtnLogout_Click);
+            fileMenu.DropDownItems.AddRange(new ToolStripItem[] { recordSaleItem, refreshItem, separator1, logoutItem });
+
+            // Operations Menu
+            var operationsMenu = new ToolStripMenuItem("&Operations");
+            var simulateItem = new ToolStripMenuItem("&Simulate Launch Event", null, btnSimulateLaunch_Click);
+            var healthCheckItem = new ToolStripMenuItem("&Health Check", null, BtnHealthCheck_Click);
+            operationsMenu.DropDownItems.AddRange(new ToolStripItem[] { simulateItem, healthCheckItem });
+
+            // Orders Menu
+            var ordersMenu = new ToolStripMenuItem("&Orders");
+            var ordersItem = new ToolStripMenuItem("&Manage Orders", null, BtnOrders_Click);
+            ordersMenu.DropDownItems.Add(ordersItem);
+            if (_authService.IsAdmin)
+            {
+                var purchaseOrdersItem = new ToolStripMenuItem("&Purchase Orders", null, BtnPurchaseOrders_Click);
+                ordersMenu.DropDownItems.Add(purchaseOrdersItem);
+            }
+
+            // Suppliers Menu (Admin only)
+            ToolStripMenuItem? suppliersMenu = null;
+            if (_authService.IsAdmin)
+            {
+                suppliersMenu = new ToolStripMenuItem("&Suppliers");
+                var suppliersItem = new ToolStripMenuItem("&Manage Suppliers", null, BtnSuppliers_Click);
+                suppliersMenu.DropDownItems.Add(suppliersItem);
+            }
+
+            // Reports Menu
+            var reportsMenu = new ToolStripMenuItem("&Reports");
+            var reportsItem = new ToolStripMenuItem("&Sales Reports", null, BtnReports_Click);
+            reportsMenu.DropDownItems.Add(reportsItem);
+
+            // HR Menu
+            var hrMenu = new ToolStripMenuItem("&HR");
+            var leaveRequestItem = new ToolStripMenuItem("&Leave Request", null, BtnLeaveRequest_Click);
+            hrMenu.DropDownItems.Add(leaveRequestItem);
+            if (_authService.IsAdmin)
+            {
+                var leaveApprovalItem = new ToolStripMenuItem("&Leave Approvals", null, BtnLeaveApproval_Click);
+                hrMenu.DropDownItems.Add(leaveApprovalItem);
+            }
+            var separator2 = new ToolStripSeparator();
+            var timeClockItem = new ToolStripMenuItem("&Time Clock", null, BtnTimeClock_Click);
+            hrMenu.DropDownItems.Add(separator2);
+            hrMenu.DropDownItems.Add(timeClockItem);
+            if (_authService.IsAdmin)
+            {
+                var shiftsItem = new ToolStripMenuItem("&Shift Management", null, BtnShiftManagement_Click);
+                hrMenu.DropDownItems.Add(shiftsItem);
+            }
+
+            // Tools Menu
+            var toolsMenu = new ToolStripMenuItem("&Tools");
+            var settingsItem = new ToolStripMenuItem("&Settings", null, BtnSettings_Click);
+            toolsMenu.DropDownItems.Add(settingsItem);
+
+            // Add all menus to MenuStrip
+            var menuItems = new List<ToolStripItem> { fileMenu, operationsMenu, ordersMenu };
+            if (suppliersMenu != null)
+            {
+                menuItems.Add(suppliersMenu);
+            }
+            menuItems.Add(reportsMenu);
+            menuItems.Add(hrMenu);
+            menuItems.Add(toolsMenu);
+
+            _mainMenuStrip.Items.AddRange(menuItems.ToArray());
         }
 
         protected override async void OnLoad(EventArgs e)
@@ -494,10 +391,11 @@ namespace TechnologyStore.Desktop
 
         private async void BtnHealthCheck_Click(object? sender, EventArgs e)
         {
+            var menuItem = sender as ToolStripMenuItem;
             try
             {
                 if (_lblStatus != null) _lblStatus.Text = "Running health checks...";
-                if (_btnHealthCheck != null) _btnHealthCheck.Enabled = false;
+                if (menuItem != null) menuItem.Enabled = false;
 
                 var report = await _healthCheckService.CheckAllAsync();
 
@@ -536,7 +434,7 @@ namespace TechnologyStore.Desktop
             }
             finally
             {
-                if (_btnHealthCheck != null) _btnHealthCheck.Enabled = true;
+                if (menuItem != null) menuItem.Enabled = true;
             }
         }
 
@@ -653,7 +551,7 @@ namespace TechnologyStore.Desktop
             }
         }
 
-        private void BtnTimeClock_Click(object sender, EventArgs e)
+        private void BtnTimeClock_Click(object? sender, EventArgs e)
         {
             try
             {
@@ -667,7 +565,7 @@ namespace TechnologyStore.Desktop
             }
         }
 
-        private void BtnShiftManagement_Click(object sender, EventArgs e)
+        private void BtnShiftManagement_Click(object? sender, EventArgs e)
         {
             try
             {
