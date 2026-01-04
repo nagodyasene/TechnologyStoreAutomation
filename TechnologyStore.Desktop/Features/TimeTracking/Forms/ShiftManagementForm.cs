@@ -32,7 +32,7 @@ public class ShiftManagementForm : Form
 
     private void InitializeComponent()
     {
-        this.Text = "Shift Management";
+        this.Text = "Vardiya Yönetimi";
         this.Size = new Size(900, 600);
         this.StartPosition = FormStartPosition.CenterScreen;
 
@@ -49,32 +49,32 @@ public class ShiftManagementForm : Form
         // --- SECTION 1: Assignment Panel ---
         var inputGroup = new GroupBox
         {
-            Text = "Assign New Shift",
+            Text = "Yeni Vardiya Ata",
             Dock = DockStyle.Fill,
             Padding = new Padding(10)
         };
 
         var inputPanel = new FlowLayoutPanel { Dock = DockStyle.Fill, FlowDirection = FlowDirection.TopDown, AutoSize = true };
 
-        inputPanel.Controls.Add(new Label { Text = "Employee:", AutoSize = true, Margin = new Padding(0, 10, 0, 0) });
+        inputPanel.Controls.Add(new Label { Text = "Çalışan:", AutoSize = true, Margin = new Padding(0, 10, 0, 0) });
         _cbEmployees = new ComboBox { Width = 250, DropDownStyle = ComboBoxStyle.DropDownList };
         inputPanel.Controls.Add(_cbEmployees);
 
-        inputPanel.Controls.Add(new Label { Text = "Date:", AutoSize = true, Margin = new Padding(0, 10, 0, 0) });
+        inputPanel.Controls.Add(new Label { Text = "Tarih:", AutoSize = true, Margin = new Padding(0, 10, 0, 0) });
         _dtpDate = new DateTimePicker { Width = 250, Format = DateTimePickerFormat.Short };
         inputPanel.Controls.Add(_dtpDate);
 
-        inputPanel.Controls.Add(new Label { Text = "Start Time:", AutoSize = true, Margin = new Padding(0, 10, 0, 0) });
+        inputPanel.Controls.Add(new Label { Text = "Başlangıç Saati:", AutoSize = true, Margin = new Padding(0, 10, 0, 0) });
         _dtpStartTime = new DateTimePicker { Width = 250, Format = DateTimePickerFormat.Time, ShowUpDown = true };
         inputPanel.Controls.Add(_dtpStartTime);
 
-        inputPanel.Controls.Add(new Label { Text = "End Time:", AutoSize = true, Margin = new Padding(0, 10, 0, 0) });
+        inputPanel.Controls.Add(new Label { Text = "Bitiş Saati:", AutoSize = true, Margin = new Padding(0, 10, 0, 0) });
         _dtpEndTime = new DateTimePicker { Width = 250, Format = DateTimePickerFormat.Time, ShowUpDown = true };
         inputPanel.Controls.Add(_dtpEndTime);
 
         var btnAssign = new Button
         {
-            Text = "Assign Shift",
+            Text = "Vardiya Ata",
             BackColor = Color.SteelBlue,
             ForeColor = Color.White,
             FlatStyle = FlatStyle.Flat,
@@ -90,7 +90,7 @@ public class ShiftManagementForm : Form
         // --- SECTION 2: Shift Grid ---
         var gridGroup = new GroupBox
         {
-            Text = "Scheduled Shifts (This Week)",
+            Text = "Planlanan Vardiyalar (Bu Hafta)",
             Dock = DockStyle.Fill
         };
 
@@ -123,7 +123,7 @@ public class ShiftManagementForm : Form
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Error loading data: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show($"Veriler yüklenirken hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 
@@ -148,7 +148,7 @@ public class ShiftManagementForm : Form
     {
         if (_cbEmployees.SelectedValue == null)
         {
-            MessageBox.Show("Please select an employee.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show("Lütfen bir çalışan seçin.", "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return;
         }
 
@@ -160,7 +160,7 @@ public class ShiftManagementForm : Form
 
         if (end <= start)
         {
-            MessageBox.Show("End time must be after start time.", "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show("Bitiş saati başlangıç saatinden sonra olmalıdır.", "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return;
         }
 
@@ -170,18 +170,18 @@ public class ShiftManagementForm : Form
             StartTime = start,
             EndTime = end,
             CreatedBy = _authService.CurrentUser?.Id,
-            Notes = "Assigned via Manager Dashboard"
+            Notes = "Yönetici paneli üzerinden atandı"
         };
 
         try
         {
             await _shiftRepository.CreateAsync(shift);
-            MessageBox.Show("Shift assigned successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("Vardiya başarıyla atandı.", "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
             await LoadShiftsAsync();
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Failed to assign shift: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show($"Vardiya atanamadı: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 }

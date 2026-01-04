@@ -28,7 +28,7 @@ public class PurchaseOrdersForm : Form
 
     private readonly BindingList<PurchaseOrderViewModel> _orders = new();
 
-    private const string ErrorTitle = "Error";
+    private const string ErrorTitle = "Hata";
 
     public PurchaseOrdersForm(IPurchaseOrderService purchaseOrderService, IAuthenticationService authService)
     {
@@ -42,7 +42,7 @@ public class PurchaseOrdersForm : Form
 
     private void InitializeComponent()
     {
-        Text = "Purchase Orders";
+        Text = "Satın Alma Siparişleri";
         Size = new Size(1100, 650);
         StartPosition = FormStartPosition.CenterParent;
         MinimumSize = new Size(800, 500);
@@ -68,13 +68,13 @@ public class PurchaseOrdersForm : Form
             Padding = new Padding(0, 0, 0, 10)
         };
 
-        filterPanel.Controls.Add(new Label { Text = "Status Filter:", AutoSize = true, Margin = new Padding(0, 5, 5, 0) });
+        filterPanel.Controls.Add(new Label { Text = "Durum Filtresi:", AutoSize = true, Margin = new Padding(0, 5, 5, 0) });
         _cmbStatusFilter = new ComboBox
         {
             DropDownStyle = ComboBoxStyle.DropDownList,
             Width = 150
         };
-        _cmbStatusFilter.Items.AddRange(new object[] { "All", "Pending", "Approved", "Sent", "Received", "Cancelled" });
+        _cmbStatusFilter.Items.AddRange(new object[] { "Tümü", "Beklemede", "Onaylandı", "Gönderildi", "Teslim Alındı", "İptal" });
         _cmbStatusFilter.SelectedIndex = 0;
         _cmbStatusFilter.SelectedIndexChanged += async (s, e) => await LoadOrdersAsync();
         filterPanel.Controls.Add(_cmbStatusFilter);
@@ -100,13 +100,13 @@ public class PurchaseOrdersForm : Form
         // Columns
         _gridOrders.Columns.AddRange(new DataGridViewColumn[]
         {
-            new DataGridViewTextBoxColumn { Name = "OrderNumber", DataPropertyName = "OrderNumber", HeaderText = "PO Number", FillWeight = 15 },
-            new DataGridViewTextBoxColumn { Name = "SupplierName", DataPropertyName = "SupplierName", HeaderText = "Supplier", FillWeight = 20 },
-            new DataGridViewTextBoxColumn { Name = "Status", DataPropertyName = "StatusDisplay", HeaderText = "Status", FillWeight = 12 },
-            new DataGridViewTextBoxColumn { Name = "TotalAmount", DataPropertyName = "TotalAmountDisplay", HeaderText = "Total", FillWeight = 12 },
-            new DataGridViewTextBoxColumn { Name = "ItemCount", DataPropertyName = "ItemCount", HeaderText = "Items", FillWeight = 8 },
-            new DataGridViewTextBoxColumn { Name = "CreatedAt", DataPropertyName = "CreatedAtDisplay", HeaderText = "Created", FillWeight = 15 },
-            new DataGridViewTextBoxColumn { Name = "ExpectedDelivery", DataPropertyName = "ExpectedDeliveryDisplay", HeaderText = "Expected", FillWeight = 15 },
+            new DataGridViewTextBoxColumn { Name = "OrderNumber", DataPropertyName = "OrderNumber", HeaderText = "SAS No", FillWeight = 15 },
+            new DataGridViewTextBoxColumn { Name = "SupplierName", DataPropertyName = "SupplierName", HeaderText = "Tedarikçi", FillWeight = 20 },
+            new DataGridViewTextBoxColumn { Name = "Status", DataPropertyName = "StatusDisplay", HeaderText = "Durum", FillWeight = 12 },
+            new DataGridViewTextBoxColumn { Name = "TotalAmount", DataPropertyName = "TotalAmountDisplay", HeaderText = "Toplam", FillWeight = 12 },
+            new DataGridViewTextBoxColumn { Name = "ItemCount", DataPropertyName = "ItemCount", HeaderText = "Kalem", FillWeight = 8 },
+            new DataGridViewTextBoxColumn { Name = "CreatedAt", DataPropertyName = "CreatedAtDisplay", HeaderText = "Oluşturma", FillWeight = 15 },
+            new DataGridViewTextBoxColumn { Name = "ExpectedDelivery", DataPropertyName = "ExpectedDeliveryDisplay", HeaderText = "Beklenen Teslim", FillWeight = 15 },
         });
 
         _gridOrders.DataSource = _orders;
@@ -122,27 +122,27 @@ public class PurchaseOrdersForm : Form
             Padding = new Padding(0, 10, 0, 0)
         };
 
-        _btnApprove = CreateButton("✅ Approve", Color.FromArgb(46, 204, 113));
+        _btnApprove = CreateButton("Onayla", Color.FromArgb(46, 204, 113));
         _btnApprove.Click += BtnApprove_Click;
         buttonPanel.Controls.Add(_btnApprove);
 
-        _btnSend = CreateButton("📧 Send to Supplier", Color.FromArgb(52, 152, 219));
+        _btnSend = CreateButton("Tedarikçiye Gönder", Color.FromArgb(52, 152, 219));
         _btnSend.Click += BtnSend_Click;
         buttonPanel.Controls.Add(_btnSend);
 
-        _btnReceive = CreateButton("📦 Mark Received", Color.FromArgb(155, 89, 182));
+        _btnReceive = CreateButton("Teslim Alındı", Color.FromArgb(155, 89, 182));
         _btnReceive.Click += BtnReceive_Click;
         buttonPanel.Controls.Add(_btnReceive);
 
-        _btnCancel = CreateButton("❌ Cancel", Color.FromArgb(231, 76, 60));
+        _btnCancel = CreateButton("İptal", Color.FromArgb(231, 76, 60));
         _btnCancel.Click += BtnCancel_Click;
         buttonPanel.Controls.Add(_btnCancel);
 
-        _btnViewDetails = CreateButton("👁️ View Details", Color.FromArgb(52, 73, 94));
+        _btnViewDetails = CreateButton("Detayları Gör", Color.FromArgb(52, 73, 94));
         _btnViewDetails.Click += BtnViewDetails_Click;
         buttonPanel.Controls.Add(_btnViewDetails);
 
-        var btnRefresh = CreateButton("🔄 Refresh", Color.FromArgb(149, 165, 166));
+        var btnRefresh = CreateButton("Yenile", Color.FromArgb(149, 165, 166));
         btnRefresh.Click += async (s, e) => await LoadOrdersAsync();
         buttonPanel.Controls.Add(btnRefresh);
 
@@ -177,7 +177,7 @@ public class PurchaseOrdersForm : Form
     {
         try
         {
-            _lblStatus.Text = "Loading...";
+            _lblStatus.Text = "Yükleniyor...";
 
             PurchaseOrderStatus? filter = _cmbStatusFilter.SelectedIndex switch
             {
@@ -197,14 +197,14 @@ public class PurchaseOrdersForm : Form
                 _orders.Add(new PurchaseOrderViewModel(order));
             }
 
-            _lblStatus.Text = $"{_orders.Count} orders";
+            _lblStatus.Text = $"{_orders.Count} sipariş";
             UpdateButtonStates();
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to load purchase orders");
-            _lblStatus.Text = "Error loading orders";
-            MessageBox.Show($"Failed to load orders: {ex.Message}", ErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            _lblStatus.Text = "Siparişler yüklenemedi";
+            MessageBox.Show($"Siparişler yüklenemedi: {ex.Message}", ErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 
@@ -237,7 +237,7 @@ public class PurchaseOrdersForm : Form
         var currentUser = _authService.CurrentUser;
         if (currentUser == null)
         {
-            MessageBox.Show("You must be logged in to approve orders.", "Auth Required", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show("Siparişleri onaylamak için giriş yapmalısınız.", "Giriş Gerekli", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return;
         }
 
@@ -245,7 +245,7 @@ public class PurchaseOrdersForm : Form
         var roleString = currentUser.Role.ToString();
         if (roleString != "Manager" && roleString != "Admin")
         {
-            MessageBox.Show("Only Managers and Admins can approve purchase orders.", "Access Denied", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show("Satın alma siparişlerini yalnızca Yöneticiler ve Adminler onaylayabilir.", "Erişim Reddedildi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return;
         }
 
@@ -259,13 +259,13 @@ public class PurchaseOrdersForm : Form
             }
             else
             {
-                MessageBox.Show(result.ErrorMessage ?? "Failed to approve order.", ErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(result.ErrorMessage ?? "Sipariş onaylanamadı.", ErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to approve order");
-            MessageBox.Show($"Error: {ex.Message}", ErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show($"Hata: {ex.Message}", ErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 
@@ -275,8 +275,8 @@ public class PurchaseOrdersForm : Form
         if (selected == null) return;
 
         var confirm = MessageBox.Show(
-            $"Send purchase order {selected.OrderNumber} to supplier?\n\nThis will email the order to the supplier.",
-            "Confirm Send",
+            $"{selected.OrderNumber} numaralı satın alma siparişi tedarikçiye gönderilsin mi?\n\nBu işlem siparişi e-posta ile tedarikçiye gönderir.",
+            "Gönderimi Onayla",
             MessageBoxButtons.YesNo,
             MessageBoxIcon.Question);
 
@@ -284,24 +284,24 @@ public class PurchaseOrdersForm : Form
 
         try
         {
-            _lblStatus.Text = "Sending email...";
+            _lblStatus.Text = "E-posta gönderiliyor...";
             var result = await _purchaseOrderService.SendToSupplierAsync(selected.Id);
 
             if (result.Success)
             {
                 _logger.LogInformation("Sent PO to supplier: {OrderNumber}", selected.OrderNumber);
-                MessageBox.Show("Purchase order sent successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Satın alma siparişi başarıyla gönderildi!", "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 await LoadOrdersAsync();
             }
             else
             {
-                MessageBox.Show(result.ErrorMessage ?? "Failed to send order.", ErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(result.ErrorMessage ?? "Sipariş gönderilemedi.", ErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to send order");
-            MessageBox.Show($"Error: {ex.Message}", ErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show($"Hata: {ex.Message}", ErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 
@@ -311,8 +311,8 @@ public class PurchaseOrdersForm : Form
         if (selected == null) return;
 
         var confirm = MessageBox.Show(
-            $"Mark purchase order {selected.OrderNumber} as received?",
-            "Confirm Receive",
+            $"{selected.OrderNumber} numaralı satın alma siparişi teslim alındı olarak işaretlensin mi?",
+            "Teslimi Onayla",
             MessageBoxButtons.YesNo,
             MessageBoxIcon.Question);
 
@@ -328,13 +328,13 @@ public class PurchaseOrdersForm : Form
             }
             else
             {
-                MessageBox.Show(result.ErrorMessage ?? "Failed to mark as received.", ErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(result.ErrorMessage ?? "Teslim alındı olarak işaretlenemedi.", ErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to mark order as received");
-            MessageBox.Show($"Error: {ex.Message}", ErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show($"Hata: {ex.Message}", ErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 
@@ -344,8 +344,8 @@ public class PurchaseOrdersForm : Form
         if (selected == null) return;
 
         var confirm = MessageBox.Show(
-            $"Cancel purchase order {selected.OrderNumber}?\n\nThis action cannot be undone.",
-            "Confirm Cancel",
+            $"{selected.OrderNumber} numaralı satın alma siparişi iptal edilsin mi?\n\nBu işlem geri alınamaz.",
+            "İptali Onayla",
             MessageBoxButtons.YesNo,
             MessageBoxIcon.Warning);
 
@@ -361,13 +361,13 @@ public class PurchaseOrdersForm : Form
             }
             else
             {
-                MessageBox.Show(result.ErrorMessage ?? "Failed to cancel order.", ErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(result.ErrorMessage ?? "Sipariş iptal edilemedi.", ErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to cancel order");
-            MessageBox.Show($"Error: {ex.Message}", ErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show($"Hata: {ex.Message}", ErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 
@@ -381,7 +381,7 @@ public class PurchaseOrdersForm : Form
             var order = await _purchaseOrderService.GetByIdAsync(selected.Id);
             if (order == null)
             {
-                MessageBox.Show("Order not found.", ErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Sipariş bulunamadı.", ErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
@@ -391,7 +391,7 @@ public class PurchaseOrdersForm : Form
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to load order details");
-            MessageBox.Show($"Error: {ex.Message}", ErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show($"Hata: {ex.Message}", ErrorTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 }
@@ -405,25 +405,38 @@ internal class PurchaseOrderViewModel
     public string OrderNumber { get; }
     public string SupplierName { get; }
     public PurchaseOrderStatus Status { get; }
-    public string StatusDisplay => Status.ToString();
+    public string StatusDisplay => GetStatusDisplayTr(Status);
     public decimal TotalAmount { get; }
     public string TotalAmountDisplay => $"${TotalAmount:N2}";
     public int ItemCount { get; }
     public DateTime CreatedAt { get; }
-    public string CreatedAtDisplay => CreatedAt.ToString("MMM dd, yyyy");
+    public string CreatedAtDisplay => CreatedAt.ToString("dd.MM.yyyy");
     public DateTime? ExpectedDelivery { get; }
-    public string ExpectedDeliveryDisplay => ExpectedDelivery?.ToString("MMM dd, yyyy") ?? "-";
+    public string ExpectedDeliveryDisplay => ExpectedDelivery?.ToString("dd.MM.yyyy") ?? "-";
 
     public PurchaseOrderViewModel(PurchaseOrder order)
     {
         Id = order.Id;
         OrderNumber = order.OrderNumber;
-        SupplierName = order.Supplier?.Name ?? $"Supplier #{order.SupplierId}";
+        SupplierName = order.Supplier?.Name ?? $"Tedarikçi #{order.SupplierId}";
         Status = order.Status;
         TotalAmount = order.TotalAmount;
         ItemCount = order.Items?.Count ?? order.ItemCount;
         CreatedAt = order.CreatedAt;
         ExpectedDelivery = order.ExpectedDeliveryDate;
+    }
+
+    private static string GetStatusDisplayTr(PurchaseOrderStatus status)
+    {
+        return status switch
+        {
+            PurchaseOrderStatus.Pending => "Beklemede",
+            PurchaseOrderStatus.Approved => "Onaylandı",
+            PurchaseOrderStatus.Sent => "Gönderildi",
+            PurchaseOrderStatus.Received => "Teslim Alındı",
+            PurchaseOrderStatus.Cancelled => "İptal",
+            _ => status.ToString()
+        };
     }
 }
 
@@ -434,7 +447,7 @@ internal class PurchaseOrderDetailsDialog : Form
 {
     public PurchaseOrderDetailsDialog(PurchaseOrder order)
     {
-        Text = $"Purchase Order: {order.OrderNumber}";
+        Text = $"Satın Alma Siparişi: {order.OrderNumber}";
         Size = new Size(600, 450);
         StartPosition = FormStartPosition.CenterParent;
         FormBorderStyle = FormBorderStyle.FixedDialog;
@@ -453,13 +466,22 @@ internal class PurchaseOrderDetailsDialog : Form
 
         // Header info
         var infoPanel = new FlowLayoutPanel { Dock = DockStyle.Fill, FlowDirection = FlowDirection.TopDown, AutoSize = true };
-        infoPanel.Controls.Add(new Label { Text = $"Supplier: {order.Supplier?.Name ?? "Unknown"}", AutoSize = true, Font = new Font(Font, FontStyle.Bold) });
-        infoPanel.Controls.Add(new Label { Text = $"Status: {order.Status}", AutoSize = true });
-        infoPanel.Controls.Add(new Label { Text = $"Created: {order.CreatedAt:MMMM dd, yyyy HH:mm}", AutoSize = true });
+        var statusTr = order.Status switch
+        {
+            PurchaseOrderStatus.Pending => "Beklemede",
+            PurchaseOrderStatus.Approved => "Onaylandı",
+            PurchaseOrderStatus.Sent => "Gönderildi",
+            PurchaseOrderStatus.Received => "Teslim Alındı",
+            PurchaseOrderStatus.Cancelled => "İptal",
+            _ => order.Status.ToString()
+        };
+        infoPanel.Controls.Add(new Label { Text = $"Tedarikçi: {order.Supplier?.Name ?? "Bilinmiyor"}", AutoSize = true, Font = new Font(Font, FontStyle.Bold) });
+        infoPanel.Controls.Add(new Label { Text = $"Durum: {statusTr}", AutoSize = true });
+        infoPanel.Controls.Add(new Label { Text = $"Oluşturma: {order.CreatedAt:dd.MM.yyyy HH:mm}", AutoSize = true });
         if (order.ExpectedDeliveryDate.HasValue)
-            infoPanel.Controls.Add(new Label { Text = $"Expected: {order.ExpectedDeliveryDate:MMMM dd, yyyy}", AutoSize = true });
+            infoPanel.Controls.Add(new Label { Text = $"Beklenen: {order.ExpectedDeliveryDate:dd.MM.yyyy}", AutoSize = true });
         if (!string.IsNullOrEmpty(order.Notes))
-            infoPanel.Controls.Add(new Label { Text = $"Notes: {order.Notes}", AutoSize = true, MaximumSize = new Size(550, 0) });
+            infoPanel.Controls.Add(new Label { Text = $"Notlar: {order.Notes}", AutoSize = true, MaximumSize = new Size(550, 0) });
         layout.Controls.Add(infoPanel, 0, 0);
 
         // Items grid
@@ -475,10 +497,10 @@ internal class PurchaseOrderDetailsDialog : Form
         grid.Columns.AddRange(new DataGridViewColumn[]
         {
             new DataGridViewTextBoxColumn { DataPropertyName = "ProductSku", HeaderText = "SKU", FillWeight = 15 },
-            new DataGridViewTextBoxColumn { DataPropertyName = "ProductName", HeaderText = "Product", FillWeight = 40 },
-            new DataGridViewTextBoxColumn { DataPropertyName = "Quantity", HeaderText = "Qty", FillWeight = 10 },
-            new DataGridViewTextBoxColumn { DataPropertyName = "UnitCostDisplay", HeaderText = "Unit Cost", FillWeight = 15 },
-            new DataGridViewTextBoxColumn { DataPropertyName = "LineTotalDisplay", HeaderText = "Total", FillWeight = 15 },
+            new DataGridViewTextBoxColumn { DataPropertyName = "ProductName", HeaderText = "Ürün", FillWeight = 40 },
+            new DataGridViewTextBoxColumn { DataPropertyName = "Quantity", HeaderText = "Adet", FillWeight = 10 },
+            new DataGridViewTextBoxColumn { DataPropertyName = "UnitCostDisplay", HeaderText = "Birim Maliyet", FillWeight = 15 },
+            new DataGridViewTextBoxColumn { DataPropertyName = "LineTotalDisplay", HeaderText = "Toplam", FillWeight = 15 },
         });
 
         var itemVMs = order.Items.Select(i => new
@@ -494,8 +516,8 @@ internal class PurchaseOrderDetailsDialog : Form
 
         // Footer with total
         var footerPanel = new FlowLayoutPanel { Dock = DockStyle.Fill, FlowDirection = FlowDirection.RightToLeft, AutoSize = true };
-        footerPanel.Controls.Add(new Label { Text = $"Total: ${order.TotalAmount:N2}", AutoSize = true, Font = new Font(Font.FontFamily, 12, FontStyle.Bold) });
-        var btnClose = new Button { Text = "Close", DialogResult = DialogResult.OK, Width = 80 };
+        footerPanel.Controls.Add(new Label { Text = $"Toplam: ${order.TotalAmount:N2}", AutoSize = true, Font = new Font(Font.FontFamily, 12, FontStyle.Bold) });
+        var btnClose = new Button { Text = "Kapat", DialogResult = DialogResult.OK, Width = 80 };
         footerPanel.Controls.Add(btnClose);
         layout.Controls.Add(footerPanel, 0, 2);
 

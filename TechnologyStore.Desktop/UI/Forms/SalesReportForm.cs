@@ -12,7 +12,19 @@ namespace TechnologyStore.Desktop.UI.Forms;
 /// </summary>
 public partial class SalesReportForm : Form
 {
-    private const string CustomRangeOption = "Custom Range";
+    private enum ReportType
+    {
+        Daily,
+        Weekly,
+        Monthly,
+        CustomRange
+    }
+
+    private sealed record ReportTypeOption(string Text, ReportType Value)
+    {
+        public override string ToString() => Text;
+    }
+
     private readonly ISalesReportService _reportService;
     private readonly IAuthenticationService _authService;
     private readonly ILogger<SalesReportForm> _logger;
@@ -43,7 +55,7 @@ public partial class SalesReportForm : Form
         this.AutoScaleMode = AutoScaleMode.Font;
         this.ClientSize = new Size(700, 550);
         this.Name = "SalesReportForm";
-        this.Text = "Sales Reports";
+        this.Text = "Satış Raporları";
         this.StartPosition = FormStartPosition.CenterParent;
         this.ResumeLayout(false);
     }
@@ -55,7 +67,7 @@ public partial class SalesReportForm : Form
         // Title
         var lblTitle = new Label
         {
-            Text = "📊 Sales Reports",
+            Text = "Satış Raporları",
             Location = new Point(20, yPos),
             Width = 300,
             Font = new Font(this.Font.FontFamily, 14, FontStyle.Bold)
@@ -65,7 +77,7 @@ public partial class SalesReportForm : Form
         yPos += 45;
 
         // Report Type
-        var lblType = new Label { Text = "Report Type:", Location = new Point(20, yPos + 3), Width = 100 };
+        var lblType = new Label { Text = "Rapor Türü:", Location = new Point(20, yPos + 3), Width = 100 };
         this.Controls.Add(lblType);
 
         _cmbReportType = new ComboBox
@@ -74,7 +86,13 @@ public partial class SalesReportForm : Form
             Width = 150,
             DropDownStyle = ComboBoxStyle.DropDownList
         };
-        _cmbReportType.Items.AddRange(new object[] { "Daily", "Weekly", "Monthly", CustomRangeOption });
+        _cmbReportType.Items.AddRange(new object[]
+        {
+            new ReportTypeOption("Günlük", ReportType.Daily),
+            new ReportTypeOption("Haftalık", ReportType.Weekly),
+            new ReportTypeOption("Aylık", ReportType.Monthly),
+            new ReportTypeOption("Özel Aralık", ReportType.CustomRange)
+        });
         _cmbReportType.SelectedIndex = 0;
         _cmbReportType.SelectedIndexChanged += CmbReportType_SelectedIndexChanged;
         this.Controls.Add(_cmbReportType);
@@ -82,7 +100,7 @@ public partial class SalesReportForm : Form
         yPos += 40;
 
         // Start Date
-        var lblStart = new Label { Text = "Start Date:", Location = new Point(20, yPos + 3), Width = 100 };
+        var lblStart = new Label { Text = "Başlangıç:", Location = new Point(20, yPos + 3), Width = 100 };
         this.Controls.Add(lblStart);
 
         _dtpStartDate = new DateTimePicker
@@ -96,7 +114,7 @@ public partial class SalesReportForm : Form
         this.Controls.Add(_dtpStartDate);
 
         // End Date (for custom range)
-        var lblEnd = new Label { Text = "End Date:", Location = new Point(300, yPos + 3), Width = 80 };
+        var lblEnd = new Label { Text = "Bitiş:", Location = new Point(300, yPos + 3), Width = 80 };
         this.Controls.Add(lblEnd);
 
         _dtpEndDate = new DateTimePicker
@@ -115,7 +133,7 @@ public partial class SalesReportForm : Form
         // Buttons
         _btnGenerate = new Button
         {
-            Text = "📈 Generate Report",
+            Text = "Rapor Oluştur",
             Location = new Point(130, yPos),
             Size = new Size(140, 35),
             BackColor = Color.FromArgb(0, 120, 212),
@@ -128,7 +146,7 @@ public partial class SalesReportForm : Form
 
         _btnExport = new Button
         {
-            Text = "💾 Export CSV",
+            Text = "CSV Dışa Aktar",
             Location = new Point(280, yPos),
             Size = new Size(120, 35),
             FlatStyle = FlatStyle.Flat,
@@ -147,7 +165,7 @@ public partial class SalesReportForm : Form
             BorderStyle = BorderStyle.FixedSingle,
             BackColor = Color.FromArgb(240, 248, 255),
             Padding = new Padding(10),
-            Text = "Select report type and date, then click Generate."
+            Text = "Rapor türünü ve tarihi seçin, ardından 'Rapor Oluştur'a tıklayın."
         };
         this.Controls.Add(_lblSummary);
 
@@ -156,7 +174,7 @@ public partial class SalesReportForm : Form
         // Product Breakdown Label
         var lblBreakdown = new Label
         {
-            Text = "📦 Product Breakdown",
+            Text = "Ürün Kırılımı",
             Location = new Point(20, yPos),
             Width = 200,
             Font = new Font(this.Font.FontFamily, 11, FontStyle.Bold)
@@ -177,10 +195,10 @@ public partial class SalesReportForm : Form
             SelectionMode = DataGridViewSelectionMode.FullRowSelect
         };
 
-        _gridBreakdown.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Product", DataPropertyName = "ProductName", Width = 250 });
-        _gridBreakdown.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Units Sold", DataPropertyName = "UnitsSold", Width = 100 });
-        _gridBreakdown.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Revenue", DataPropertyName = "Revenue", Width = 120 });
-        _gridBreakdown.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "% of Total", DataPropertyName = "PercentageOfTotal", Width = 100 });
+        _gridBreakdown.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Ürün", DataPropertyName = "ProductName", Width = 250 });
+        _gridBreakdown.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Satılan Adet", DataPropertyName = "UnitsSold", Width = 100 });
+        _gridBreakdown.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Ciro", DataPropertyName = "Revenue", Width = 120 });
+        _gridBreakdown.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "% Toplam", DataPropertyName = "PercentageOfTotal", Width = 100 });
 
         this.Controls.Add(_gridBreakdown);
 
@@ -209,11 +227,11 @@ public partial class SalesReportForm : Form
         _dtpStartDate.MaxDate = today;
         _dtpEndDate.MaxDate = today;
 
-        var reportType = _cmbReportType.SelectedItem?.ToString();
+        var reportType = _cmbReportType.SelectedItem is ReportTypeOption opt ? opt.Value : ReportType.Daily;
 
         switch (reportType)
         {
-            case "Weekly":
+            case ReportType.Weekly:
                 // Rolling last 7 days ending today (inclusive)
                 _dtpStartDate.Value = today.AddDays(-6);
                 _dtpEndDate.Value = today;
@@ -221,7 +239,7 @@ public partial class SalesReportForm : Form
                 _dtpEndDate.Enabled = false;
                 break;
 
-            case "Monthly":
+            case ReportType.Monthly:
                 // Rolling last 30 days ending today (inclusive)
                 _dtpStartDate.Value = today.AddDays(-29);
                 _dtpEndDate.Value = today;
@@ -229,7 +247,7 @@ public partial class SalesReportForm : Form
                 _dtpEndDate.Enabled = false;
                 break;
 
-            case CustomRangeOption:
+            case ReportType.CustomRange:
                 // Allow manual range selection, but never allow future dates
                 _dtpStartDate.Enabled = true;
                 _dtpEndDate.Enabled = true;
@@ -254,11 +272,12 @@ public partial class SalesReportForm : Form
         if (_cmbReportType == null || _dtpStartDate == null || _dtpEndDate == null) return;
 
         SetFormEnabled(false);
-        if (_lblStatus != null) _lblStatus.Text = "Generating report...";
+        if (_lblStatus != null) _lblStatus.Text = "Rapor oluşturuluyor...";
 
         try
         {
-            var reportType = _cmbReportType.SelectedItem?.ToString();
+            var selectedOpt = _cmbReportType.SelectedItem as ReportTypeOption;
+            var reportType = selectedOpt?.Value ?? ReportType.Daily;
             var today = DateTime.Today;
 
             // Determine the actual query range (and prevent future dates).
@@ -267,26 +286,26 @@ public partial class SalesReportForm : Form
 
             switch (reportType)
             {
-                case "Weekly":
+                case ReportType.Weekly:
                     endDate = today;
                     startDate = today.AddDays(-6);
                     break;
-                case "Monthly":
+                case ReportType.Monthly:
                     endDate = today;
                     startDate = today.AddDays(-29);
                     break;
-                case CustomRangeOption:
+                case ReportType.CustomRange:
                     startDate = _dtpStartDate.Value.Date;
                     endDate = _dtpEndDate.Value.Date;
                     if (startDate > today || endDate > today)
-                        throw new ArgumentException("Date ranges cannot include future dates.");
+                        throw new ArgumentException("Tarih aralığı gelecekteki günleri içeremez.");
                     if (startDate > endDate)
-                        throw new ArgumentException("Start date cannot be later than end date.");
+                        throw new ArgumentException("Başlangıç tarihi bitiş tarihinden sonra olamaz.");
                     break;
                 default:
                     startDate = _dtpStartDate.Value.Date;
                     if (startDate > today)
-                        throw new ArgumentException("Date cannot be in the future.");
+                        throw new ArgumentException("Tarih gelecekte olamaz.");
                     endDate = startDate;
                     break;
             }
@@ -294,34 +313,34 @@ public partial class SalesReportForm : Form
             _currentReport = reportType switch
             {
                 // Always drive via explicit date ranges so behavior is unambiguous.
-                "Weekly" => await _reportService.GetCustomRangeReportAsync(startDate, endDate),
-                "Monthly" => await _reportService.GetCustomRangeReportAsync(startDate, endDate),
-                CustomRangeOption => await _reportService.GetCustomRangeReportAsync(startDate, endDate),
+                ReportType.Weekly => await _reportService.GetCustomRangeReportAsync(startDate, endDate),
+                ReportType.Monthly => await _reportService.GetCustomRangeReportAsync(startDate, endDate),
+                ReportType.CustomRange => await _reportService.GetCustomRangeReportAsync(startDate, endDate),
                 _ => await _reportService.GetDailyReportAsync(startDate)
             };
 
             // Ensure report type label matches UI selection
-            if (_currentReport != null && reportType is "Weekly" or "Monthly")
+            if (_currentReport != null)
             {
-                _currentReport.ReportType = reportType!;
+                _currentReport.ReportType = GetReportTypeLabelTr(reportType);
             }
 
             DisplayReport(_currentReport);
 
             if (_btnExport != null) _btnExport.Enabled = true;
-            if (_lblStatus != null) _lblStatus.Text = $"Report generated at {DateTime.Now:HH:mm:ss}";
+            if (_lblStatus != null) _lblStatus.Text = $"Rapor oluşturuldu: {DateTime.Now:HH:mm:ss}";
         }
         catch (ArgumentException ex)
         {
             // Input validation error (e.g. invalid date range)
-            MessageBox.Show(ex.Message, "Invalid Input", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            if (_lblStatus != null) _lblStatus.Text = "Report generation failed.";
+            MessageBox.Show(ex.Message, "Geçersiz Girdi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            if (_lblStatus != null) _lblStatus.Text = "Rapor oluşturulamadı.";
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error generating sales report");
-            MessageBox.Show("An error occurred while generating the report. Please check the logs.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            if (_lblStatus != null) _lblStatus.Text = "Error generating report.";
+            MessageBox.Show("Rapor oluşturulurken bir hata oluştu. Lütfen logları kontrol edin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            if (_lblStatus != null) _lblStatus.Text = "Rapor oluşturulurken hata oluştu.";
         }
         finally
         {
@@ -334,11 +353,11 @@ public partial class SalesReportForm : Form
         if (_lblSummary == null || _gridBreakdown == null) return;
 
         // Update summary
-        _lblSummary.Text = $"📅 {report.ReportType} Report: {report.StartDate:yyyy-MM-dd} to {report.EndDate:yyyy-MM-dd}\n\n" +
-                          $"📊 Transactions: {report.TotalTransactions}    |    " +
-                          $"📦 Units Sold: {report.TotalUnitsSold}    |    " +
-                          $"💰 Revenue: {report.TotalRevenue:C}    |    " +
-                          $"📈 Avg Sale: {report.AverageSaleAmount:C}";
+        _lblSummary.Text = $"{report.ReportType}: {report.StartDate:yyyy-MM-dd} - {report.EndDate:yyyy-MM-dd}\n\n" +
+                          $"İşlem: {report.TotalTransactions}    |    " +
+                          $"Satılan Adet: {report.TotalUnitsSold}    |    " +
+                          $"Ciro: {report.TotalRevenue:C}    |    " +
+                          $"Ortalama Satış: {report.AverageSaleAmount:C}";
 
         // Update grid
         _gridBreakdown.DataSource = report.ProductBreakdown;
@@ -348,14 +367,14 @@ public partial class SalesReportForm : Form
     {
         if (_currentReport == null)
         {
-            MessageBox.Show("Please generate a report first.", "No Report", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("Lütfen önce bir rapor oluşturun.", "Rapor Yok", MessageBoxButtons.OK, MessageBoxIcon.Information);
             return;
         }
 
         // Security Check: Only Admin or authorized roles can export detailed data
         if (!_authService.IsAdmin)
         {
-            MessageBox.Show("You do not have permission to export reports.", "Access Denied", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show("Rapor dışa aktarma yetkiniz yok.", "Erişim Reddedildi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return;
         }
 
@@ -363,22 +382,22 @@ public partial class SalesReportForm : Form
         {
             var saveDialog = new SaveFileDialog
             {
-                Filter = "CSV Files (*.csv)|*.csv",
-                FileName = $"SalesReport_{_currentReport.ReportType}_{_currentReport.StartDate:yyyyMMdd}.csv",
-                Title = "Export Sales Report"
+                Filter = "CSV Dosyaları (*.csv)|*.csv",
+                FileName = $"SatisRaporu_{_currentReport.ReportType}_{_currentReport.StartDate:yyyyMMdd}.csv",
+                Title = "Satış Raporunu Dışa Aktar"
             };
 
             if (saveDialog.ShowDialog() == DialogResult.OK)
             {
                 var csv = _reportService.ExportToCsv(_currentReport);
                 File.WriteAllText(saveDialog.FileName, csv);
-                MessageBox.Show($"Report exported to:\n{saveDialog.FileName}", "Export Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show($"Rapor dışa aktarıldı:\n{saveDialog.FileName}", "Dışa Aktarma Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error exporting sales report to CSV");
-            MessageBox.Show($"And error occurred during export: {ex.Message}", "Export Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show($"Dışa aktarma sırasında hata oluştu: {ex.Message}", "Dışa Aktarma Hatası", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 
@@ -392,7 +411,19 @@ public partial class SalesReportForm : Form
         if (_btnGenerate != null)
         {
             _btnGenerate.Enabled = enabled;
-            _btnGenerate.Text = enabled ? "📈 Generate Report" : "Generating...";
+            _btnGenerate.Text = enabled ? "Rapor Oluştur" : "Oluşturuluyor...";
         }
+    }
+
+    private static string GetReportTypeLabelTr(ReportType reportType)
+    {
+        return reportType switch
+        {
+            ReportType.Daily => "Günlük Rapor",
+            ReportType.Weekly => "Haftalık Rapor",
+            ReportType.Monthly => "Aylık Rapor",
+            ReportType.CustomRange => "Özel Aralık Raporu",
+            _ => "Rapor"
+        };
     }
 }

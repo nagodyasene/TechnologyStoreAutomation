@@ -32,7 +32,7 @@ public partial class LoginForm : Form
         this.AutoScaleMode = AutoScaleMode.Font;
         this.ClientSize = new Size(400, 280);
         this.Name = "LoginForm";
-        this.Text = "Technology Store - Login";
+        this.Text = "Teknoloji Mağazası - Giriş";
         this.StartPosition = FormStartPosition.CenterScreen;
         this.FormBorderStyle = FormBorderStyle.FixedDialog;
         this.MaximizeBox = false;
@@ -49,7 +49,7 @@ public partial class LoginForm : Form
         // Title
         var lblTitle = new Label
         {
-            Text = "🔐 Please Sign In",
+            Text = "Giriş Yapın",
             Location = new Point(20, yPos),
             Width = 360,
             Font = new Font(this.Font.FontFamily, 14, FontStyle.Bold),
@@ -62,7 +62,7 @@ public partial class LoginForm : Form
         // Username Label & TextBox
         var lblUsername = new Label
         {
-            Text = "Username:",
+            Text = "Kullanıcı Adı:",
             Location = new Point(20, yPos + 3),
             Width = labelWidth
         };
@@ -82,7 +82,7 @@ public partial class LoginForm : Form
         // Password Label & TextBox
         var lblPassword = new Label
         {
-            Text = "Password:",
+            Text = "Şifre:",
             Location = new Point(20, yPos + 3),
             Width = labelWidth
         };
@@ -103,7 +103,7 @@ public partial class LoginForm : Form
         // Remember Me Checkbox
         _chkRememberMe = new CheckBox
         {
-            Text = "Remember me",
+            Text = "Beni hatırla",
             Location = new Point(controlLeft, yPos),
             Width = 150,
             Visible = true
@@ -127,7 +127,7 @@ public partial class LoginForm : Form
         // Login Button
         _btnLogin = new Button
         {
-            Text = "Login",
+            Text = "Giriş",
             Location = new Point(controlLeft, yPos),
             Width = 100,
             Height = 35,
@@ -142,7 +142,7 @@ public partial class LoginForm : Form
         // Cancel Button
         _btnCancel = new Button
         {
-            Text = "Exit",
+            Text = "Çıkış",
             Location = new Point(controlLeft + 110, yPos),
             Width = 100,
             Height = 35,
@@ -193,7 +193,7 @@ public partial class LoginForm : Form
         }
         catch (Exception ex)
         {
-            ShowError($"An error occurred: {ex.Message}");
+            ShowError($"Bir hata oluştu: {ex.Message}");
         }
         finally
         {
@@ -206,10 +206,10 @@ public partial class LoginForm : Form
     private LoginValidationResult ValidateLoginForm(string username, string password)
     {
         if (string.IsNullOrWhiteSpace(username))
-            return new LoginValidationResult(false, "Please enter your username.", _txtUsername);
+            return new LoginValidationResult(false, "Lütfen kullanıcı adınızı girin.", _txtUsername);
 
         if (string.IsNullOrWhiteSpace(password))
-            return new LoginValidationResult(false, "Please enter your password.", _txtPassword);
+            return new LoginValidationResult(false, "Lütfen şifrenizi girin.", _txtPassword);
 
         return new LoginValidationResult(true);
     }
@@ -228,7 +228,7 @@ public partial class LoginForm : Form
         }
         else
         {
-            ShowError(result.ErrorMessage ?? "Login failed.");
+            ShowError(result.ErrorMessage ?? "Giriş başarısız.");
             _txtPassword?.Clear();
             _txtPassword?.Focus();
         }
@@ -259,7 +259,7 @@ public partial class LoginForm : Form
         if (_btnLogin != null)
         {
             _btnLogin.Enabled = enabled;
-            _btnLogin.Text = enabled ? "Login" : "Logging in...";
+            _btnLogin.Text = enabled ? "Giriş" : "Giriş yapılıyor...";
         }
         if (_btnCancel != null) _btnCancel.Enabled = enabled;
         if (_chkRememberMe != null) _chkRememberMe.Enabled = enabled;

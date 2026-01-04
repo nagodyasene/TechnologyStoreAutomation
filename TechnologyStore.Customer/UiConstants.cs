@@ -13,5 +13,5 @@ public static class UiConstants
     /// <summary>
     /// Out of stock label text
     /// </summary>
-    public const string OutOfStockText = "Out of Stock";
+    public const string OutOfStockText = "Stokta Yok";
 }

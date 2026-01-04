@@ -26,6 +26,11 @@ public partial class LeaveRequestForm : Form
     private Button? _btnCancel;
     private DataGridView? _gridHistory;
 
+    private sealed record LeaveTypeOption(string Text, LeaveType Value)
+    {
+        public override string ToString() => Text;
+    }
+
     public LeaveRequestForm(ILeaveRepository leaveRepository, IAuthenticationService authService, Employee? employee)
     {
         _leaveRepository = leaveRepository ?? throw new ArgumentNullException(nameof(leaveRepository));
@@ -44,7 +49,7 @@ public partial class LeaveRequestForm : Form
         this.AutoScaleMode = AutoScaleMode.Font;
         this.ClientSize = new Size(600, 550);
         this.Name = "LeaveRequestForm";
-        this.Text = "Request Leave";
+        this.Text = "İzin Talebi";
         this.StartPosition = FormStartPosition.CenterParent;
         this.FormBorderStyle = FormBorderStyle.FixedDialog;
         this.MaximizeBox = false;
@@ -61,7 +66,7 @@ public partial class LeaveRequestForm : Form
         // Title
         var lblTitle = new Label
         {
-            Text = "📅 New Leave Request",
+            Text = "Yeni İzin Talebi",
             Location = new Point(20, yPos),
             Width = 300,
             Font = new Font(this.Font.FontFamily, 14, FontStyle.Bold)
@@ -73,7 +78,7 @@ public partial class LeaveRequestForm : Form
         // Remaining Days Info
         _lblRemainingDays = new Label
         {
-            Text = $"Remaining Leave Days: {_currentEmployee?.RemainingLeaveDays ?? 0}",
+            Text = $"Kalan İzin Günü: {_currentEmployee?.RemainingLeaveDays ?? 0}",
             Location = new Point(20, yPos),
             Width = 300,
             ForeColor = Color.FromArgb(0, 120, 212),
@@ -84,7 +89,7 @@ public partial class LeaveRequestForm : Form
         yPos += 35;
 
         // Leave Type
-        var lblType = new Label { Text = "Leave Type:", Location = new Point(20, yPos + 3), Width = labelWidth };
+        var lblType = new Label { Text = "İzin Türü:", Location = new Point(20, yPos + 3), Width = labelWidth };
         this.Controls.Add(lblType);
 
         _cmbLeaveType = new ComboBox
@@ -93,14 +98,20 @@ public partial class LeaveRequestForm : Form
             Width = 200,
             DropDownStyle = ComboBoxStyle.DropDownList
         };
-        _cmbLeaveType.Items.AddRange(Enum.GetNames<LeaveType>());
+        _cmbLeaveType.Items.AddRange(new object[]
+        {
+            new LeaveTypeOption("Yıllık", LeaveType.Annual),
+            new LeaveTypeOption("Hastalık", LeaveType.Sick),
+            new LeaveTypeOption("Ücretsiz", LeaveType.Unpaid),
+            new LeaveTypeOption("Mazeret", LeaveType.Personal)
+        });
         _cmbLeaveType.SelectedIndex = 0;
         this.Controls.Add(_cmbLeaveType);
 
         yPos += 40;
 
         // Start Date
-        var lblStart = new Label { Text = "Start Date:", Location = new Point(20, yPos + 3), Width = labelWidth };
+        var lblStart = new Label { Text = "Başlangıç Tarihi:", Location = new Point(20, yPos + 3), Width = labelWidth };
         this.Controls.Add(lblStart);
 
         _dtpStartDate = new DateTimePicker
@@ -116,7 +127,7 @@ public partial class LeaveRequestForm : Form
         yPos += 40;
 
         // End Date
-        var lblEnd = new Label { Text = "End Date:", Location = new Point(20, yPos + 3), Width = labelWidth };
+        var lblEnd = new Label { Text = "Bitiş Tarihi:", Location = new Point(20, yPos + 3), Width = labelWidth };
         this.Controls.Add(lblEnd);
 
         _dtpEndDate = new DateTimePicker
@@ -132,7 +143,7 @@ public partial class LeaveRequestForm : Form
         yPos += 40;
 
         // Total Days Label
-        var lblTotalLabel = new Label { Text = "Total Days:", Location = new Point(20, yPos + 3), Width = labelWidth };
+        var lblTotalLabel = new Label { Text = "Toplam Gün:", Location = new Point(20, yPos + 3), Width = labelWidth };
         this.Controls.Add(lblTotalLabel);
 
         _lblTotalDays = new Label
@@ -147,7 +158,7 @@ public partial class LeaveRequestForm : Form
         yPos += 40;
 
         // Reason
-        var lblReason = new Label { Text = "Reason:", Location = new Point(20, yPos), Width = labelWidth };
+        var lblReason = new Label { Text = "Gerekçe:", Location = new Point(20, yPos), Width = labelWidth };
         this.Controls.Add(lblReason);
 
         _txtReason = new TextBox
@@ -165,7 +176,7 @@ public partial class LeaveRequestForm : Form
         // Buttons
         _btnSubmit = new Button
         {
-            Text = "Submit Request",
+            Text = "Talebi Gönder",
             Location = new Point(controlLeft, yPos),
             Width = 130,
             Height = 35,
@@ -179,7 +190,7 @@ public partial class LeaveRequestForm : Form
 
         _btnCancel = new Button
         {
-            Text = "Cancel",
+            Text = "İptal",
             Location = new Point(controlLeft + 140, yPos),
             Width = 100,
             Height = 35,
@@ -193,7 +204,7 @@ public partial class LeaveRequestForm : Form
         // History Section
         var lblHistory = new Label
         {
-            Text = "📋 My Leave History",
+            Text = "İzin Geçmişim",
             Location = new Point(20, yPos),
             Width = 200,
             Font = new Font(this.Font.FontFamily, 11, FontStyle.Bold)
@@ -213,12 +224,14 @@ public partial class LeaveRequestForm : Form
             SelectionMode = DataGridViewSelectionMode.FullRowSelect
         };
 
-        _gridHistory.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Type", DataPropertyName = "LeaveType", Width = 80 });
-        _gridHistory.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "From", DataPropertyName = "StartDate", Width = 90 });
-        _gridHistory.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "To", DataPropertyName = "EndDate", Width = 90 });
-        _gridHistory.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Days", DataPropertyName = "TotalDays", Width = 50 });
-        _gridHistory.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Status", DataPropertyName = "Status", Width = 80 });
-        _gridHistory.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Reason", DataPropertyName = "Reason", Width = 160 });
+        _gridHistory.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Tür", DataPropertyName = "LeaveType", Width = 80 });
+        _gridHistory.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Başlangıç", DataPropertyName = "StartDate", Width = 90 });
+        _gridHistory.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Bitiş", DataPropertyName = "EndDate", Width = 90 });
+        _gridHistory.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Gün", DataPropertyName = "TotalDays", Width = 50 });
+        _gridHistory.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Durum", DataPropertyName = "Status", Width = 80 });
+        _gridHistory.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Gerekçe", DataPropertyName = "Reason", Width = 160 });
+
+        _gridHistory.CellFormatting += GridHistory_CellFormatting;
 
         this.Controls.Add(_gridHistory);
     }
@@ -241,7 +254,7 @@ public partial class LeaveRequestForm : Form
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error loading leave history for employee {EmployeeId}", _currentEmployee.Id);
-            MessageBox.Show("Unable to load leave history at this time.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show("İzin geçmişi şu anda yüklenemiyor.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 
@@ -272,7 +285,7 @@ public partial class LeaveRequestForm : Form
     {
         if (_currentEmployee == null)
         {
-            MessageBox.Show("Employee record not found.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show("Çalışan kaydı bulunamadı.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             return;
         }
 
@@ -282,8 +295,8 @@ public partial class LeaveRequestForm : Form
         if (totalDays > _currentEmployee.RemainingLeaveDays)
         {
             var result = MessageBox.Show(
-                $"You are requesting {totalDays} days but only have {_currentEmployee.RemainingLeaveDays} remaining.\n\nSubmit anyway?",
-                "Insufficient Leave Days",
+                $"{totalDays} gün izin istiyorsunuz fakat yalnızca {_currentEmployee.RemainingLeaveDays} gününüz kaldı.\n\nYine de gönderilsin mi?",
+                "Yetersiz İzin Günü",
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Warning);
 
@@ -294,7 +307,7 @@ public partial class LeaveRequestForm : Form
 
         try
         {
-            var leaveType = Enum.Parse<LeaveType>(_cmbLeaveType!.SelectedItem!.ToString()!);
+            var leaveType = (_cmbLeaveType!.SelectedItem as LeaveTypeOption)?.Value ?? LeaveType.Annual;
 
             var request = new LeaveRequest
             {
@@ -308,20 +321,20 @@ public partial class LeaveRequestForm : Form
 
             await _leaveRepository.CreateLeaveRequestAsync(request);
 
-            MessageBox.Show("Leave request submitted successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("İzin talebi başarıyla gönderildi!", "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
             this.DialogResult = DialogResult.OK;
             this.Close();
         }
         catch (InvalidOperationException ex)
         {
             // Business logic errors (overlapping dates)
-            MessageBox.Show(ex.Message, "Request Denied", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show(ex.Message, "Talep Reddedildi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             SetFormEnabled(true);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error submitting request for employee {EmployeeId}", _currentEmployee.Id);
-            MessageBox.Show($"An unexpected error occurred while submitting your request.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show("Talebiniz gönderilirken beklenmeyen bir hata oluştu.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             SetFormEnabled(true);
         }
     }
@@ -335,8 +348,42 @@ public partial class LeaveRequestForm : Form
         if (_btnSubmit != null)
         {
             _btnSubmit.Enabled = enabled;
-            _btnSubmit.Text = enabled ? "Submit Request" : "Submitting...";
+            _btnSubmit.Text = enabled ? "Talebi Gönder" : "Gönderiliyor...";
         }
         if (_btnCancel != null) _btnCancel.Enabled = enabled;
+    }
+
+    private void GridHistory_CellFormatting(object? sender, DataGridViewCellFormattingEventArgs e)
+    {
+        if (_gridHistory == null) return;
+        if (e.RowIndex < 0 || e.ColumnIndex < 0) return;
+
+        var request = _gridHistory.Rows[e.RowIndex].DataBoundItem as LeaveRequest;
+        if (request == null) return;
+
+        var col = _gridHistory.Columns[e.ColumnIndex];
+        if (col?.DataPropertyName == "Status")
+        {
+            e.Value = request.Status switch
+            {
+                LeaveStatus.Pending => "Beklemede",
+                LeaveStatus.Approved => "Onaylandı",
+                LeaveStatus.Rejected => "Reddedildi",
+                _ => request.Status.ToString()
+            };
+            e.FormattingApplied = true;
+        }
+        else if (col?.DataPropertyName == "LeaveType")
+        {
+            e.Value = request.LeaveType switch
+            {
+                LeaveType.Annual => "Yıllık",
+                LeaveType.Sick => "Hastalık",
+                LeaveType.Unpaid => "Ücretsiz",
+                LeaveType.Personal => "Mazeret",
+                _ => request.LeaveType.ToString()
+            };
+            e.FormattingApplied = true;
+        }
     }
 }

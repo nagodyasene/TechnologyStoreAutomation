@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using TechnologyStore.Desktop.Services;
 using TechnologyStore.Desktop.UI.Forms;
+using System.Globalization;
 
 namespace TechnologyStore.Desktop
 {
@@ -16,6 +17,11 @@ namespace TechnologyStore.Desktop
         {
             // Initialize global exception handler first (before anything else can fail)
             GlobalExceptionHandler.Initialize();
+
+            // Turkish-only UI: force culture to tr-TR (no language switching)
+            var tr = new CultureInfo("tr-TR");
+            CultureInfo.DefaultThreadCurrentCulture = tr;
+            CultureInfo.DefaultThreadCurrentUICulture = tr;
             
             try
             {
@@ -28,8 +34,8 @@ namespace TechnologyStore.Desktop
                 logger.LogCritical(ex, "Fatal error during application startup");
                 
                 MessageBox.Show(
-                    $"A fatal error occurred during startup:\n\n{ex.Message}\n\nThe application will now close.",
-                    "Fatal Error",
+                    $"Başlatma sırasında kritik bir hata oluştu:\n\n{ex.Message}\n\nUygulama kapatılacak.",
+                    "Kritik Hata",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
             }
@@ -48,7 +54,7 @@ namespace TechnologyStore.Desktop
             {
                 MessageBox.Show(
                     ServiceConfiguration.GetConfigurationErrorMessage(),
-                    "Configuration Error",
+                    "Yapılandırma Hatası",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
                 return;
@@ -107,8 +113,8 @@ namespace TechnologyStore.Desktop
                 GlobalExceptionHandler.ReportException(ex, "Background Job Initialization");
                 
                 MessageBox.Show(
-                    $"Warning: Background job scheduling failed.\n\n{ex.Message}\n\nThe application will continue, but automated tasks won't run.",
-                    "Background Jobs Warning",
+                    $"Uyarı: Arka plan iş zamanlaması başarısız.\n\n{ex.Message}\n\nUygulama devam edecek; ancak otomatik görevler çalışmayacak.",
+                    "Arka Plan İşleri Uyarısı",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Warning);
             }

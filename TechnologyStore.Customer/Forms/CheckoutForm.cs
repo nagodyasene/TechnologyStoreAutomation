@@ -58,7 +58,7 @@ public partial class CheckoutForm : Form
         this.AutoScaleMode = AutoScaleMode.Font;
         this.ClientSize = new Size(550, 650);
         this.Name = "CheckoutForm";
-        this.Text = "Checkout";
+        this.Text = "Ödeme";
         this.StartPosition = FormStartPosition.CenterParent;
         this.BackColor = Color.White;
         this.FormBorderStyle = FormBorderStyle.FixedDialog;
@@ -75,7 +75,7 @@ public partial class CheckoutForm : Form
         // Title
         var lblTitle = new Label
         {
-            Text = "📋 Checkout",
+            Text = "Ödeme",
             Location = new Point(leftMargin, yPos),
             AutoSize = true,
             Font = new Font(DefaultFontFamily, 18, FontStyle.Bold),
@@ -88,7 +88,7 @@ public partial class CheckoutForm : Form
         // Order Summary
         var lblSummary = new Label
         {
-            Text = "Order Summary",
+            Text = "Sipariş Özeti",
             Location = new Point(leftMargin, yPos),
             Width = fieldWidth,
             Font = new Font(DefaultFontFamily, 12, FontStyle.Bold)
@@ -106,7 +106,7 @@ public partial class CheckoutForm : Form
         };
         this.Controls.Add(summaryPanel);
 
-        var itemsText = $"{_cartService.UniqueItemCount} item(s), {_cartService.ItemCount} unit(s)";
+        var itemsText = $"{_cartService.UniqueItemCount} ürün, {_cartService.ItemCount} adet";
 
         var lblItems = new Label
         {
@@ -119,7 +119,7 @@ public partial class CheckoutForm : Form
 
         var lblTotal = new Label
         {
-            Text = $"Total: ${_cartService.Total:N2}",
+            Text = $"Toplam: ${_cartService.Total:N2}",
             Location = new Point(15, 45),
             Width = 300,
             Font = new Font(DefaultFontFamily, 14, FontStyle.Bold),
@@ -134,7 +134,7 @@ public partial class CheckoutForm : Form
         {
             var lblGuestInfo = new Label
             {
-                Text = "Your Information",
+                Text = "Bilgileriniz",
                 Location = new Point(leftMargin, yPos),
                 Width = fieldWidth,
                 Font = new Font(DefaultFontFamily, 12, FontStyle.Bold)
@@ -144,20 +144,20 @@ public partial class CheckoutForm : Form
             yPos += 30;
 
             // Email
-            AddField("Email Address *", ref yPos, leftMargin, fieldWidth, out _txtGuestEmail, false);
+            AddField("E-posta *", ref yPos, leftMargin, fieldWidth, out _txtGuestEmail, false);
 
             // Name
-            AddField("Full Name *", ref yPos, leftMargin, fieldWidth, out _txtGuestName, false);
+            AddField("Ad Soyad *", ref yPos, leftMargin, fieldWidth, out _txtGuestName, false);
 
             // Phone
-            AddField("Phone (optional)", ref yPos, leftMargin, fieldWidth, out _txtGuestPhone, false);
+            AddField("Telefon (opsiyonel)", ref yPos, leftMargin, fieldWidth, out _txtGuestPhone, false);
         }
         else
         {
             // Show logged-in customer info
             var lblCustomerInfo = new Label
             {
-                Text = "Billing Information",
+                Text = "Fatura Bilgileri",
                 Location = new Point(leftMargin, yPos),
                 Width = fieldWidth,
                 Font = new Font(DefaultFontFamily, 12, FontStyle.Bold)
@@ -201,7 +201,7 @@ public partial class CheckoutForm : Form
         // Pickup date section
         var lblPickup = new Label
         {
-            Text = "Pickup Details",
+            Text = "Teslim Alma Detayları",
             Location = new Point(leftMargin, yPos),
             Width = fieldWidth,
             Font = new Font(DefaultFontFamily, 12, FontStyle.Bold)
@@ -212,7 +212,7 @@ public partial class CheckoutForm : Form
 
         _chkSpecifyDate = new CheckBox
         {
-            Text = "Specify a preferred pickup date",
+            Text = "Tercih edilen teslim alma tarihini belirtin",
             Location = new Point(leftMargin, yPos),
             Width = fieldWidth,
             Font = new Font(DefaultFontFamily, 10)
@@ -241,7 +241,7 @@ public partial class CheckoutForm : Form
         // Notes
         var lblNotes = new Label
         {
-            Text = "Order Notes (optional)",
+            Text = "Sipariş Notu (opsiyonel)",
             Location = new Point(leftMargin, yPos),
             Width = fieldWidth,
             Font = new Font(DefaultFontFamily, 10, FontStyle.Bold)
@@ -256,7 +256,7 @@ public partial class CheckoutForm : Form
             Size = new Size(fieldWidth, 60),
             Multiline = true,
             Font = new Font(DefaultFontFamily, 10),
-            PlaceholderText = "Any special requests or instructions..."
+            PlaceholderText = "Özel istek veya talimatlar..."
         };
         this.Controls.Add(_txtNotes);
 
@@ -279,7 +279,7 @@ public partial class CheckoutForm : Form
         // Place order button
         _btnPlaceOrder = new Button
         {
-            Text = "🛍️ Place Order",
+            Text = "Siparişi Ver",
             Location = new Point(leftMargin, yPos),
             Width = fieldWidth,
             Height = 45,
@@ -298,7 +298,7 @@ public partial class CheckoutForm : Form
         // Cancel button
         var btnCancel = new Button
         {
-            Text = "Cancel",
+            Text = "İptal",
             Location = new Point(leftMargin, yPos),
             Width = 100,
             Height = 35,
@@ -500,7 +500,7 @@ public partial class CheckoutForm : Form
         if (_btnPlaceOrder != null)
         {
             _btnPlaceOrder.Enabled = enabled;
-            _btnPlaceOrder.Text = enabled ? "🛍️ Place Order" : "Processing...";
+            _btnPlaceOrder.Text = enabled ? "Siparişi Ver" : "İşleniyor...";
         }
     }
 }

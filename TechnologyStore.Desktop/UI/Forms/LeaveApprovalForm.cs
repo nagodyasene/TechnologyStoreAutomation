@@ -40,7 +40,7 @@ public partial class LeaveApprovalForm : Form
         this.AutoScaleMode = AutoScaleMode.Font;
         this.ClientSize = new Size(800, 500);
         this.Name = "LeaveApprovalForm";
-        this.Text = "Leave Request Approval";
+        this.Text = "İzin Talepleri Onayı";
         this.StartPosition = FormStartPosition.CenterParent;
         this.ResumeLayout(false);
     }
@@ -50,7 +50,7 @@ public partial class LeaveApprovalForm : Form
         // Title
         var lblTitle = new Label
         {
-            Text = "✅ Leave Request Approval",
+            Text = "İzin Talepleri Onayı",
             Location = new Point(20, 15),
             Width = 300,
             Font = new Font(this.Font.FontFamily, 14, FontStyle.Bold)
@@ -66,7 +66,7 @@ public partial class LeaveApprovalForm : Form
         };
 
         // Status Filter
-        var lblFilter = new Label { Text = "Filter:", Location = new Point(20, 12), Width = 40 };
+        var lblFilter = new Label { Text = "Filtre:", Location = new Point(20, 12), Width = 40 };
         toolbar.Controls.Add(lblFilter);
 
         _cmbStatusFilter = new ComboBox
@@ -75,7 +75,7 @@ public partial class LeaveApprovalForm : Form
             Width = 120,
             DropDownStyle = ComboBoxStyle.DropDownList
         };
-        _cmbStatusFilter.Items.AddRange(new object[] { "All", "Pending", "Approved", "Rejected" });
+        _cmbStatusFilter.Items.AddRange(new object[] { "Tümü", "Beklemede", "Onaylandı", "Reddedildi" });
         _cmbStatusFilter.SelectedIndex = 1; // Default to Pending
         _cmbStatusFilter.SelectedIndexChanged += async (s, e) => await LoadRequestsAsync();
         toolbar.Controls.Add(_cmbStatusFilter);
@@ -83,7 +83,7 @@ public partial class LeaveApprovalForm : Form
         // Approve Button
         _btnApprove = new Button
         {
-            Text = "✓ Approve",
+            Text = "Onayla",
             Location = new Point(200, 7),
             Size = new Size(100, 30),
             BackColor = Color.FromArgb(76, 175, 80),
@@ -97,7 +97,7 @@ public partial class LeaveApprovalForm : Form
         // Reject Button
         _btnReject = new Button
         {
-            Text = "✗ Reject",
+            Text = "Reddet",
             Location = new Point(310, 7),
             Size = new Size(100, 30),
             BackColor = Color.FromArgb(244, 67, 54),
@@ -111,7 +111,7 @@ public partial class LeaveApprovalForm : Form
         // Refresh Button
         _btnRefresh = new Button
         {
-            Text = "🔄 Refresh",
+            Text = "Yenile",
             Location = new Point(420, 7),
             Size = new Size(100, 30),
             FlatStyle = FlatStyle.Flat
@@ -135,14 +135,14 @@ public partial class LeaveApprovalForm : Form
         };
 
         _gridRequests.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "ID", DataPropertyName = "Id", Width = 40 });
-        _gridRequests.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Employee", DataPropertyName = "EmployeeName", Width = 130 });
-        _gridRequests.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Type", DataPropertyName = "LeaveType", Width = 70 });
-        _gridRequests.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "From", DataPropertyName = "StartDate", Width = 85 });
-        _gridRequests.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "To", DataPropertyName = "EndDate", Width = 85 });
-        _gridRequests.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Days", DataPropertyName = "TotalDays", Width = 45 });
-        _gridRequests.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Status", DataPropertyName = "Status", Width = 70 });
-        _gridRequests.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Reason", DataPropertyName = "Reason", Width = 150 });
-        _gridRequests.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Submitted", DataPropertyName = "CreatedAt", Width = 85 });
+        _gridRequests.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Çalışan", DataPropertyName = "EmployeeName", Width = 130 });
+        _gridRequests.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Tür", DataPropertyName = "LeaveType", Width = 70 });
+        _gridRequests.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Başlangıç", DataPropertyName = "StartDate", Width = 85 });
+        _gridRequests.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Bitiş", DataPropertyName = "EndDate", Width = 85 });
+        _gridRequests.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Gün", DataPropertyName = "TotalDays", Width = 45 });
+        _gridRequests.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Durum", DataPropertyName = "Status", Width = 70 });
+        _gridRequests.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Gerekçe", DataPropertyName = "Reason", Width = 150 });
+        _gridRequests.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Gönderim", DataPropertyName = "CreatedAt", Width = 85 });
 
         // Color rows by status
         _gridRequests.CellFormatting += GridRequests_CellFormatting;
@@ -154,7 +154,7 @@ public partial class LeaveApprovalForm : Form
         {
             Location = new Point(20, 455),
             Width = 500,
-            Text = "Select a pending request to approve or reject."
+            Text = "Onaylamak veya reddetmek için beklemedeki bir talep seçin."
         };
         this.Controls.Add(_lblStatus);
     }
@@ -171,13 +171,13 @@ public partial class LeaveApprovalForm : Form
 
         try
         {
-            if (_lblStatus != null) _lblStatus.Text = "Loading...";
+            if (_lblStatus != null) _lblStatus.Text = "Yükleniyor...";
 
-            LeaveStatus? statusFilter = _cmbStatusFilter.SelectedItem?.ToString() switch
+            LeaveStatus? statusFilter = (_cmbStatusFilter.SelectedIndex) switch
             {
-                "Pending" => LeaveStatus.Pending,
-                "Approved" => LeaveStatus.Approved,
-                "Rejected" => LeaveStatus.Rejected,
+                1 => LeaveStatus.Pending,
+                2 => LeaveStatus.Approved,
+                3 => LeaveStatus.Rejected,
                 _ => null
             };
 
@@ -185,12 +185,12 @@ public partial class LeaveApprovalForm : Form
             var list = requests.ToList();
             _gridRequests.DataSource = list;
 
-            if (_lblStatus != null) _lblStatus.Text = $"Showing {list.Count} request(s).";
+            if (_lblStatus != null) _lblStatus.Text = $"{list.Count} talep gösteriliyor.";
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error loading leave requests");
-            MessageBox.Show("An error occurred while loading requests. Please try again later.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show("Talepler yüklenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 
@@ -201,6 +201,35 @@ public partial class LeaveApprovalForm : Form
         var row = _gridRequests.Rows[e.RowIndex];
         var request = row.DataBoundItem as LeaveRequest;
         if (request == null) return;
+
+        // Translate status/leave type to Turkish for display (do not change underlying values)
+        if (e.ColumnIndex >= 0)
+        {
+            var col = _gridRequests.Columns[e.ColumnIndex];
+            if (col?.DataPropertyName == "Status")
+            {
+                e.Value = request.Status switch
+                {
+                    LeaveStatus.Pending => "Beklemede",
+                    LeaveStatus.Approved => "Onaylandı",
+                    LeaveStatus.Rejected => "Reddedildi",
+                    _ => request.Status.ToString()
+                };
+                e.FormattingApplied = true;
+            }
+            else if (col?.DataPropertyName == "LeaveType")
+            {
+                e.Value = request.LeaveType switch
+                {
+                    LeaveType.Annual => "Yıllık",
+                    LeaveType.Sick => "Hastalık",
+                    LeaveType.Unpaid => "Ücretsiz",
+                    LeaveType.Personal => "Mazeret",
+                    _ => request.LeaveType.ToString()
+                };
+                e.FormattingApplied = true;
+            }
+        }
 
         switch (request.Status)
         {
@@ -223,16 +252,16 @@ public partial class LeaveApprovalForm : Form
 
         if (request.Status != LeaveStatus.Pending)
         {
-            MessageBox.Show("Only pending requests can be approved.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("Yalnızca beklemedeki talepler onaylanabilir.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
             return;
         }
 
         var result = MessageBox.Show(
-            $"Approve leave request from {request.EmployeeName}?\n\n" +
-            $"Type: {request.LeaveType}\n" +
-            $"Dates: {request.StartDate:d} to {request.EndDate:d}\n" +
-            $"Days: {request.TotalDays}",
-            "Confirm Approval",
+            $"{request.EmployeeName} adlı çalışan için izin talebi onaylansın mı?\n\n" +
+            $"Tür: {request.LeaveType}\n" +
+            $"Tarih: {request.StartDate:dd.MM.yyyy} - {request.EndDate:dd.MM.yyyy}\n" +
+            $"Gün: {request.TotalDays}",
+            "Onayı Onayla",
             MessageBoxButtons.YesNo,
             MessageBoxIcon.Question);
 
@@ -240,25 +269,25 @@ public partial class LeaveApprovalForm : Form
 
         if (_authService.CurrentUser == null)
         {
-            MessageBox.Show("You must be logged in to approve requests.", "Authentication Required", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show("Talepleri onaylamak için giriş yapmalısınız.", "Giriş Gerekli", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return;
         }
 
         try
         {
             await _leaveRepository.ApproveAsync(request.Id, _authService.CurrentUser.Id);
-            MessageBox.Show("Leave request approved!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("İzin talebi onaylandı!", "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
             await LoadRequestsAsync();
         }
         catch (InvalidOperationException ex)
         {
             // Business validation errors (like insufficient balance) should be shown to user
-            MessageBox.Show(ex.Message, "Validation Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show(ex.Message, "Doğrulama Hatası", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error approving leave request {RequestId}", request.Id);
-            MessageBox.Show("An unexpected error occurred while approving the request.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show("Talep onaylanırken beklenmeyen bir hata oluştu.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 
@@ -269,34 +298,34 @@ public partial class LeaveApprovalForm : Form
 
         if (request.Status != LeaveStatus.Pending)
         {
-            MessageBox.Show("Only pending requests can be rejected.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("Yalnızca beklemedeki talepler reddedilebilir.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
             return;
         }
 
         // Show input dialog for rejection reason
-        var comment = ShowInputDialog("Rejection Reason", "Please provide a reason for rejection:");
+        var comment = ShowInputDialog("Red Gerekçesi", "Lütfen reddetme gerekçesini girin:");
         if (string.IsNullOrWhiteSpace(comment))
         {
-            MessageBox.Show("A rejection reason is required.", "Required", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show("Red gerekçesi zorunludur.", "Zorunlu", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return;
         }
 
         if (_authService.CurrentUser == null)
         {
-            MessageBox.Show("You must be logged in to reject requests.", "Authentication Required", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show("Talepleri reddetmek için giriş yapmalısınız.", "Giriş Gerekli", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return;
         }
 
         try
         {
             await _leaveRepository.RejectAsync(request.Id, _authService.CurrentUser.Id, comment);
-            MessageBox.Show("Leave request rejected.", "Done", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("İzin talebi reddedildi.", "Tamamlandı", MessageBoxButtons.OK, MessageBoxIcon.Information);
             await LoadRequestsAsync();
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error rejecting leave request {RequestId}", request.Id);
-            MessageBox.Show("An unexpected error occurred while rejection the request.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show("Talep reddedilirken beklenmeyen bir hata oluştu.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 
@@ -304,7 +333,7 @@ public partial class LeaveApprovalForm : Form
     {
         if (_gridRequests == null || _gridRequests.SelectedRows.Count == 0)
         {
-            MessageBox.Show("Please select a request first.", "Selection Required", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show("Lütfen önce bir talep seçin.", "Seçim Gerekli", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return null;
         }
 
@@ -326,8 +355,8 @@ public partial class LeaveApprovalForm : Form
 
         var label = new Label { Left = 20, Top = 20, Width = 350, Text = prompt };
         var textBox = new TextBox { Left = 20, Top = 50, Width = 350, Height = 60, Multiline = true };
-        var btnOk = new Button { Text = "OK", Left = 200, Top = 105, Width = 80, DialogResult = DialogResult.OK };
-        var btnCancel = new Button { Text = "Cancel", Left = 290, Top = 105, Width = 80, DialogResult = DialogResult.Cancel };
+        var btnOk = new Button { Text = "Tamam", Left = 200, Top = 105, Width = 80, DialogResult = DialogResult.OK };
+        var btnCancel = new Button { Text = "İptal", Left = 290, Top = 105, Width = 80, DialogResult = DialogResult.Cancel };
 
         form.Controls.AddRange(new Control[] { label, textBox, btnOk, btnCancel });
         form.AcceptButton = btnOk;

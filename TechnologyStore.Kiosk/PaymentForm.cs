@@ -22,7 +22,7 @@ namespace TechnologyStore.Kiosk
 
         private void InitializeComponent()
         {
-            this.Text = "Checkout";
+            this.Text = "Ödeme";
             this.Size = new Size(800, 600);
             this.StartPosition = FormStartPosition.CenterScreen; // Or CenterParent
             this.FormBorderStyle = FormBorderStyle.None;
@@ -43,7 +43,7 @@ namespace TechnologyStore.Kiosk
 
             // 1. Header
             var lblHeader = new Label();
-            lblHeader.Text = "Review Your Order";
+            lblHeader.Text = "Siparişi İnceleyin";
             lblHeader.Font = new Font("Segoe UI", 24, FontStyle.Bold);
             lblHeader.AutoSize = true;
             lblHeader.TextAlign = ContentAlignment.MiddleLeft;
@@ -75,7 +75,7 @@ namespace TechnologyStore.Kiosk
             decimal total = _cart.Sum(x => x.Price * x.Quantity);
 
             var lblTotal = new Label();
-            lblTotal.Text = $"Total Due:\n${total:F2}";
+            lblTotal.Text = $"Ödenecek Tutar:\n${total:F2}";
             lblTotal.Font = new Font("Segoe UI", 32, FontStyle.Bold);
             lblTotal.ForeColor = Color.DarkGreen;
             lblTotal.AutoSize = true;
@@ -83,23 +83,23 @@ namespace TechnologyStore.Kiosk
             rightPanel.Controls.Add(lblTotal);
 
             var lblPrompt = new Label();
-            lblPrompt.Text = "Select Payment Method:";
+            lblPrompt.Text = "Ödeme Yöntemi Seçin:";
             lblPrompt.Font = new Font("Segoe UI", 16);
             lblPrompt.Location = new Point(20, 150);
             lblPrompt.AutoSize = true;
             rightPanel.Controls.Add(lblPrompt);
 
             // Buttons
-            var btnCard = CreatePaymentButton("💳 Credit Card", Color.FromArgb(0, 120, 215), 200);
-            btnCard.Click += async (s, e) => await ProcessPayment("Credit Card");
+            var btnCard = CreatePaymentButton("Kredi Kartı", Color.FromArgb(0, 120, 215), 200);
+            btnCard.Click += async (s, e) => await ProcessPayment("Kredi Kartı");
             rightPanel.Controls.Add(btnCard);
 
-            var btnNfc = CreatePaymentButton("📱 NFC / Mobile", Color.Black, 280);
+            var btnNfc = CreatePaymentButton("NFC / Mobil", Color.Black, 280);
             btnNfc.Click += async (s, e) => await ProcessPayment("NFC");
             rightPanel.Controls.Add(btnNfc);
 
-            var btnCash = CreatePaymentButton("💵 Cash", Color.Green, 360);
-            btnCash.Click += async (s, e) => await ProcessPayment("Cash");
+            var btnCash = CreatePaymentButton("Nakit", Color.Green, 360);
+            btnCash.Click += async (s, e) => await ProcessPayment("Nakit");
             rightPanel.Controls.Add(btnCash);
             
             // Status Label
@@ -114,7 +114,7 @@ namespace TechnologyStore.Kiosk
 
             // 4. Footer: Back Button
             var btnBack = new Button();
-            btnBack.Text = "← Back to Scan";
+            btnBack.Text = "Taramaya Dön";
             btnBack.FlatStyle = FlatStyle.Flat;
             btnBack.Font = new Font("Segoe UI", 14);
             btnBack.Size = new Size(200, 50);
@@ -140,7 +140,7 @@ namespace TechnologyStore.Kiosk
         {
             try
             {
-                _lblStatus.Text = $"Processing {method}...";
+                _lblStatus.Text = $"{method} işleniyor...";
                 _lblStatus.Refresh();
                 
                 // Simulate network delay
@@ -152,20 +152,20 @@ namespace TechnologyStore.Kiosk
                     await _repository.RecordSaleAsync(item.ProductId, item.Quantity, item.Price * item.Quantity);
                 }
 
-                _lblStatus.Text = "Approved!";
+                _lblStatus.Text = "Onaylandı!";
                 _lblStatus.ForeColor = Color.Green;
                 await Task.Delay(500);
 
                 GenerateReceipt(method);
 
-                MessageBox.Show("Payment Successful! Please take your receipt.");
+                MessageBox.Show("Ödeme başarılı! Lütfen fişinizi alın.");
                 this.DialogResult = DialogResult.OK; // Signal success to ScanForm
                 this.Close();
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Payment Failed: {ex.Message}");
-                _lblStatus.Text = "Failed. Try again.";
+                MessageBox.Show($"Ödeme başarısız: {ex.Message}");
+                _lblStatus.Text = "Başarısız. Tekrar deneyin.";
                 _lblStatus.ForeColor = Color.Red;
             }
         }
@@ -173,18 +173,18 @@ namespace TechnologyStore.Kiosk
         private void GenerateReceipt(string method)
         {
             decimal total = _cart.Sum(x => x.Price * x.Quantity);
-            string receiptContent = $"--- TECHNOLOGY STORE ---\n";
-            receiptContent += $"Date: {DateTime.Now}\n";
-            receiptContent += $"Method: {method}\n\n";
-            receiptContent += "ITEMS:\n";
+            string receiptContent = $"--- TEKNOLOJİ MAĞAZASI ---\n";
+            receiptContent += $"Tarih: {DateTime.Now:dd.MM.yyyy HH:mm}\n";
+            receiptContent += $"Yöntem: {method}\n\n";
+            receiptContent += "ÜRÜNLER:\n";
             foreach (var item in _cart)
             {
                 receiptContent += $"{item.Name}\n  {item.Quantity} x ${item.Price:F2} = ${(item.Price * item.Quantity):F2}\n";
             }
             receiptContent += "\n------------------------\n";
-            receiptContent += $"TOTAL: ${total:F2}\n";
+            receiptContent += $"TOPLAM: ${total:F2}\n";
             receiptContent += "------------------------\n";
-            receiptContent += "Thank you for shopping!";
+            receiptContent += "Teşekkür ederiz!";
 
             string fileName = $"receipt_{DateTime.Now:yyyyMMddHHmmss}.txt";
             System.IO.File.WriteAllText(fileName, receiptContent);

@@ -73,6 +73,63 @@ public class ProductRepository : IProductRepository
         return ex.SqlState != null && transientCodes.Contains(ex.SqlState);
     }
 
+    public async Task<Product> CreateAsync(Product product)
+    {
+        if (product == null) throw new ArgumentNullException(nameof(product));
+        if (string.IsNullOrWhiteSpace(product.Name)) throw new ArgumentException("Product name is required", nameof(product));
+        if (string.IsNullOrWhiteSpace(product.Sku)) throw new ArgumentException("SKU is required", nameof(product));
+
+        // Normalize inputs
+        product.Name = product.Name.Trim();
+        product.Sku = product.Sku.Trim();
+        product.Category = string.IsNullOrWhiteSpace(product.Category) ? null : product.Category.Trim();
+
+        var phase = string.IsNullOrWhiteSpace(product.LifecyclePhase) ? "ACTIVE" : product.LifecyclePhase.Trim().ToUpperInvariant();
+        if (phase is not ("ACTIVE" or "LEGACY" or "OBSOLETE"))
+            throw new ArgumentException("Lifecycle phase must be ACTIVE, LEGACY, or OBSOLETE", nameof(product));
+
+        if (product.UnitPrice <= 0) throw new ArgumentOutOfRangeException(nameof(product.UnitPrice), "Unit price must be greater than 0.");
+        if (product.CurrentStock < 0) throw new ArgumentOutOfRangeException(nameof(product.CurrentStock), "Current stock cannot be negative.");
+
+        return await ExecuteWithRetryAsync(async () =>
+        {
+            using (var db = CreateConnection())
+            {
+                const string sql = @"
+                    INSERT INTO products (name, sku, category, unit_price, current_stock, lifecycle_phase, successor_product_id, supplier_id)
+                    VALUES (@Name, @Sku, @Category, @UnitPrice, @CurrentStock, @LifecyclePhase::lifecycle_phase_type, @SuccessorProductId, @SupplierId)
+                    RETURNING id;";
+
+                try
+                {
+                    var id = await db.ExecuteScalarAsync<int>(sql, new
+                    {
+                        Name = product.Name,
+                        Sku = product.Sku,
+                        Category = product.Category,
+                        UnitPrice = product.UnitPrice,
+                        CurrentStock = product.CurrentStock,
+                        LifecyclePhase = phase,
+                        SuccessorProductId = product.SuccessorProductId,
+                        SupplierId = product.SupplierId
+                    }).ConfigureAwait(false);
+
+                    // Return a fully populated product record
+                    var created = await GetByIdAsync(id).ConfigureAwait(false);
+                    if (created == null)
+                        throw new InvalidOperationException("Product was created but could not be reloaded.");
+
+                    return created;
+                }
+                catch (PostgresException ex) when (ex.SqlState == "23505")
+                {
+                    // Unique violation (e.g., sku)
+                    throw new InvalidOperationException("A product with this SKU already exists.", ex);
+                }
+            }
+        }, nameof(CreateAsync)).ConfigureAwait(false);
+    }
+
     public async Task GenerateDailySnapshotAsync(DateTime dateToProcess)
     {
         await ExecuteWithRetryAsync(async () =>
@@ -458,7 +515,7 @@ public class ProductRepository : IProductRepository
                         last_updated = CURRENT_TIMESTAMP
                     WHERE id = ANY(@ProductIds);";
 
-                await db.ExecuteAsync(sql, new { SupplierId = supplierId, ProductIds = ids }).ConfigureAwait(false);
+                var affected = await db.ExecuteAsync(sql, new { SupplierId = supplierId, ProductIds = ids }).ConfigureAwait(false);
                 _logger.LogInformation("Assigned supplier {SupplierId} to {Count} product(s)", supplierId, ids.Length);
                 return true;
             }

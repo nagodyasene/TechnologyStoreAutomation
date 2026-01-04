@@ -17,20 +17,20 @@ namespace TechnologyStore.Kiosk
 
         private void InitializeComponent()
         {
-            this.Text = "Technology Store Kiosk";
+            this.Text = "Teknoloji Mağazası Kiosk";
             this.WindowState = FormWindowState.Maximized;
             this.FormBorderStyle = FormBorderStyle.None;
             this.BackColor = Color.FromArgb(0, 122, 204); // Brand Blue
 
             var lblTitle = new Label();
-            lblTitle.Text = "Values Technology Store";
+            lblTitle.Text = "Teknoloji Mağazası";
             lblTitle.Font = new Font("Segoe UI", 48, FontStyle.Bold);
             lblTitle.ForeColor = Color.White;
             lblTitle.AutoSize = true;
             lblTitle.Location = new Point(100, 200);
 
             var lblSubtitle = new Label();
-            lblSubtitle.Text = "Touch Screen to Start Checkout";
+            lblSubtitle.Text = "Ödeme için ekrana dokunun";
             lblSubtitle.Font = new Font("Segoe UI", 24, FontStyle.Regular);
             lblSubtitle.ForeColor = Color.White;
             lblSubtitle.AutoSize = true;

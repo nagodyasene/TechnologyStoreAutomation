@@ -48,31 +48,34 @@ public class HealthReport
     public string GetSummary()
     {
         var sb = new StringBuilder();
-        sb.AppendLine($"Health Check Report - {OverallStatus}");
-        sb.AppendLine($"Checked at: {CheckedAt:yyyy-MM-dd HH:mm:ss}");
-        sb.AppendLine($"Total duration: {TotalDuration.TotalMilliseconds:F0}ms");
+        sb.AppendLine($"Sağlık Kontrol Raporu - {GetStatusTr(OverallStatus)}");
+        sb.AppendLine($"Kontrol zamanı: {CheckedAt:dd.MM.yyyy HH:mm:ss}");
+        sb.AppendLine($"Toplam süre: {TotalDuration.TotalMilliseconds:F0}ms");
         sb.AppendLine();
 
         foreach (var result in Results)
         {
-            var statusIcon = result.Status switch
-            {
-                HealthStatus.Healthy => "✅",
-                HealthStatus.Degraded => "⚠️",
-                HealthStatus.Unhealthy => "❌",
-                _ => "❓"
-            };
-
-            sb.AppendLine($"{statusIcon} {result.Name}: {result.Status} ({result.Duration.TotalMilliseconds:F0}ms)");
+            sb.AppendLine($"{result.Name}: {GetStatusTr(result.Status)} ({result.Duration.TotalMilliseconds:F0}ms)");
 
             if (!string.IsNullOrEmpty(result.Description))
                 sb.AppendLine($"   {result.Description}");
 
             if (result.Exception != null)
-                sb.AppendLine($"   Error: {result.Exception.Message}");
+                sb.AppendLine($"   Hata: {result.Exception.Message}");
         }
 
         return sb.ToString();
+    }
+
+    private static string GetStatusTr(HealthStatus status)
+    {
+        return status switch
+        {
+            HealthStatus.Healthy => "Sağlıklı",
+            HealthStatus.Degraded => "Kısmen Sorunlu",
+            HealthStatus.Unhealthy => "Sorunlu",
+            _ => status.ToString()
+        };
     }
 }
 
@@ -146,7 +149,7 @@ public class HealthCheckService : IHealthCheckService
     /// </summary>
     public async Task<HealthCheckResult> CheckDatabaseAsync()
     {
-        var result = new HealthCheckResult { Name = "Database" };
+        var result = new HealthCheckResult { Name = "Veritabanı" };
         var stopwatch = Stopwatch.StartNew();
 
         try
@@ -165,17 +168,17 @@ public class HealthCheckService : IHealthCheckService
             if (stopwatch.ElapsedMilliseconds <= DatabaseResponseTimeHealthyMs)
             {
                 result.Status = HealthStatus.Healthy;
-                result.Description = $"Database responding normally ({stopwatch.ElapsedMilliseconds}ms)";
+                result.Description = $"Veritabanı normal yanıt veriyor ({stopwatch.ElapsedMilliseconds}ms)";
             }
             else if (stopwatch.ElapsedMilliseconds <= DatabaseResponseTimeDegradedMs)
             {
                 result.Status = HealthStatus.Degraded;
-                result.Description = $"Database responding slowly ({stopwatch.ElapsedMilliseconds}ms)";
+                result.Description = $"Veritabanı yavaş yanıt veriyor ({stopwatch.ElapsedMilliseconds}ms)";
             }
             else
             {
                 result.Status = HealthStatus.Degraded;
-                result.Description = $"Database responding very slowly ({stopwatch.ElapsedMilliseconds}ms)";
+                result.Description = $"Veritabanı çok yavaş yanıt veriyor ({stopwatch.ElapsedMilliseconds}ms)";
             }
 
             // Add connection info
@@ -188,7 +191,7 @@ public class HealthCheckService : IHealthCheckService
             stopwatch.Stop();
             result.Duration = stopwatch.Elapsed;
             result.Status = HealthStatus.Unhealthy;
-            result.Description = "Database connection failed";
+            result.Description = "Veritabanı bağlantısı başarısız";
             result.Exception = ex;
 
             _logger.LogError(ex, "Database health check failed");
@@ -202,7 +205,7 @@ public class HealthCheckService : IHealthCheckService
     /// </summary>
     public async Task<HealthCheckResult> CheckDatabaseConnectionPoolAsync()
     {
-        var result = new HealthCheckResult { Name = "Connection Pool" };
+        var result = new HealthCheckResult { Name = "Bağlantı Havuzu" };
         var stopwatch = Stopwatch.StartNew();
 
         try
@@ -236,7 +239,7 @@ public class HealthCheckService : IHealthCheckService
             stopwatch.Stop();
             result.Duration = stopwatch.Elapsed;
             result.Status = HealthStatus.Unhealthy;
-            result.Description = "Connection pool exhausted or unavailable";
+            result.Description = "Bağlantı havuzu tükendi veya kullanılamıyor";
             result.Exception = ex;
 
             _logger.LogError(ex, "Connection pool health check failed");
@@ -250,7 +253,7 @@ public class HealthCheckService : IHealthCheckService
     /// </summary>
     public HealthCheckResult CheckMemory()
     {
-        var result = new HealthCheckResult { Name = "Memory" };
+        var result = new HealthCheckResult { Name = "Bellek" };
         var stopwatch = Stopwatch.StartNew();
 
         try
@@ -266,17 +269,17 @@ public class HealthCheckService : IHealthCheckService
             if (workingSetMb < 256)
             {
                 result.Status = HealthStatus.Healthy;
-                result.Description = $"Memory usage normal ({workingSetMb}MB)";
+                result.Description = $"Bellek kullanımı normal ({workingSetMb}MB)";
             }
             else if (workingSetMb < 512)
             {
                 result.Status = HealthStatus.Degraded;
-                result.Description = $"Memory usage elevated ({workingSetMb}MB)";
+                result.Description = $"Bellek kullanımı yüksek ({workingSetMb}MB)";
             }
             else
             {
                 result.Status = HealthStatus.Degraded;
-                result.Description = $"Memory usage high ({workingSetMb}MB)";
+                result.Description = $"Bellek kullanımı çok yüksek ({workingSetMb}MB)";
             }
 
             result.Data["WorkingSetMB"] = workingSetMb;
@@ -290,7 +293,7 @@ public class HealthCheckService : IHealthCheckService
             stopwatch.Stop();
             result.Duration = stopwatch.Elapsed;
             result.Status = HealthStatus.Degraded;
-            result.Description = "Could not retrieve memory information";
+            result.Description = "Bellek bilgisi alınamadı";
             result.Exception = ex;
         }
 
@@ -302,7 +305,7 @@ public class HealthCheckService : IHealthCheckService
     /// </summary>
     public HealthCheckResult CheckDiskSpace()
     {
-        var result = new HealthCheckResult { Name = "Disk Space" };
+        var result = new HealthCheckResult { Name = "Disk Alanı" };
         var stopwatch = Stopwatch.StartNew();
 
         try
@@ -320,17 +323,17 @@ public class HealthCheckService : IHealthCheckService
             if (freeSpaceGb > 10)
             {
                 result.Status = HealthStatus.Healthy;
-                result.Description = $"Disk space adequate ({freeSpaceGb:F1}GB free)";
+                result.Description = $"Disk alanı yeterli ({freeSpaceGb:F1}GB boş)";
             }
             else if (freeSpaceGb > 2)
             {
                 result.Status = HealthStatus.Degraded;
-                result.Description = $"Disk space low ({freeSpaceGb:F1}GB free)";
+                result.Description = $"Disk alanı düşük ({freeSpaceGb:F1}GB boş)";
             }
             else
             {
                 result.Status = HealthStatus.Unhealthy;
-                result.Description = $"Disk space critical ({freeSpaceGb:F1}GB free)";
+                result.Description = $"Disk alanı kritik ({freeSpaceGb:F1}GB boş)";
             }
 
             result.Data["DriveName"] = driveInfo.Name;
@@ -343,7 +346,7 @@ public class HealthCheckService : IHealthCheckService
             stopwatch.Stop();
             result.Duration = stopwatch.Elapsed;
             result.Status = HealthStatus.Degraded;
-            result.Description = "Could not retrieve disk space information";
+            result.Description = "Disk alanı bilgisi alınamadı";
             result.Exception = ex;
         }
 

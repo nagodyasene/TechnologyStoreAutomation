@@ -41,7 +41,8 @@ public class PurchaseOrderRepository : IPurchaseOrderRepository
             {
                 order.OrderNumber,
                 order.SupplierId,
-                Status = order.Status.ToString().ToUpper(),
+                // IMPORTANT: Use invariant casing; tr-TR would turn PENDING into PENDİNG and break Postgres enum parsing.
+                Status = order.Status.ToString().ToUpperInvariant(),
                 order.TotalAmount,
                 order.Notes,
                 order.ExpectedDeliveryDate
@@ -260,7 +261,8 @@ public class PurchaseOrderRepository : IPurchaseOrderRepository
         var rowsAffected = await db.ExecuteAsync(sql, new
         {
             OrderId = orderId,
-            Status = status.ToString().ToUpper(),
+            // IMPORTANT: Use invariant casing; tr-TR would turn PENDING into PENDİNG etc.
+            Status = status.ToString().ToUpperInvariant(),
             ApprovedByUserId = approvedByUserId
         });
 
@@ -322,9 +324,29 @@ public class PurchaseOrderRepository : IPurchaseOrderRepository
                     last_updated = CURRENT_TIMESTAMP
                 WHERE id = @ProductId";
 
+            const string inventorySql = @"
+                INSERT INTO inventory_transactions (product_id, quantity_change, transaction_type, transaction_date, notes)
+                VALUES (@ProductId, @Quantity, 'RESTOCK', CURRENT_DATE, @Notes);";
+
+            var totalUpdated = 0;
             foreach (var (productId, quantity) in items)
             {
-                await db.ExecuteAsync(stockSql, new { ProductId = productId, Quantity = quantity }, transaction);
+                var updated = await db.ExecuteAsync(stockSql, new { ProductId = productId, Quantity = quantity }, transaction);
+                totalUpdated += updated;
+
+                await db.ExecuteAsync(inventorySql, new
+                {
+                    ProductId = productId,
+                    Quantity = quantity,
+                    Notes = $"PO {orderId} teslim alındı"
+                }, transaction);
+            }
+
+            // Safety: if none of the products were updated, don't silently succeed.
+            if (totalUpdated == 0 && items.Any())
+            {
+                await transaction.RollbackAsync();
+                return false;
             }
 
             await transaction.CommitAsync();

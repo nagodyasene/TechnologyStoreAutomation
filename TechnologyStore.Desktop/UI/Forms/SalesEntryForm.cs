@@ -48,7 +48,7 @@ public partial class SalesEntryForm : Form
         this.AutoScaleMode = AutoScaleMode.Font;
         this.ClientSize = new Size(450, 300);
         this.Name = "SalesEntryForm";
-        this.Text = "Record Sale";
+        this.Text = "Satış Kaydet";
         this.StartPosition = FormStartPosition.CenterParent;
         this.FormBorderStyle = FormBorderStyle.FixedDialog;
         this.MaximizeBox = false;
@@ -65,7 +65,7 @@ public partial class SalesEntryForm : Form
         // Product Label & ComboBox
         var lblProduct = new Label
         {
-            Text = "Product:",
+            Text = "Ürün:",
             Location = new Point(20, yPos),
             Width = labelWidth
         };
@@ -85,7 +85,7 @@ public partial class SalesEntryForm : Form
         // Quantity Label & NumericUpDown
         var lblQuantity = new Label
         {
-            Text = "Quantity:",
+            Text = "Adet:",
             Location = new Point(20, yPos),
             Width = labelWidth
         };
@@ -107,7 +107,7 @@ public partial class SalesEntryForm : Form
         // Sale Date Label & DateTimePicker
         var lblSaleDate = new Label
         {
-            Text = "Sale Date:",
+            Text = "Satış Tarihi:",
             Location = new Point(20, yPos),
             Width = labelWidth
         };
@@ -127,7 +127,7 @@ public partial class SalesEntryForm : Form
         // Unit Price Label & TextBox
         var lblUnitPrice = new Label
         {
-            Text = "Unit Price:",
+            Text = "Birim Fiyat:",
             Location = new Point(20, yPos),
             Width = labelWidth
         };
@@ -146,7 +146,7 @@ public partial class SalesEntryForm : Form
         // Total Label
         var lblTotalLabel = new Label
         {
-            Text = "Total Amount:",
+            Text = "Toplam Tutar:",
             Location = new Point(20, yPos),
             Width = labelWidth,
             Font = new Font(this.Font, FontStyle.Bold)
@@ -167,7 +167,7 @@ public partial class SalesEntryForm : Form
         // Buttons
         _btnRecord = new Button
         {
-            Text = "Record Sale",
+            Text = "Satışı Kaydet",
             Location = new Point(controlLeft, yPos),
             Width = 120,
             Height = 35
@@ -177,7 +177,7 @@ public partial class SalesEntryForm : Form
 
         _btnCancel = new Button
         {
-            Text = "Cancel",
+            Text = "İptal",
             Location = new Point(controlLeft + 130, yPos),
             Width = 100,
             Height = 35
@@ -214,7 +214,7 @@ public partial class SalesEntryForm : Form
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Error loading products: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show($"Ürünler yüklenirken hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 
@@ -267,8 +267,8 @@ public partial class SalesEntryForm : Form
         if (quantity > product.CurrentStock)
         {
             var result = MessageBox.Show(
-                $"Warning: Only {product.CurrentStock} units in stock. Record sale anyway?",
-                "Low Stock",
+                $"Uyarı: Stokta yalnızca {product.CurrentStock} adet var. Yine de satış kaydedilsin mi?",
+                "Düşük Stok",
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Warning);
             
@@ -288,27 +288,27 @@ public partial class SalesEntryForm : Form
         // Product validation
         if (_cmbProduct?.SelectedItem is not Product)
         {
-            errors.Add("Please select a product.");
+            errors.Add("Lütfen bir ürün seçin.");
         }
 
         // Quantity validation
         if (_numQuantity == null)
         {
-            errors.Add("Quantity control not initialized.");
+            errors.Add("Adet alanı başlatılmadı.");
         }
         else if (_numQuantity.Value < MinQuantity)
         {
-            errors.Add($"Quantity must be at least {MinQuantity}.");
+            errors.Add($"Adet en az {MinQuantity} olmalıdır.");
         }
         else if (_numQuantity.Value > MaxQuantity)
         {
-            errors.Add($"Quantity cannot exceed {MaxQuantity}.");
+            errors.Add($"Adet {MaxQuantity} değerini aşamaz.");
         }
 
         // Date validation - only allow today's date
         if (_dtpSaleDate == null)
         {
-            errors.Add("Date control not initialized.");
+            errors.Add("Tarih alanı başlatılmadı.");
         }
         else
         {
@@ -317,7 +317,7 @@ public partial class SalesEntryForm : Form
 
             if (selectedDate != today)
             {
-                errors.Add("Sale date must be today's date. Recording past or future dates is not allowed.");
+                errors.Add("Satış tarihi bugünün tarihi olmalıdır. Geçmiş veya gelecek tarih kaydı yapılamaz.");
             }
         }
 
@@ -332,7 +332,7 @@ public partial class SalesEntryForm : Form
         var message = string.Join(Environment.NewLine, errors.Select(e => $"• {e}"));
         MessageBox.Show(
             message,
-            "Validation Errors",
+            "Doğrulama Hataları",
             MessageBoxButtons.OK,
             MessageBoxIcon.Warning);
     }
@@ -355,14 +355,14 @@ public partial class SalesEntryForm : Form
             _logger.LogInformation("Sale recorded successfully: Product={ProductId}, Total={Total}", 
                 product.Id, totalAmount);
 
-            MessageBox.Show("Sale recorded successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("Satış başarıyla kaydedildi!", "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
             this.DialogResult = DialogResult.OK;
             this.Close();
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error recording sale for product {ProductId}", product.Id);
-            MessageBox.Show($"Error recording sale: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show($"Satış kaydı başarısız: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             SetFormEnabled(true);
         }
     }

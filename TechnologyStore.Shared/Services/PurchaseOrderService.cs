@@ -17,7 +17,7 @@ public class PurchaseOrderService : IPurchaseOrderService
     private readonly BusinessRuleSettings _businessRules;
     private readonly ILogger<PurchaseOrderService> _logger;
 
-    private const string OrderNotFoundMessage = "Purchase order not found.";
+    private const string OrderNotFoundMessage = "Satın alma siparişi bulunamadı.";
 
     public PurchaseOrderService(
         IPurchaseOrderRepository purchaseOrderRepository,
@@ -39,14 +39,21 @@ public class PurchaseOrderService : IPurchaseOrderService
     {
         return await GeneratePurchaseOrdersByRunwayThresholdAsync(
             runwayDaysThreshold: _businessRules.ReorderRunwayDays,
-            label: "low stock");
+            label: "düşük stok");
+    }
+
+    public async Task<IEnumerable<PurchaseOrder>> GeneratePurchaseOrdersForUrgentStockAsync()
+    {
+        return await GeneratePurchaseOrdersByRunwayThresholdAsync(
+            runwayDaysThreshold: _businessRules.UrgentRunwayDays,
+            label: "acil stok");
     }
 
     public async Task<IEnumerable<PurchaseOrder>> GeneratePurchaseOrdersForCriticalStockAsync()
     {
         return await GeneratePurchaseOrdersByRunwayThresholdAsync(
             runwayDaysThreshold: _businessRules.CriticalRunwayDays,
-            label: "critical stock");
+            label: "kritik stok");
     }
 
     private async Task<IEnumerable<PurchaseOrder>> GeneratePurchaseOrdersByRunwayThresholdAsync(int runwayDaysThreshold, string label)
@@ -56,7 +63,7 @@ public class PurchaseOrderService : IPurchaseOrderService
         try
         {
             // Get dashboard data which includes RunwayDays calculation
-            var dashboardData = await _productRepository.GetDashboardDataAsync();
+            var dashboardData = (await _productRepository.GetDashboardDataAsync()).ToList();
 
             // Filter products that are ACTIVE and below threshold
             var matchingProducts = dashboardData
@@ -73,7 +80,9 @@ public class PurchaseOrderService : IPurchaseOrderService
 
             // Get full product details to access SupplierId
             var products = await _productRepository.GetAllAsync();
-            var productDict = products.ToDictionary(p => p.Id);
+            var productsList = products?.ToList() ?? new List<Product>();
+
+            var productDict = productsList.ToDictionary(p => p.Id);
 
             // Group by supplier (only those with SupplierId)
             var productsBySupplier = matchingProducts
@@ -81,12 +90,18 @@ public class PurchaseOrderService : IPurchaseOrderService
                 .GroupBy(p => productDict[p.Id].SupplierId!.Value)
                 .ToList();
 
+            var skippedAlreadyOpen = 0;
+            var skippedSupplierMissing = 0;
+            var skippedSupplierInactive = 0;
+            var createdOrderCount = 0;
+
             foreach (var supplierGroup in productsBySupplier)
             {
                 var supplierId = supplierGroup.Key;
                 var supplier = await _supplierRepository.GetByIdAsync(supplierId);
                 if (supplier == null || !supplier.IsActive)
                 {
+                    skippedSupplierInactive += supplierGroup.Count();
                     _logger.LogWarning("Supplier {SupplierId} not found or inactive, skipping", supplierId);
                     continue;
                 }
@@ -101,6 +116,7 @@ public class PurchaseOrderService : IPurchaseOrderService
                     var product = productDict[dashboardProduct.Id];
                     if (openProductIds.Contains(product.Id))
                     {
+                        skippedAlreadyOpen++;
                         continue;
                     }
 
@@ -134,12 +150,13 @@ public class PurchaseOrderService : IPurchaseOrderService
                     Status = PurchaseOrderStatus.Pending, // admin must approve
                     TotalAmount = items.Sum(i => i.Quantity * i.UnitCost),
                     Items = items,
-                    Notes = $"Auto-generated due to {label} levels (RunwayDays <= {runwayDaysThreshold}). Generated on {DateTime.UtcNow:yyyy-MM-dd HH:mm} UTC.",
+                    Notes = $"Otomatik oluşturuldu: {label} (RunwayDays <= {runwayDaysThreshold}). Oluşturma zamanı: {DateTime.UtcNow:dd.MM.yyyy HH:mm} UTC.",
                     ExpectedDeliveryDate = DateTime.UtcNow.AddDays(supplier.LeadTimeDays)
                 };
 
                 var createdOrder = await _purchaseOrderRepository.CreateAsync(order);
                 generatedOrders.Add(createdOrder);
+                createdOrderCount++;
 
                 _logger.LogInformation("Generated PO {OrderNumber} for supplier {SupplierName} with {ItemCount} items, total ${Total:F2}",
                     orderNumber, supplier.Name, items.Count, order.TotalAmount);
@@ -152,6 +169,7 @@ public class PurchaseOrderService : IPurchaseOrderService
 
             if (productsWithoutSupplier.Any())
             {
+                skippedSupplierMissing = productsWithoutSupplier.Count;
                 _logger.LogWarning("{Count} {Label} products have no assigned supplier: {Products}",
                     productsWithoutSupplier.Count,
                     label,
@@ -161,7 +179,7 @@ public class PurchaseOrderService : IPurchaseOrderService
         catch (Exception ex)
         {
             // Don't log and rethrow (S2139) - let caller handle
-            throw new InvalidOperationException($"Error generating purchase orders for {label} products", ex);
+            throw new InvalidOperationException($"{label} ürünler için satın alma siparişleri oluşturulurken hata oluştu", ex);
         }
 
         return generatedOrders;
@@ -177,24 +195,24 @@ public class PurchaseOrderService : IPurchaseOrderService
         {
             var supplier = await _supplierRepository.GetByIdAsync(supplierId);
             if (supplier == null)
-                return PurchaseOrderResult.Failed("Supplier not found.");
+                return PurchaseOrderResult.Failed("Tedarikçi bulunamadı.");
 
             if (!supplier.IsActive)
-                return PurchaseOrderResult.Failed("Supplier is not active.");
+                return PurchaseOrderResult.Failed("Tedarikçi aktif değil.");
 
             if (!items.Any())
-                return PurchaseOrderResult.Failed("At least one item is required.");
+                return PurchaseOrderResult.Failed("En az bir kalem gerekli.");
 
             var orderItems = new List<PurchaseOrderItem>();
             var allProducts = await _productRepository.GetAllAsync();
             if (allProducts == null)
-                return PurchaseOrderResult.Failed("Failed to retrieve product list.");
+                return PurchaseOrderResult.Failed("Ürün listesi alınamadı.");
                 
             foreach (var (productId, quantity, unitCost) in items)
             {
                 var product = allProducts.FirstOrDefault(p => p.Id == productId);
                 if (product == null)
-                    return PurchaseOrderResult.Failed($"Product ID {productId} not found.");
+                    return PurchaseOrderResult.Failed($"Ürün bulunamadı (ID: {productId}).");
 
                 orderItems.Add(new PurchaseOrderItem
                 {
@@ -227,7 +245,7 @@ public class PurchaseOrderService : IPurchaseOrderService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error creating manual purchase order");
-            return PurchaseOrderResult.Failed("An error occurred while creating the purchase order.");
+            return PurchaseOrderResult.Failed("Satın alma siparişi oluşturulurken bir hata oluştu.");
         }
     }
 
@@ -241,11 +259,11 @@ public class PurchaseOrderService : IPurchaseOrderService
                 return PurchaseOrderResult.Failed(OrderNotFoundMessage);
 
             if (order.Status != PurchaseOrderStatus.Pending)
-                return PurchaseOrderResult.Failed($"Cannot approve order in '{order.Status}' status.");
+                return PurchaseOrderResult.Failed($"'{order.Status}' durumundaki sipariş onaylanamaz.");
 
             var success = await _purchaseOrderRepository.UpdateStatusAsync(orderId, PurchaseOrderStatus.Approved, approvedByUserId);
             if (!success)
-                return PurchaseOrderResult.Failed("Failed to update order status.");
+                return PurchaseOrderResult.Failed("Sipariş durumu güncellenemedi.");
 
             order.Status = PurchaseOrderStatus.Approved;
             order.ApprovedAt = DateTime.UtcNow;
@@ -257,7 +275,7 @@ public class PurchaseOrderService : IPurchaseOrderService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error approving purchase order {OrderId}", orderId);
-            return PurchaseOrderResult.Failed("An error occurred while approving the purchase order.");
+            return PurchaseOrderResult.Failed("Satın alma siparişi onaylanırken bir hata oluştu.");
         }
     }
 
@@ -271,26 +289,26 @@ public class PurchaseOrderService : IPurchaseOrderService
                 return PurchaseOrderResult.Failed(OrderNotFoundMessage);
 
             if (order.Status != PurchaseOrderStatus.Approved)
-                return PurchaseOrderResult.Failed($"Cannot send order in '{order.Status}' status. Order must be approved first.");
+                return PurchaseOrderResult.Failed($"'{order.Status}' durumundaki sipariş gönderilemez. Önce onaylanmalıdır.");
 
             var supplier = await _supplierRepository.GetByIdAsync(order.SupplierId);
             if (supplier == null)
-                return PurchaseOrderResult.Failed("Supplier not found.");
+                return PurchaseOrderResult.Failed("Tedarikçi bulunamadı.");
 
             var emailConfigured = await _emailService.IsConfiguredAsync();
             
             if (!emailConfigured)
             {
                 return PurchaseOrderResult.Failed(
-                    "Email service is not configured.\n\n" +
-                    "To enable sending:\n" +
-                    "- Put Gmail OAuth credentials at 'credentials.json' (in the app working directory), OR\n" +
-                    "- Enable Email Test Mode in Tools → Settings (logs email instead of sending).");
+                    "E-posta servisi yapılandırılmamış.\n\n" +
+                    "Gönderimi etkinleştirmek için:\n" +
+                    "- Gmail OAuth kimlik bilgilerini 'credentials.json' olarak uygulama çalışma dizinine koyun, VEYA\n" +
+                    "- Araçlar → Ayarlar içinden E-posta Test Modu'nu açın (göndermek yerine loglar).");
             }
 
             // Generate email content
             var emailHtml = GeneratePurchaseOrderEmailHtml(order, supplier);
-            var subject = $"Purchase Order {order.OrderNumber} from TechTrend Store";
+            var subject = $"Satın Alma Siparişi {order.OrderNumber} - TechTrend Store";
 
             // Send email
             var emailSent = await _emailService.SendEmailAsync(supplier.Email, subject, emailHtml);
@@ -303,13 +321,13 @@ public class PurchaseOrderService : IPurchaseOrderService
                     return PurchaseOrderResult.Failed(diag.LastErrorMessage);
                 }
 
-                return PurchaseOrderResult.Failed("Failed to send email to supplier.");
+                return PurchaseOrderResult.Failed("E-posta tedarikçiye gönderilemedi.");
             }
 
             // Update status
             var success = await _purchaseOrderRepository.MarkAsSentAsync(orderId);
             if (!success)
-                return PurchaseOrderResult.Failed("Email sent but failed to update order status.");
+                return PurchaseOrderResult.Failed("E-posta gönderildi ancak sipariş durumu güncellenemedi.");
 
             order.Status = PurchaseOrderStatus.Sent;
             order.SentAt = DateTime.UtcNow;
@@ -320,7 +338,7 @@ public class PurchaseOrderService : IPurchaseOrderService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error sending purchase order {OrderId} to supplier", orderId);
-            return PurchaseOrderResult.Failed("An error occurred while sending to supplier.");
+            return PurchaseOrderResult.Failed("Tedarikçiye gönderim sırasında bir hata oluştu.");
         }
     }
 
@@ -334,13 +352,19 @@ public class PurchaseOrderService : IPurchaseOrderService
                 return PurchaseOrderResult.Failed(OrderNotFoundMessage);
 
             if (order.Status != PurchaseOrderStatus.Sent)
-                return PurchaseOrderResult.Failed($"Cannot mark as received. Order is in '{order.Status}' status.");
+                return PurchaseOrderResult.Failed($"Teslim alındı olarak işaretlenemez. Sipariş durumu: '{order.Status}'.");
 
             // Update order status and product stock levels atomically
             var items = order.Items.Select(item => (item.ProductId, item.Quantity)).ToList();
             var success = await _purchaseOrderRepository.MarkAsReceivedAsync(orderId, items);
             if (!success)
-                return PurchaseOrderResult.Failed("Failed to update order status. Order may have already been received or is in an invalid state.");
+                return PurchaseOrderResult.Failed("Sipariş durumu güncellenemedi. Sipariş zaten teslim alınmış olabilir veya geçersiz durumda olabilir.");
+
+            // Invalidate dashboard/product caches (Desktop uses a cached decorator)
+            if (_productRepository is TechnologyStore.Shared.Interfaces.IProductCacheInvalidation cacheInvalidation)
+            {
+                cacheInvalidation.InvalidateProductCaches();
+            }
 
             _logger.LogDebug("Updated stock for {ItemCount} products from PO {OrderNumber}",
                 items.Count, order.OrderNumber);
@@ -355,7 +379,7 @@ public class PurchaseOrderService : IPurchaseOrderService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error marking purchase order {OrderId} as received", orderId);
-            return PurchaseOrderResult.Failed("An error occurred.");
+            return PurchaseOrderResult.Failed("Bir hata oluştu.");
         }
     }
 
@@ -370,11 +394,11 @@ public class PurchaseOrderService : IPurchaseOrderService
                 return PurchaseOrderResult.Failed(OrderNotFoundMessage);
 
             if (order.Status == PurchaseOrderStatus.Sent || order.Status == PurchaseOrderStatus.Received)
-                return PurchaseOrderResult.Failed($"Cannot cancel order that has been '{order.Status}'.");
+                return PurchaseOrderResult.Failed($"'{order.Status}' durumundaki sipariş iptal edilemez.");
 
             var success = await _purchaseOrderRepository.UpdateStatusAsync(orderId, PurchaseOrderStatus.Cancelled);
             if (!success)
-                return PurchaseOrderResult.Failed("Failed to cancel order.");
+                return PurchaseOrderResult.Failed("Sipariş iptal edilemedi.");
 
             order.Status = PurchaseOrderStatus.Cancelled;
             _logger.LogInformation("Cancelled PO {OrderNumber}", order.OrderNumber);
@@ -383,7 +407,7 @@ public class PurchaseOrderService : IPurchaseOrderService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error cancelling purchase order {OrderId}", orderId);
-            return PurchaseOrderResult.Failed("An error occurred while cancelling the order.");
+            return PurchaseOrderResult.Failed("Sipariş iptal edilirken bir hata oluştu.");
         }
     }
 
@@ -438,23 +462,23 @@ public class PurchaseOrderService : IPurchaseOrderService
 <body>
     <div class='container'>
         <div class='header'>
-            <h1>Purchase Order</h1>
+            <h1>Satın Alma Siparişi</h1>
             <h2>{order.OrderNumber}</h2>
         </div>
         <div class='content'>
-            <p><strong>Date:</strong> {DateTime.UtcNow:MMMM dd, yyyy}</p>
-            <p><strong>To:</strong> {supplier.Name}</p>
-            {(string.IsNullOrEmpty(supplier.ContactPerson) ? "" : $"<p><strong>Attention:</strong> {supplier.ContactPerson}</p>")}
-            {(order.ExpectedDeliveryDate.HasValue ? $"<p><strong>Expected Delivery:</strong> {order.ExpectedDeliveryDate:MMMM dd, yyyy}</p>" : "")}
+            <p><strong>Tarih:</strong> {DateTime.UtcNow:dd.MM.yyyy}</p>
+            <p><strong>Alıcı:</strong> {supplier.Name}</p>
+            {(string.IsNullOrEmpty(supplier.ContactPerson) ? "" : $"<p><strong>İlgili:</strong> {supplier.ContactPerson}</p>")}
+            {(order.ExpectedDeliveryDate.HasValue ? $"<p><strong>Beklenen Teslim:</strong> {order.ExpectedDeliveryDate:dd.MM.yyyy}</p>" : "")}
             
             <table>
                 <thead>
                     <tr>
                         <th>SKU</th>
-                        <th>Product</th>
-                        <th style='text-align: center;'>Qty</th>
-                        <th style='text-align: right;'>Unit Cost</th>
-                        <th style='text-align: right;'>Total</th>
+                        <th>Ürün</th>
+                        <th style='text-align: center;'>Adet</th>
+                        <th style='text-align: right;'>Birim Maliyet</th>
+                        <th style='text-align: right;'>Toplam</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -463,14 +487,14 @@ public class PurchaseOrderService : IPurchaseOrderService
             </table>
             
             <div class='total'>
-                Total: ${order.TotalAmount:F2}
+                Toplam: ${order.TotalAmount:F2}
             </div>
             
-            {(string.IsNullOrEmpty(order.Notes) ? "" : $"<p><strong>Notes:</strong> {order.Notes}</p>")}
+            {(string.IsNullOrEmpty(order.Notes) ? "" : $"<p><strong>Notlar:</strong> {order.Notes}</p>")}
             
             <div class='footer'>
-                <p>This purchase order was generated by TechTrend Automation Dashboard.</p>
-                <p>Please confirm receipt of this order by replying to this email.</p>
+                <p>Bu satın alma siparişi TechTrend Otomasyon Paneli tarafından oluşturulmuştur.</p>
+                <p>Lütfen bu e-postaya yanıt vererek siparişi aldığınızı teyit edin.</p>
             </div>
         </div>
     </div>

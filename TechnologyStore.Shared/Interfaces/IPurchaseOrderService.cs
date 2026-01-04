@@ -21,6 +21,12 @@ public class PurchaseOrderResult
 public interface IPurchaseOrderService
 {
     /// <summary>
+    /// Scans all products for urgent stock (RunwayDays &lt;= UrgentRunwayDays)
+    /// and generates purchase orders for products with assigned suppliers.
+    /// </summary>
+    Task<IEnumerable<PurchaseOrder>> GeneratePurchaseOrdersForUrgentStockAsync();
+
+    /// <summary>
     /// Scans all products for low stock (RunwayDays <= ReorderRunwayDays) 
     /// and generates purchase orders for products with assigned suppliers
     /// </summary>

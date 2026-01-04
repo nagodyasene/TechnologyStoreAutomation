@@ -40,7 +40,7 @@ namespace TechnologyStore.Desktop.Features.Payroll.Forms
 
         private void InitializeComponent()
         {
-            this.Text = "Payroll Management";
+            this.Text = "Bordro Yönetimi";
             this.Size = new System.Drawing.Size(1000, 700);
             this.StartPosition = FormStartPosition.CenterScreen;
 
@@ -59,19 +59,19 @@ namespace TechnologyStore.Desktop.Features.Payroll.Forms
             pnlControls.AutoSize = true;
             mainLayout.Controls.Add(pnlControls, 0, 0);
 
-            var lblStart = new Label { Text = "Start Date:", AutoSize = true, TextAlign = System.Drawing.ContentAlignment.MiddleRight, Padding = new Padding(0, 6, 0, 0) };
+            var lblStart = new Label { Text = "Başlangıç:", AutoSize = true, TextAlign = System.Drawing.ContentAlignment.MiddleRight, Padding = new Padding(0, 6, 0, 0) };
             _dtStart = new DateTimePicker { Format = DateTimePickerFormat.Short, Value = DateTime.Today.AddDays(-15) };
 
-            var lblEnd = new Label { Text = "End Date:", AutoSize = true, TextAlign = System.Drawing.ContentAlignment.MiddleRight, Padding = new Padding(0, 6, 0, 0) };
+            var lblEnd = new Label { Text = "Bitiş:", AutoSize = true, TextAlign = System.Drawing.ContentAlignment.MiddleRight, Padding = new Padding(0, 6, 0, 0) };
             _dtEnd = new DateTimePicker { Format = DateTimePickerFormat.Short, Value = DateTime.Today };
 
-            var btnPreview = new Button { Text = "Preview Run", AutoSize = true };
+            var btnPreview = new Button { Text = "Önizleme", AutoSize = true };
             btnPreview.Click += async (s, e) => await LoadPreviewAsync();
 
-            _btnCommit = new Button { Text = "Finalize & Save", AutoSize = true, Enabled = false, BackColor = System.Drawing.Color.LightGreen };
+            _btnCommit = new Button { Text = "Kesinleştir ve Kaydet", AutoSize = true, Enabled = false, BackColor = System.Drawing.Color.LightGreen };
             _btnCommit.Click += async (s, e) => await CommitRunAsync();
 
-            _btnExport = new Button { Text = "Export CSV", AutoSize = true, Enabled = false };
+            _btnExport = new Button { Text = "CSV Dışa Aktar", AutoSize = true, Enabled = false };
             _btnExport.Click += (s, e) => ExportCsv();
 
             pnlControls.Controls.AddRange(new Control[] { lblStart, _dtStart, lblEnd, _dtEnd, btnPreview, _btnCommit, _btnExport });
@@ -84,15 +84,15 @@ namespace TechnologyStore.Desktop.Features.Payroll.Forms
             _grid.ReadOnly = true;
             _grid.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
 
-            _grid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Employee", DataPropertyName = "EmployeeName" });
-            _grid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Total Hours", DataPropertyName = "TotalHours", DefaultCellStyle = new DataGridViewCellStyle { Format = "N2" } });
-            _grid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Hourly Rate", DataPropertyName = "HourlyRate", DefaultCellStyle = new DataGridViewCellStyle { Format = "C2" } });
-            _grid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Gross Pay", DataPropertyName = "GrossPay", DefaultCellStyle = new DataGridViewCellStyle { Format = "C2", Font = new System.Drawing.Font(DefaultFont, System.Drawing.FontStyle.Bold) } });
+            _grid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Çalışan", DataPropertyName = "EmployeeName" });
+            _grid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Toplam Saat", DataPropertyName = "TotalHours", DefaultCellStyle = new DataGridViewCellStyle { Format = "N2" } });
+            _grid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Saatlik Ücret", DataPropertyName = "HourlyRate", DefaultCellStyle = new DataGridViewCellStyle { Format = "C2" } });
+            _grid.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Brüt Ücret", DataPropertyName = "GrossPay", DefaultCellStyle = new DataGridViewCellStyle { Format = "C2", Font = new System.Drawing.Font(DefaultFont, System.Drawing.FontStyle.Bold) } });
 
             mainLayout.Controls.Add(_grid, 0, 1);
 
             // Status
-            _lblStatus = new Label { Text = "Ready", Dock = DockStyle.Fill, TextAlign = System.Drawing.ContentAlignment.MiddleLeft };
+            _lblStatus = new Label { Text = "Hazır", Dock = DockStyle.Fill, TextAlign = System.Drawing.ContentAlignment.MiddleLeft };
             mainLayout.Controls.Add(_lblStatus, 0, 2);
         }
 
@@ -100,27 +100,27 @@ namespace TechnologyStore.Desktop.Features.Payroll.Forms
         {
             try
             {
-                _lblStatus.Text = "Calculating payroll...";
+                _lblStatus.Text = "Bordro hesaplanıyor...";
                 _currentPreview = await _payrollService.PreviewPayrollAsync(_dtStart.Value, _dtEnd.Value);
 
                 _grid.DataSource = null;
                 _grid.DataSource = _currentPreview;
 
                 decimal totalPayout = _currentPreview.Sum(x => x.GrossPay);
-                _lblStatus.Text = $"Preview generated. Total Payout: {totalPayout:C2}";
+                _lblStatus.Text = $"Önizleme oluşturuldu. Toplam Ödeme: {totalPayout:C2}";
 
                 _btnCommit.Enabled = _currentPreview.Any();
                 _btnExport.Enabled = _currentPreview.Any();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error generating preview: " + ex.Message);
+                MessageBox.Show("Önizleme oluşturulamadı: " + ex.Message, "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private async Task CommitRunAsync()
         {
-            if (MessageBox.Show("Are you sure you want to finalize this payroll run? This will save the record to the database.", "Confirm", MessageBoxButtons.YesNo) != DialogResult.Yes)
+            if (MessageBox.Show("Bu bordro çalışmasını kesinleştirmek istiyor musunuz? Bu işlem kaydı veritabanına kaydeder.", "Onay", MessageBoxButtons.YesNo) != DialogResult.Yes)
                 return;
 
             try
@@ -130,18 +130,18 @@ namespace TechnologyStore.Desktop.Features.Payroll.Forms
                     StartDate = _dtStart.Value,
                     EndDate = _dtEnd.Value,
                     CreatedBy = _authService.CurrentUser?.Id,
-                    Notes = $"Generated on {DateTime.Now}"
+                    Notes = $"Oluşturma: {DateTime.Now:dd.MM.yyyy HH:mm}"
                 };
 
                 await _payrollService.CommitPayrollRunAsync(run, _currentPreview);
 
-                MessageBox.Show("Payroll run saved successfully!");
+                MessageBox.Show("Bordro kaydı başarıyla kaydedildi!", "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 _btnCommit.Enabled = false; // Prevent double submit
-                _lblStatus.Text = "Saved.";
+                _lblStatus.Text = "Kaydedildi.";
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error saving payroll: " + ex.Message);
+                MessageBox.Show("Bordro kaydedilemedi: " + ex.Message, "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -149,18 +149,18 @@ namespace TechnologyStore.Desktop.Features.Payroll.Forms
         {
             if (!_currentPreview.Any()) return;
 
-            using (var sfd = new SaveFileDialog { Filter = "CSV Files|*.csv", FileName = $"payroll_{DateTime.Now:yyyyMMdd}.csv" })
+            using (var sfd = new SaveFileDialog { Filter = "CSV Dosyaları|*.csv", FileName = $"bordro_{DateTime.Now:yyyyMMdd}.csv" })
             {
                 if (sfd.ShowDialog() == DialogResult.OK)
                 {
                     var sb = new StringBuilder();
-                    sb.AppendLine("Employee,Total Hours,Hourly Rate,Gross Pay");
+                    sb.AppendLine("Çalışan,Toplam Saat,Saatlik Ücret,Brüt Ücret");
                     foreach (var item in _currentPreview)
                     {
                         sb.AppendLine($"{item.EmployeeName},{item.TotalHours},{item.HourlyRate},{item.GrossPay}");
                     }
                     System.IO.File.WriteAllText(sfd.FileName, sb.ToString());
-                    MessageBox.Show("Export complete.");
+                    MessageBox.Show("Dışa aktarma tamamlandı.", "Başarılı", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
         }

@@ -36,7 +36,7 @@ public partial class CustomerLoginForm : Form
         this.AutoScaleMode = AutoScaleMode.Font;
         this.ClientSize = new Size(450, 400);
         this.Name = "CustomerLoginForm";
-        this.Text = "Technology Store - Customer Login";
+        this.Text = "Teknoloji Mağazası - Müşteri Girişi";
         this.StartPosition = FormStartPosition.CenterScreen;
         this.FormBorderStyle = FormBorderStyle.FixedDialog;
         this.MaximizeBox = false;
@@ -53,7 +53,7 @@ public partial class CustomerLoginForm : Form
         // Logo/Title
         var lblTitle = new Label
         {
-            Text = "🛒 Technology Store",
+            Text = "Teknoloji Mağazası",
             Location = new Point(0, yPos),
             Width = this.ClientSize.Width,
             Font = new Font(DefaultFontFamily, 20, FontStyle.Bold),
@@ -66,7 +66,7 @@ public partial class CustomerLoginForm : Form
 
         var lblSubtitle = new Label
         {
-            Text = "Welcome! Please sign in to continue",
+            Text = "Hoş geldiniz! Devam etmek için giriş yapın",
             Location = new Point(0, yPos),
             Width = this.ClientSize.Width,
             Font = new Font(DefaultFontFamily, 10),
@@ -80,7 +80,7 @@ public partial class CustomerLoginForm : Form
         // Email field
         var lblEmail = new Label
         {
-            Text = "Email Address",
+            Text = "E-posta",
             Location = new Point(centerX, yPos),
             Width = 300,
             Font = new Font(DefaultFontFamily, 9, FontStyle.Bold)
@@ -104,7 +104,7 @@ public partial class CustomerLoginForm : Form
         // Password field
         var lblPassword = new Label
         {
-            Text = "Password",
+            Text = "Şifre",
             Location = new Point(centerX, yPos),
             Width = 300,
             Font = new Font(DefaultFontFamily, 9, FontStyle.Bold)
@@ -144,7 +144,7 @@ public partial class CustomerLoginForm : Form
         // Login button
         _btnLogin = new Button
         {
-            Text = "Sign In",
+            Text = "Giriş Yap",
             Location = new Point(centerX, yPos),
             Width = 300,
             Height = 40,
@@ -163,7 +163,7 @@ public partial class CustomerLoginForm : Form
         // Register button
         _btnRegister = new Button
         {
-            Text = "Create New Account",
+            Text = "Yeni Hesap Oluştur",
             Location = new Point(centerX, yPos),
             Width = 300,
             Height = 40,
@@ -182,7 +182,7 @@ public partial class CustomerLoginForm : Form
         // Divider
         var divider = new Label
         {
-            Text = "─────────  OR  ─────────",
+            Text = "─────────  VEYA  ─────────",
             Location = new Point(centerX, yPos),
             Width = 300,
             TextAlign = ContentAlignment.MiddleCenter,
@@ -195,7 +195,7 @@ public partial class CustomerLoginForm : Form
         // Guest checkout button
         _btnGuest = new Button
         {
-            Text = "Continue as Guest",
+            Text = "Misafir Olarak Devam Et",
             Location = new Point(centerX, yPos),
             Width = 300,
             Height = 35,
@@ -245,7 +245,7 @@ public partial class CustomerLoginForm : Form
         }
         catch (Exception ex)
         {
-            ShowError($"An error occurred: {ex.Message}");
+            ShowError($"Bir hata oluştu: {ex.Message}");
         }
         finally
         {
@@ -258,10 +258,10 @@ public partial class CustomerLoginForm : Form
     private LoginValidationResult ValidateLoginForm(string email, string password)
     {
         if (string.IsNullOrWhiteSpace(email))
-            return new LoginValidationResult(false, "Please enter your email address.", _txtEmail);
+            return new LoginValidationResult(false, "Lütfen e-posta adresinizi girin.", _txtEmail);
 
         if (string.IsNullOrWhiteSpace(password))
-            return new LoginValidationResult(false, "Please enter your password.", _txtPassword);
+            return new LoginValidationResult(false, "Lütfen şifrenizi girin.", _txtPassword);
 
         return new LoginValidationResult(true);
     }
@@ -276,7 +276,7 @@ public partial class CustomerLoginForm : Form
         }
         else
         {
-            ShowError(result.ErrorMessage ?? "Login failed.");
+            ShowError(result.ErrorMessage ?? "Giriş başarısız.");
             _txtPassword?.Clear();
             _txtPassword?.Focus();
         }
@@ -325,7 +325,7 @@ public partial class CustomerLoginForm : Form
         if (_btnLogin != null)
         {
             _btnLogin.Enabled = enabled;
-            _btnLogin.Text = enabled ? "Sign In" : "Signing in...";
+            _btnLogin.Text = enabled ? "Giriş Yap" : "Giriş yapılıyor...";
         }
         if (_btnRegister != null) _btnRegister.Enabled = enabled;
         if (_btnGuest != null) _btnGuest.Enabled = enabled;

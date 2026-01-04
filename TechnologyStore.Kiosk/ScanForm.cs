@@ -42,7 +42,7 @@ namespace TechnologyStore.Kiosk
 
         private void InitializeComponent()
         {
-            this.Text = "Scan Items";
+            this.Text = "Ürün Tara";
             this.WindowState = FormWindowState.Maximized;
             this.BackColor = Color.White;
 
@@ -76,7 +76,7 @@ namespace TechnologyStore.Kiosk
             mainLayout.SetRowSpan(rightPanel, 2); // Span top bar if needed, or adjust. Let's keep it simple.
 
             // Manual Entry
-            var lblManual = new Label() { Text = "Manual SKU Entry:", Location = new Point(10, 10), AutoSize = true, Font = new Font("Segoe UI", 12) };
+            var lblManual = new Label() { Text = "Manuel SKU Girişi:", Location = new Point(10, 10), AutoSize = true, Font = new Font("Segoe UI", 12) };
             rightPanel.Controls.Add(lblManual);
 
             _txtSku = new TextBox();
@@ -86,7 +86,7 @@ namespace TechnologyStore.Kiosk
             _txtSku.KeyDown += TxtSku_KeyDown;
             rightPanel.Controls.Add(_txtSku);
 
-            var btnAdd = new Button() { Text = "Add", Location = new Point(320, 38), Size = new Size(80, 34), BackColor = Color.LightGray };
+            var btnAdd = new Button() { Text = "Ekle", Location = new Point(320, 38), Size = new Size(80, 34), BackColor = Color.LightGray };
             btnAdd.Click += async (s, e) => await AddProductToCart(_txtSku.Text);
             rightPanel.Controls.Add(btnAdd);
 
@@ -100,7 +100,7 @@ namespace TechnologyStore.Kiosk
 
             // Total
             _lblTotal = new Label();
-            _lblTotal.Text = "Total: $0.00";
+            _lblTotal.Text = "Toplam: $0.00";
             _lblTotal.Font = new Font("Segoe UI", 24, FontStyle.Bold);
             _lblTotal.Location = new Point(10, 520);
             _lblTotal.AutoSize = true;
@@ -109,7 +109,7 @@ namespace TechnologyStore.Kiosk
 
             // Pay Button
             _btnPay = new Button();
-            _btnPay.Text = "Pay Now";
+            _btnPay.Text = "Öde";
             _btnPay.Font = new Font("Segoe UI", 18, FontStyle.Bold);
             _btnPay.BackColor = Color.Green;
             _btnPay.ForeColor = Color.White;
@@ -136,7 +136,7 @@ namespace TechnologyStore.Kiosk
                 _videoDevices = new FilterInfoCollection(FilterCategory.VideoInputDevice);
                 if (_videoDevices.Count == 0)
                 {
-                    MessageBox.Show("No camera found.");
+                    MessageBox.Show("Kamera bulunamadı.");
                     return;
                 }
 
@@ -150,7 +150,7 @@ namespace TechnologyStore.Kiosk
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error initializing camera: " + ex.Message);
+                MessageBox.Show("Kamera başlatılamadı: " + ex.Message);
             }
         }
 
@@ -164,7 +164,7 @@ namespace TechnologyStore.Kiosk
 
             if (_videoDevices == null || _cbCameras.SelectedIndex < 0 || _cbCameras.SelectedIndex >= _videoDevices.Count)
             {
-                MessageBox.Show("No camera selected or available.");
+                MessageBox.Show("Kamera seçilmedi veya kullanılabilir kamera yok.");
                 return;
             }
 
@@ -214,7 +214,7 @@ namespace TechnologyStore.Kiosk
             var product = await _respository.GetBySkuAsync(sku);
             if (product == null)
             {
-                MessageBox.Show($"Product not found: {sku}");
+                MessageBox.Show($"Ürün bulunamadı: {sku}");
                 return;
             }
 

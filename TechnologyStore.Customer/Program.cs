@@ -5,6 +5,7 @@ using TechnologyStore.Customer.Forms;
 using TechnologyStore.Shared.Config;
 using TechnologyStore.Shared.Interfaces;
 using TechnologyStore.Shared.Services;
+using System.Globalization;
 
 namespace TechnologyStore.Customer;
 
@@ -13,6 +14,11 @@ internal static class Program
     [STAThread]
     static void Main()
     {
+        // Turkish-only UI: force culture to tr-TR (no language switching)
+        var tr = new CultureInfo("tr-TR");
+        CultureInfo.DefaultThreadCurrentCulture = tr;
+        CultureInfo.DefaultThreadCurrentUICulture = tr;
+
         try
         {
             RunApplication();
@@ -23,8 +29,8 @@ internal static class Program
             logger.LogCritical(ex, "Fatal error during application startup");
 
             MessageBox.Show(
-                $"A fatal error occurred during startup:\n\n{ex.Message}\n\nThe application will now close.",
-                "Fatal Error",
+                $"Başlatma sırasında kritik bir hata oluştu:\n\n{ex.Message}\n\nUygulama kapatılacak.",
+                "Kritik Hata",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Error);
         }
@@ -40,7 +46,7 @@ internal static class Program
         {
             MessageBox.Show(
                 CustomerServiceConfiguration.GetConfigurationErrorMessage(),
-                "Configuration Error",
+                "Yapılandırma Hatası",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Error);
             return;

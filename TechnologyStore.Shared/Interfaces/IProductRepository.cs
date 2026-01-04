@@ -8,6 +8,11 @@ namespace TechnologyStore.Shared.Interfaces;
 public interface IProductRepository
 {
     /// <summary>
+    /// Creates a new product in the catalog.
+    /// </summary>
+    Task<Product> CreateAsync(Product product);
+
+    /// <summary>
     /// Calculates the 'Closing Stock' and 'Total Sold' for a given date based on the Transaction Ledger.
     /// </summary>
     Task GenerateDailySnapshotAsync(DateTime dateToProcess);

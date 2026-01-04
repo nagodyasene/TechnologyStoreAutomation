@@ -28,23 +28,23 @@ public class CustomerAuthService : ICustomerAuthService
     public async Task<CustomerAuthResult> RegisterAsync(string email, string password, string fullName, string? phone)
     {
         if (string.IsNullOrWhiteSpace(email))
-            return CustomerAuthResult.Failed("Email is required.");
+            return CustomerAuthResult.Failed("E-posta zorunludur.");
         
         if (string.IsNullOrWhiteSpace(password))
-            return CustomerAuthResult.Failed("Password is required.");
+            return CustomerAuthResult.Failed("Şifre zorunludur.");
         
         if (password.Length < 6)
-            return CustomerAuthResult.Failed("Password must be at least 6 characters.");
+            return CustomerAuthResult.Failed("Şifre en az 6 karakter olmalıdır.");
         
         if (string.IsNullOrWhiteSpace(fullName))
-            return CustomerAuthResult.Failed("Full name is required.");
+            return CustomerAuthResult.Failed("Ad soyad zorunludur.");
 
         try
         {
             // Check if email already exists
             if (await _customerRepository.EmailExistsAsync(email))
             {
-                return CustomerAuthResult.Failed("An account with this email already exists.");
+                return CustomerAuthResult.Failed("Bu e-posta ile kayıtlı bir hesap zaten var.");
             }
 
             var customer = new Customer
@@ -67,17 +67,17 @@ public class CustomerAuthService : ICustomerAuthService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Registration failed for {Email}", email);
-            return CustomerAuthResult.Failed("An error occurred during registration. Please try again.");
+            return CustomerAuthResult.Failed("Kayıt sırasında bir hata oluştu. Lütfen tekrar deneyin.");
         }
     }
 
     public async Task<CustomerAuthResult> LoginAsync(string email, string password)
     {
         if (string.IsNullOrWhiteSpace(email))
-            return CustomerAuthResult.Failed("Email is required.");
+            return CustomerAuthResult.Failed("E-posta zorunludur.");
         
         if (string.IsNullOrWhiteSpace(password))
-            return CustomerAuthResult.Failed("Password is required.");
+            return CustomerAuthResult.Failed("Şifre zorunludur.");
 
         try
         {
@@ -86,24 +86,24 @@ public class CustomerAuthService : ICustomerAuthService
             if (customer == null)
             {
                 _logger.LogWarning("Login failed: Customer not found - {Email}", email);
-                return CustomerAuthResult.Failed("Invalid email or password.");
+                return CustomerAuthResult.Failed("E-posta veya şifre hatalı.");
             }
 
             if (customer.IsGuest)
             {
-                return CustomerAuthResult.Failed("This email was used for guest checkout. Please register for an account.");
+                return CustomerAuthResult.Failed("Bu e-posta misafir ödeme için kullanılmış. Lütfen hesap oluşturun.");
             }
 
             if (!customer.IsActive)
             {
                 _logger.LogWarning("Login failed: Account deactivated - {Email}", email);
-                return CustomerAuthResult.Failed("This account has been deactivated.");
+                return CustomerAuthResult.Failed("Bu hesap pasif hale getirilmiş.");
             }
 
             if (string.IsNullOrEmpty(customer.PasswordHash) || !VerifyPassword(password, customer.PasswordHash))
             {
                 _logger.LogWarning("Login failed: Invalid password - {Email}", email);
-                return CustomerAuthResult.Failed("Invalid email or password.");
+                return CustomerAuthResult.Failed("E-posta veya şifre hatalı.");
             }
 
             await _customerRepository.UpdateLastLoginAsync(customer.Id);
@@ -118,7 +118,7 @@ public class CustomerAuthService : ICustomerAuthService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Login error for {Email}", email);
-            return CustomerAuthResult.Failed("An error occurred during login. Please try again.");
+            return CustomerAuthResult.Failed("Giriş sırasında bir hata oluştu. Lütfen tekrar deneyin.");
         }
     }
 

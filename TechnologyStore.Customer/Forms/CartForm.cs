@@ -52,7 +52,7 @@ public partial class CartForm : Form
         this.AutoScaleMode = AutoScaleMode.Font;
         this.ClientSize = new Size(700, 550);
         this.Name = "CartForm";
-        this.Text = "Shopping Cart";
+        this.Text = "Alışveriş Sepeti";
         this.StartPosition = FormStartPosition.CenterParent;
         this.BackColor = Color.FromArgb(245, 247, 250);
         this.FormBorderStyle = FormBorderStyle.FixedDialog;
@@ -65,7 +65,7 @@ public partial class CartForm : Form
         // Title
         var lblTitle = new Label
         {
-            Text = "🛒 Your Shopping Cart",
+            Text = "Alışveriş Sepetiniz",
             Location = new Point(20, 15),
             AutoSize = true,
             Font = new Font(DefaultFontFamily, 18, FontStyle.Bold),
@@ -90,19 +90,19 @@ public partial class CartForm : Form
         };
 
         _gridCart.Columns.Add(new DataGridViewTextBoxColumn { Name = "ProductId", Visible = false });
-        _gridCart.Columns.Add(new DataGridViewTextBoxColumn { Name = "Product", HeaderText = "Product", FillWeight = 150, ReadOnly = true });
-        _gridCart.Columns.Add(new DataGridViewTextBoxColumn { Name = "UnitPrice", HeaderText = "Unit Price", FillWeight = 60, ReadOnly = true });
+        _gridCart.Columns.Add(new DataGridViewTextBoxColumn { Name = "Product", HeaderText = "Ürün", FillWeight = 150, ReadOnly = true });
+        _gridCart.Columns.Add(new DataGridViewTextBoxColumn { Name = "UnitPrice", HeaderText = "Birim Fiyat", FillWeight = 60, ReadOnly = true });
 
-        var qtyColumn = new DataGridViewTextBoxColumn { Name = "Quantity", HeaderText = "Qty", FillWeight = 40 };
+        var qtyColumn = new DataGridViewTextBoxColumn { Name = "Quantity", HeaderText = "Adet", FillWeight = 40 };
         _gridCart.Columns.Add(qtyColumn);
 
-        _gridCart.Columns.Add(new DataGridViewTextBoxColumn { Name = "LineTotal", HeaderText = "Total", FillWeight = 60, ReadOnly = true });
+        _gridCart.Columns.Add(new DataGridViewTextBoxColumn { Name = "LineTotal", HeaderText = "Toplam", FillWeight = 60, ReadOnly = true });
 
         var removeColumn = new DataGridViewButtonColumn
         {
             Name = "Remove",
             HeaderText = "",
-            Text = "✕",
+            Text = "Sil",
             UseColumnTextForButtonValue = true,
             FillWeight = 30
         };
@@ -132,7 +132,7 @@ public partial class CartForm : Form
 
         _lblSubtotal = new Label
         {
-            Text = "Subtotal: $0.00",
+            Text = "Ara Toplam: $0.00",
             Location = new Point(15, 15),
             Width = 230,
             Font = new Font(DefaultFontFamily, 11),
@@ -142,7 +142,7 @@ public partial class CartForm : Form
 
         _lblTax = new Label
         {
-            Text = "Tax (10%): $0.00",
+            Text = "Vergi (%10): $0.00",
             Location = new Point(15, 40),
             Width = 230,
             Font = new Font(DefaultFontFamily, 11),
@@ -153,7 +153,7 @@ public partial class CartForm : Form
 
         _lblTotal = new Label
         {
-            Text = "Total: $0.00",
+            Text = "Toplam: $0.00",
             Location = new Point(15, 70),
             Width = 230,
             Font = new Font(DefaultFontFamily, 14, FontStyle.Bold),
@@ -166,7 +166,7 @@ public partial class CartForm : Form
         var lblEmptyMessage = new Label
         {
             Name = "lblEmpty",
-            Text = "Your cart is empty.\nStart shopping to add items!",
+            Text = "Sepetiniz boş.\nÜrün eklemek için alışverişe başlayın!",
             Location = new Point(20, 375),
             Size = new Size(380, 60),
             Font = new Font(DefaultFontFamily, 11),
@@ -178,7 +178,7 @@ public partial class CartForm : Form
         // Buttons
         _btnContinue = new Button
         {
-            Text = "← Continue Shopping",
+            Text = "Alışverişe Devam Et",
             Location = new Point(20, 500),
             Width = 180,
             Height = 40,
@@ -194,7 +194,7 @@ public partial class CartForm : Form
 
         _btnCheckout = new Button
         {
-            Text = "Proceed to Checkout →",
+            Text = "Ödemeye Geç",
             Location = new Point(500, 500),
             Width = 180,
             Height = 40,
@@ -283,7 +283,7 @@ public partial class CartForm : Form
                 }
                 else if (!_cartService.UpdateQuantity(productId, newQty))
                 {
-                    MessageBox.Show("Not enough stock available.", "Stock Limit",
+                    MessageBox.Show("Yeterli stok yok.", "Stok Sınırı",
                         MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
             }
@@ -296,7 +296,7 @@ public partial class CartForm : Form
     {
         if (_cartService.IsEmpty)
         {
-            MessageBox.Show("Your cart is empty.", "Empty Cart", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("Sepetiniz boş.", "Boş Sepet", MessageBoxButtons.OK, MessageBoxIcon.Information);
             return;
         }
 

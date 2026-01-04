@@ -22,6 +22,11 @@ public partial class OrderManagementForm : Form
 
     private Order? _selectedOrder;
 
+    private sealed record StatusOption(string Text, string? StatusValue)
+    {
+        public override string ToString() => Text;
+    }
+
     public OrderManagementForm(IOrderRepository orderRepository)
     {
         _orderRepository = orderRepository ?? throw new ArgumentNullException(nameof(orderRepository));
@@ -37,7 +42,7 @@ public partial class OrderManagementForm : Form
         this.AutoScaleMode = AutoScaleMode.Font;
         this.ClientSize = new Size(1200, 750);
         this.Name = "OrderManagementForm";
-        this.Text = "Order Management";
+        this.Text = "Sipariş Yönetimi";
         this.StartPosition = FormStartPosition.CenterParent;
         this.BackColor = Color.FromArgb(245, 247, 250);
         this.ResumeLayout(false);
@@ -57,7 +62,7 @@ public partial class OrderManagementForm : Form
 
         var lblTitle = new Label
         {
-            Text = "📦 Order Management",
+            Text = "Sipariş Yönetimi",
             Location = new Point(20, 15),
             AutoSize = true,
             Font = new Font(UiConstants.DefaultFontFamily, 18, FontStyle.Bold),
@@ -77,7 +82,7 @@ public partial class OrderManagementForm : Form
 
         var lblStatus = new Label
         {
-            Text = "Status:",
+            Text = "Durum:",
             Location = new Point(15, 18),
             AutoSize = true,
             Font = new Font(UiConstants.DefaultFontFamily, 10)
@@ -92,12 +97,12 @@ public partial class OrderManagementForm : Form
             Font = new Font(UiConstants.DefaultFontFamily, 10)
         };
         _cboStatusFilter.Items.AddRange(new object[] {
-            "All Orders",
-            OrderStatus.Pending,
-            OrderStatus.Confirmed,
-            OrderStatus.ReadyForPickup,
-            OrderStatus.Completed,
-            OrderStatus.Cancelled
+            new StatusOption("Tüm Siparişler", null),
+            new StatusOption("Beklemede", OrderStatus.Pending),
+            new StatusOption("Onaylandı", OrderStatus.Confirmed),
+            new StatusOption("Hazır", OrderStatus.ReadyForPickup),
+            new StatusOption("Tamamlandı", OrderStatus.Completed),
+            new StatusOption("İptal", OrderStatus.Cancelled)
         });
         _cboStatusFilter.SelectedIndex = 0;
         _cboStatusFilter.SelectedIndexChanged += (s, e) => _ = LoadOrdersAsync();
@@ -105,7 +110,7 @@ public partial class OrderManagementForm : Form
 
         var lblSearch = new Label
         {
-            Text = "Search:",
+            Text = "Ara:",
             Location = new Point(280, 18),
             AutoSize = true,
             Font = new Font(UiConstants.DefaultFontFamily, 10)
@@ -117,14 +122,14 @@ public partial class OrderManagementForm : Form
             Location = new Point(340, 14),
             Width = 200,
             Font = new Font(UiConstants.DefaultFontFamily, 10),
-            PlaceholderText = "Order # or customer..."
+            PlaceholderText = "Sipariş no veya müşteri..."
         };
         _txtSearch.TextChanged += (s, e) => _ = LoadOrdersAsync();
         filterPanel.Controls.Add(_txtSearch);
 
         _btnRefresh = new Button
         {
-            Text = "🔄 Refresh",
+            Text = "Yenile",
             Location = new Point(560, 10),
             Width = 100,
             Height = 32,
@@ -167,13 +172,13 @@ public partial class OrderManagementForm : Form
         };
 
         _gridOrders.Columns.Add(new DataGridViewTextBoxColumn { Name = "Id", Visible = false });
-        _gridOrders.Columns.Add(new DataGridViewTextBoxColumn { Name = "OrderNumber", HeaderText = "Order #", FillWeight = 80 });
-        _gridOrders.Columns.Add(new DataGridViewTextBoxColumn { Name = "CustomerName", HeaderText = "Customer", FillWeight = 100 });
-        _gridOrders.Columns.Add(new DataGridViewTextBoxColumn { Name = StatusColumnName, HeaderText = StatusColumnName, FillWeight = 80 });
-        _gridOrders.Columns.Add(new DataGridViewTextBoxColumn { Name = "ItemCount", HeaderText = "Items", FillWeight = 40 });
-        _gridOrders.Columns.Add(new DataGridViewTextBoxColumn { Name = "Total", HeaderText = "Total", FillWeight = 60 });
-        _gridOrders.Columns.Add(new DataGridViewTextBoxColumn { Name = "PickupDate", HeaderText = "Pickup Date", FillWeight = 80 });
-        _gridOrders.Columns.Add(new DataGridViewTextBoxColumn { Name = "CreatedAt", HeaderText = "Order Date", FillWeight = 100 });
+        _gridOrders.Columns.Add(new DataGridViewTextBoxColumn { Name = "OrderNumber", HeaderText = "Sipariş No", FillWeight = 80 });
+        _gridOrders.Columns.Add(new DataGridViewTextBoxColumn { Name = "CustomerName", HeaderText = "Müşteri", FillWeight = 100 });
+        _gridOrders.Columns.Add(new DataGridViewTextBoxColumn { Name = StatusColumnName, HeaderText = "Durum", FillWeight = 80 });
+        _gridOrders.Columns.Add(new DataGridViewTextBoxColumn { Name = "ItemCount", HeaderText = "Kalem", FillWeight = 40 });
+        _gridOrders.Columns.Add(new DataGridViewTextBoxColumn { Name = "Total", HeaderText = "Toplam", FillWeight = 60 });
+        _gridOrders.Columns.Add(new DataGridViewTextBoxColumn { Name = "PickupDate", HeaderText = "Teslim Tarihi", FillWeight = 80 });
+        _gridOrders.Columns.Add(new DataGridViewTextBoxColumn { Name = "CreatedAt", HeaderText = "Sipariş Tarihi", FillWeight = 100 });
 
         _gridOrders.SelectionChanged += GridOrders_SelectionChanged;
         _gridOrders.CellFormatting += GridOrders_CellFormatting;
@@ -200,7 +205,7 @@ public partial class OrderManagementForm : Form
 
         _lblOrderDetails = new Label
         {
-            Text = "Select an order to view details",
+            Text = "Detayları görmek için bir sipariş seçin",
             Location = new Point(15, 10),
             AutoSize = true,
             Font = new Font(UiConstants.DefaultFontFamily, 12, FontStyle.Bold),
@@ -223,10 +228,10 @@ public partial class OrderManagementForm : Form
             AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
         };
 
-        _gridOrderItems.Columns.Add(new DataGridViewTextBoxColumn { Name = "ProductName", HeaderText = "Product", FillWeight = 150 });
-        _gridOrderItems.Columns.Add(new DataGridViewTextBoxColumn { Name = "Quantity", HeaderText = "Qty", FillWeight = 40 });
-        _gridOrderItems.Columns.Add(new DataGridViewTextBoxColumn { Name = "UnitPrice", HeaderText = "Unit Price", FillWeight = 60 });
-        _gridOrderItems.Columns.Add(new DataGridViewTextBoxColumn { Name = "LineTotal", HeaderText = "Line Total", FillWeight = 60 });
+        _gridOrderItems.Columns.Add(new DataGridViewTextBoxColumn { Name = "ProductName", HeaderText = "Ürün", FillWeight = 150 });
+        _gridOrderItems.Columns.Add(new DataGridViewTextBoxColumn { Name = "Quantity", HeaderText = "Adet", FillWeight = 40 });
+        _gridOrderItems.Columns.Add(new DataGridViewTextBoxColumn { Name = "UnitPrice", HeaderText = "Birim Fiyat", FillWeight = 60 });
+        _gridOrderItems.Columns.Add(new DataGridViewTextBoxColumn { Name = "LineTotal", HeaderText = "Satır Toplamı", FillWeight = 60 });
 
         _gridOrderItems.DefaultCellStyle.Font = new Font(UiConstants.DefaultFontFamily, 9);
         _gridOrderItems.ColumnHeadersDefaultCellStyle.Font = new Font(UiConstants.DefaultFontFamily, 9, FontStyle.Bold);
@@ -245,7 +250,7 @@ public partial class OrderManagementForm : Form
 
         var lblActions = new Label
         {
-            Text = "Update Status:",
+            Text = "Durum Güncelle:",
             Location = new Point(0, 0),
             AutoSize = true,
             Font = new Font(UiConstants.DefaultFontFamily, 10, FontStyle.Bold)
@@ -253,10 +258,10 @@ public partial class OrderManagementForm : Form
         actionPanel.Controls.Add(lblActions);
 
         // Status update buttons
-        AddStatusButton(actionPanel, "✅ Confirm", OrderStatus.Confirmed, 30, Color.FromArgb(76, 175, 80));
-        AddStatusButton(actionPanel, "📦 Ready", OrderStatus.ReadyForPickup, 75, Color.FromArgb(33, 150, 243));
-        AddStatusButton(actionPanel, "✔️ Complete", OrderStatus.Completed, 120, Color.FromArgb(0, 150, 136));
-        AddStatusButton(actionPanel, "❌ Cancel", OrderStatus.Cancelled, 165, Color.FromArgb(244, 67, 54));
+        AddStatusButton(actionPanel, "Onayla", OrderStatus.Confirmed, 30, Color.FromArgb(76, 175, 80));
+        AddStatusButton(actionPanel, "Hazır", OrderStatus.ReadyForPickup, 75, Color.FromArgb(33, 150, 243));
+        AddStatusButton(actionPanel, "Tamamla", OrderStatus.Completed, 120, Color.FromArgb(0, 150, 136));
+        AddStatusButton(actionPanel, "İptal", OrderStatus.Cancelled, 165, Color.FromArgb(244, 67, 54));
     }
 
     private void AddStatusButton(Panel parent, string text, string status, int yPos, Color color)
@@ -304,16 +309,14 @@ public partial class OrderManagementForm : Form
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Error loading orders: {ex.Message}", "Error",
+            MessageBox.Show($"Siparişler yüklenirken hata oluştu: {ex.Message}", "Hata",
                 MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 
     private async Task<IEnumerable<Order>> GetFilteredOrdersAsync()
     {
-        var statusFilter = _cboStatusFilter?.SelectedIndex > 0
-            ? _cboStatusFilter.SelectedItem?.ToString()
-            : null;
+        var statusFilter = (_cboStatusFilter?.SelectedItem as StatusOption)?.StatusValue;
 
         var searchText = _txtSearch?.Text?.Trim().ToLowerInvariant() ?? string.Empty;
 
@@ -333,18 +336,18 @@ public partial class OrderManagementForm : Form
         if (_gridOrders == null) return;
 
         var pickupText = order.PickupDate.HasValue
-            ? order.PickupDate.Value.ToString("MMM dd, yyyy")
-            : "ASAP";
+            ? order.PickupDate.Value.ToString("dd.MM.yyyy")
+            : "En kısa sürede";
 
         _gridOrders.Rows.Add(
             order.Id,
             order.OrderNumber,
-            $"Customer #{order.CustomerId}",
+            $"Müşteri #{order.CustomerId}",
             order.Status,
             order.Items.Count,
             $"${order.Total:N2}",
             pickupText,
-            order.CreatedAt.ToString("MMM dd, yyyy HH:mm")
+            order.CreatedAt.ToString("dd.MM.yyyy HH:mm")
         );
     }
 
@@ -379,7 +382,7 @@ public partial class OrderManagementForm : Form
 
             if (_selectedOrder == null || _lblOrderDetails == null || _gridOrderItems == null) return;
 
-            _lblOrderDetails.Text = $"Order {_selectedOrder.OrderNumber} - {_selectedOrder.Status}";
+            _lblOrderDetails.Text = $"Sipariş {_selectedOrder.OrderNumber} - {GetStatusTr(_selectedOrder.Status)}";
 
             _gridOrderItems.Rows.Clear();
             foreach (var item in _selectedOrder.Items)
@@ -394,7 +397,7 @@ public partial class OrderManagementForm : Form
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Error loading order details: {ex.Message}", "Error",
+            MessageBox.Show($"Sipariş detayları yüklenirken hata oluştu: {ex.Message}", "Hata",
                 MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
@@ -403,7 +406,7 @@ public partial class OrderManagementForm : Form
     {
         if (_selectedOrder == null)
         {
-            MessageBox.Show("Please select an order first.", "No Order Selected",
+            MessageBox.Show("Lütfen önce bir sipariş seçin.", "Sipariş Seçilmedi",
                 MessageBoxButtons.OK, MessageBoxIcon.Information);
             return;
         }
@@ -417,16 +420,16 @@ public partial class OrderManagementForm : Form
         if (!IsValidStatusTransition(_selectedOrder.Status, newStatus))
         {
             MessageBox.Show(
-                $"Cannot change status from '{_selectedOrder.Status}' to '{newStatus}'.",
-                "Invalid Status Change",
+                $"Durum '{GetStatusTr(_selectedOrder.Status)}' değerinden '{GetStatusTr(newStatus)}' değerine değiştirilemez.",
+                "Geçersiz Durum Değişikliği",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Warning);
             return;
         }
 
         var result = MessageBox.Show(
-            $"Update order {_selectedOrder.OrderNumber} status to '{newStatus}'?",
-            "Confirm Status Change",
+            $"{_selectedOrder.OrderNumber} numaralı siparişin durumu '{GetStatusTr(newStatus)}' olarak güncellensin mi?",
+            "Durum Değişikliğini Onayla",
             MessageBoxButtons.YesNo,
             MessageBoxIcon.Question);
 
@@ -437,8 +440,8 @@ public partial class OrderManagementForm : Form
             await _orderRepository.UpdateStatusAsync(_selectedOrder.Id, newStatus);
 
             MessageBox.Show(
-                $"Order {_selectedOrder.OrderNumber} has been updated to '{newStatus}'.",
-                "Status Updated",
+                $"{_selectedOrder.OrderNumber} numaralı sipariş '{GetStatusTr(newStatus)}' olarak güncellendi.",
+                "Durum Güncellendi",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Information);
 
@@ -446,7 +449,7 @@ public partial class OrderManagementForm : Form
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Error updating order status: {ex.Message}", "Error",
+            MessageBox.Show($"Sipariş durumu güncellenirken hata oluştu: {ex.Message}", "Hata",
                 MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
@@ -486,6 +489,21 @@ public partial class OrderManagementForm : Form
         {
             e.CellStyle!.BackColor = colors.BackColor;
             e.CellStyle.ForeColor = colors.ForeColor;
+            e.Value = GetStatusTr(status);
+            e.FormattingApplied = true;
         }
+    }
+
+    private static string GetStatusTr(string status)
+    {
+        return status switch
+        {
+            OrderStatus.Pending => "Beklemede",
+            OrderStatus.Confirmed => "Onaylandı",
+            OrderStatus.ReadyForPickup => "Hazır",
+            OrderStatus.Completed => "Tamamlandı",
+            OrderStatus.Cancelled => "İptal",
+            _ => status
+        };
     }
 }

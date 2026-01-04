@@ -5,6 +5,7 @@ using TechnologyStore.Shared.Models; // Add Models if used
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using System.IO;
+using System.Globalization;
 
 namespace TechnologyStore.Kiosk
 {
@@ -16,6 +17,11 @@ namespace TechnologyStore.Kiosk
         [STAThread]
         static void Main()
         {
+            // Turkish-only UI: force culture to tr-TR (no language switching)
+            var tr = new CultureInfo("tr-TR");
+            CultureInfo.DefaultThreadCurrentCulture = tr;
+            CultureInfo.DefaultThreadCurrentUICulture = tr;
+
             Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

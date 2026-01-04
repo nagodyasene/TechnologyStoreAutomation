@@ -44,8 +44,8 @@ public class RecommendationEngine : IRecommendationEngine
 
         // Default: All good
         return analysis.RunwayDays > AdequateRunwayDays 
-            ? "✅ Normal - Stock adequate" 
-            : "✅ Normal";
+            ? "Normal - Stok yeterli" 
+            : "Normal";
     }
 
     /// <summary>
@@ -56,15 +56,15 @@ public class RecommendationEngine : IRecommendationEngine
         if (lifecyclePhase == "OBSOLETE")
         {
             return analysis.CurrentStock > 5
-                ? "🔴 LIQUIDATE - Clear remaining stock"
-                : "🔴 OBSOLETE - Discontinue";
+                ? "Tasfiye - Kalan stoğu erit"
+                : "Kullanımdışı - Satışı durdur";
         }
 
         if (lifecyclePhase == "LEGACY")
         {
             return analysis.RunwayDays < 30
-                ? "🟡 LEGACY - Discount 15% to clear"
-                : "🟡 LEGACY - Monitor, reduce orders";
+                ? "Eski - Eritmek için %15 indirim"
+                : "Eski - Takip et, siparişleri azalt";
         }
 
         return null;
@@ -76,13 +76,13 @@ public class RecommendationEngine : IRecommendationEngine
     private static string? GetStockLevelRecommendation(TrendAnalysis analysis)
     {
         if (analysis.RunwayDays <= CriticalRunwayDays)
-            return "🚨 CRITICAL - Reorder IMMEDIATELY";
+            return "Kritik - Hemen sipariş ver";
 
         if (analysis.RunwayDays <= UrgentRunwayDays)
-            return "⚠️ URGENT - Reorder today";
+            return "Acil - Bugün sipariş ver";
 
         if (analysis.RunwayDays <= ReorderRunwayDays)
-            return "📦 Reorder recommended";
+            return "Sipariş önerilir";
 
         return null;
     }
@@ -96,7 +96,7 @@ public class RecommendationEngine : IRecommendationEngine
         {
             TrendDirection.Rising => GetRisingTrendRecommendation(analysis),
             TrendDirection.Falling => GetFallingTrendRecommendation(analysis),
-            TrendDirection.Volatile => "⚡ VOLATILE - Review pricing/promotion",
+            TrendDirection.Volatile => "Dalgalı - Fiyat/promosyonu gözden geçir",
             _ => null
         };
     }
@@ -107,12 +107,12 @@ public class RecommendationEngine : IRecommendationEngine
     private static string GetRisingTrendRecommendation(TrendAnalysis analysis)
     {
         if (analysis.IsAccelerating)
-            return "🚀 ACCELERATING - Increase stock levels";
+            return "Hızlanıyor - Stok seviyesini artır";
         
         if (analysis.TrendStrength > StrongTrendThreshold)
-            return "📈 TRENDING UP - Monitor for restock";
+            return "Yükselişte - Yeniden stok için takip et";
         
-        return "✅ Normal - Slight increase";
+        return "Normal - Hafif artış";
     }
 
     /// <summary>
@@ -121,8 +121,8 @@ public class RecommendationEngine : IRecommendationEngine
     private static string GetFallingTrendRecommendation(TrendAnalysis analysis)
     {
         if (analysis.TrendStrength < -StrongTrendThreshold)
-            return "📉 DECLINING - Reduce orders";
+            return "Düşüşte - Siparişleri azalt";
         
-        return "⚠️ Slight decline - Watch closely";
+        return "Hafif düşüş - Yakından takip et";
     }
 }

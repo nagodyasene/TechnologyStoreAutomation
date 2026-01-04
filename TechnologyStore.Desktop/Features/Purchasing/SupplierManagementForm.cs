@@ -31,7 +31,7 @@ public class SupplierManagementForm : Form
 
     private void InitializeComponent()
     {
-        Text = "Supplier Management";
+        Text = "Tedarikçi Yönetimi";
         Size = new Size(900, 600);
         StartPosition = FormStartPosition.CenterParent;
         MinimumSize = new Size(700, 400);
@@ -67,11 +67,11 @@ public class SupplierManagementForm : Form
         _gridSuppliers.Columns.AddRange(new DataGridViewColumn[]
         {
             new DataGridViewTextBoxColumn { Name = "Id", DataPropertyName = "Id", HeaderText = "ID", Width = 50, FillWeight = 10 },
-            new DataGridViewTextBoxColumn { Name = "Name", DataPropertyName = "Name", HeaderText = "Name", FillWeight = 25 },
-            new DataGridViewTextBoxColumn { Name = "Email", DataPropertyName = "Email", HeaderText = "Email", FillWeight = 25 },
-            new DataGridViewTextBoxColumn { Name = "Phone", DataPropertyName = "Phone", HeaderText = "Phone", FillWeight = 15 },
-            new DataGridViewTextBoxColumn { Name = "ContactPerson", DataPropertyName = "ContactPerson", HeaderText = "Contact", FillWeight = 15 },
-            new DataGridViewTextBoxColumn { Name = "LeadTimeDays", DataPropertyName = "LeadTimeDays", HeaderText = "Lead Time", Width = 80, FillWeight = 10 },
+            new DataGridViewTextBoxColumn { Name = "Name", DataPropertyName = "Name", HeaderText = "Ad", FillWeight = 25 },
+            new DataGridViewTextBoxColumn { Name = "Email", DataPropertyName = "Email", HeaderText = "E-posta", FillWeight = 25 },
+            new DataGridViewTextBoxColumn { Name = "Phone", DataPropertyName = "Phone", HeaderText = "Telefon", FillWeight = 15 },
+            new DataGridViewTextBoxColumn { Name = "ContactPerson", DataPropertyName = "ContactPerson", HeaderText = "İrtibat", FillWeight = 15 },
+            new DataGridViewTextBoxColumn { Name = "LeadTimeDays", DataPropertyName = "LeadTimeDays", HeaderText = "Teslim Süresi", Width = 80, FillWeight = 10 },
         });
 
         _gridSuppliers.DataSource = _suppliers;
@@ -86,19 +86,19 @@ public class SupplierManagementForm : Form
             Padding = new Padding(0, 10, 0, 0)
         };
 
-        var btnAdd = CreateButton("➕ Add Supplier", Color.FromArgb(46, 204, 113));
+        var btnAdd = CreateButton("Tedarikçi Ekle", Color.FromArgb(46, 204, 113));
         btnAdd.Click += BtnAdd_Click;
         buttonPanel.Controls.Add(btnAdd);
 
-        var btnEdit = CreateButton("✏️ Edit", Color.FromArgb(52, 152, 219));
+        var btnEdit = CreateButton("Düzenle", Color.FromArgb(52, 152, 219));
         btnEdit.Click += BtnEdit_Click;
         buttonPanel.Controls.Add(btnEdit);
 
-        var btnDelete = CreateButton("🗑️ Delete", Color.FromArgb(231, 76, 60));
+        var btnDelete = CreateButton("Sil", Color.FromArgb(231, 76, 60));
         btnDelete.Click += BtnDelete_Click;
         buttonPanel.Controls.Add(btnDelete);
 
-        var btnRefresh = CreateButton("🔄 Refresh", Color.FromArgb(149, 165, 166));
+        var btnRefresh = CreateButton("Yenile", Color.FromArgb(149, 165, 166));
         btnRefresh.Click += async (s, e) => await LoadSuppliersAsync();
         buttonPanel.Controls.Add(btnRefresh);
 
@@ -132,7 +132,7 @@ public class SupplierManagementForm : Form
     {
         try
         {
-            _lblStatus.Text = "Loading...";
+            _lblStatus.Text = "Yükleniyor...";
             var suppliers = await _supplierRepository.GetAllAsync(activeOnly: false);
 
             _suppliers.Clear();
@@ -141,13 +141,13 @@ public class SupplierManagementForm : Form
                 _suppliers.Add(supplier);
             }
 
-            _lblStatus.Text = $"{_suppliers.Count} suppliers";
+            _lblStatus.Text = $"{_suppliers.Count} tedarikçi";
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to load suppliers");
-            _lblStatus.Text = "Error loading suppliers";
-            MessageBox.Show($"Failed to load suppliers: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            _lblStatus.Text = "Tedarikçiler yüklenemedi";
+            MessageBox.Show($"Tedarikçiler yüklenemedi: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 
@@ -164,7 +164,7 @@ public class SupplierManagementForm : Form
     {
         if (_gridSuppliers.CurrentRow?.DataBoundItem is not Supplier selected)
         {
-            MessageBox.Show("Please select a supplier to edit.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("Düzenlemek için bir tedarikçi seçin.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
             return;
         }
 
@@ -194,7 +194,7 @@ public class SupplierManagementForm : Form
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to save supplier");
-            MessageBox.Show($"Failed to save supplier: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show($"Tedarikçi kaydedilemedi: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 
@@ -202,13 +202,13 @@ public class SupplierManagementForm : Form
     {
         if (_gridSuppliers.CurrentRow?.DataBoundItem is not Supplier selected)
         {
-            MessageBox.Show("Please select a supplier to delete.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("Silmek için bir tedarikçi seçin.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
             return;
         }
 
         var result = MessageBox.Show(
-            $"Are you sure you want to delete '{selected.Name}'?\n\nThis will deactivate the supplier (soft delete).",
-            "Confirm Delete",
+            $"'{selected.Name}' adlı tedarikçi silinsin mi?\n\nBu işlem tedarikçiyi pasifleştirir (soft delete).",
+            "Silmeyi Onayla",
             MessageBoxButtons.YesNo,
             MessageBoxIcon.Warning);
 
@@ -223,7 +223,7 @@ public class SupplierManagementForm : Form
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to delete supplier");
-                MessageBox.Show($"Failed to delete supplier: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Tedarikçi silinemedi: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }
@@ -253,7 +253,7 @@ internal class SupplierEditDialog : Form
 
     private void InitializeComponent()
     {
-        Text = Supplier == null ? "Add Supplier" : "Edit Supplier";
+        Text = Supplier == null ? "Tedarikçi Ekle" : "Tedarikçiyi Düzenle";
         Size = new Size(400, 400);
         StartPosition = FormStartPosition.CenterParent;
         FormBorderStyle = FormBorderStyle.FixedDialog;
@@ -272,38 +272,38 @@ internal class SupplierEditDialog : Form
 
         int row = 0;
 
-        layout.Controls.Add(new Label { Text = "Name *", AutoSize = true }, 0, row);
+        layout.Controls.Add(new Label { Text = "Ad *", AutoSize = true }, 0, row);
         _txtName = new TextBox { Dock = DockStyle.Fill };
         layout.Controls.Add(_txtName, 1, row++);
 
-        layout.Controls.Add(new Label { Text = "Email *", AutoSize = true }, 0, row);
+        layout.Controls.Add(new Label { Text = "E-posta *", AutoSize = true }, 0, row);
         _txtEmail = new TextBox { Dock = DockStyle.Fill };
         layout.Controls.Add(_txtEmail, 1, row++);
 
-        layout.Controls.Add(new Label { Text = "Phone", AutoSize = true }, 0, row);
+        layout.Controls.Add(new Label { Text = "Telefon", AutoSize = true }, 0, row);
         _txtPhone = new TextBox { Dock = DockStyle.Fill };
         layout.Controls.Add(_txtPhone, 1, row++);
 
-        layout.Controls.Add(new Label { Text = "Contact", AutoSize = true }, 0, row);
+        layout.Controls.Add(new Label { Text = "İrtibat", AutoSize = true }, 0, row);
         _txtContact = new TextBox { Dock = DockStyle.Fill };
         layout.Controls.Add(_txtContact, 1, row++);
 
-        layout.Controls.Add(new Label { Text = "Address", AutoSize = true }, 0, row);
+        layout.Controls.Add(new Label { Text = "Adres", AutoSize = true }, 0, row);
         _txtAddress = new TextBox { Dock = DockStyle.Fill, Multiline = true, Height = 60 };
         layout.Controls.Add(_txtAddress, 1, row++);
 
-        layout.Controls.Add(new Label { Text = "Lead Time", AutoSize = true }, 0, row);
+        layout.Controls.Add(new Label { Text = "Teslim Süresi (Gün)", AutoSize = true }, 0, row);
         _numLeadTime = new NumericUpDown { Minimum = 1, Maximum = 90, Value = 7, Width = 60 };
         layout.Controls.Add(_numLeadTime, 1, row++);
 
-        layout.Controls.Add(new Label { Text = "Active", AutoSize = true }, 0, row);
+        layout.Controls.Add(new Label { Text = "Aktif", AutoSize = true }, 0, row);
         _chkActive = new CheckBox { Checked = true };
         layout.Controls.Add(_chkActive, 1, row++);
 
         // Buttons
         var buttonPanel = new FlowLayoutPanel { Dock = DockStyle.Fill, FlowDirection = FlowDirection.RightToLeft };
-        var btnCancel = new Button { Text = "Cancel", DialogResult = DialogResult.Cancel, Width = 80 };
-        var btnSave = new Button { Text = "Save", Width = 80 };
+        var btnCancel = new Button { Text = "İptal", DialogResult = DialogResult.Cancel, Width = 80 };
+        var btnSave = new Button { Text = "Kaydet", Width = 80 };
         btnSave.Click += BtnSave_Click;
         buttonPanel.Controls.Add(btnCancel);
         buttonPanel.Controls.Add(btnSave);
@@ -329,14 +329,14 @@ internal class SupplierEditDialog : Form
     {
         if (string.IsNullOrWhiteSpace(_txtName.Text))
         {
-            MessageBox.Show("Name is required.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show("Ad alanı zorunludur.", "Doğrulama", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             _txtName.Focus();
             return;
         }
 
         if (string.IsNullOrWhiteSpace(_txtEmail.Text) || !_txtEmail.Text.Contains('@'))
         {
-            MessageBox.Show("Valid email is required.", "Validation", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show("Geçerli bir e-posta gereklidir.", "Doğrulama", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             _txtEmail.Focus();
             return;
         }

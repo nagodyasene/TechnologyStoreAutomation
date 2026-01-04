@@ -10,7 +10,7 @@ namespace TechnologyStore.Desktop.Services;
 /// Caching decorator for IProductRepository.
 /// Wraps an existing repository and adds caching for frequently accessed data.
 /// </summary>
-public class CachedProductRepository : IProductRepository
+public class CachedProductRepository : IProductRepository, IProductCacheInvalidation
 {
     private readonly IProductRepository _innerRepository;
     private readonly IMemoryCache _cache;
@@ -62,6 +62,14 @@ public class CachedProductRepository : IProductRepository
         _logger.LogDebug("Dashboard data cached for {Seconds} seconds", _settings.DashboardDataExpirationSeconds);
 
         return data;
+    }
+
+    public async Task<Product> CreateAsync(Product product)
+    {
+        var created = await _innerRepository.CreateAsync(product);
+        InvalidateProductCaches();
+        _logger.LogDebug("Product created and caches invalidated (Id={ProductId})", created.Id);
+        return created;
     }
 
     /// <summary>
@@ -250,6 +258,8 @@ public class CachedProductRepository : IProductRepository
     /// <summary>
     /// Invalidates product-related caches
     /// </summary>
+    void IProductCacheInvalidation.InvalidateProductCaches() => InvalidateProductCaches();
+
     private void InvalidateProductCaches()
     {
         _cache.Remove(DashboardDataKey);

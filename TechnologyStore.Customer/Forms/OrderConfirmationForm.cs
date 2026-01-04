@@ -31,7 +31,7 @@ public partial class OrderConfirmationForm : Form
         this.AutoScaleMode = AutoScaleMode.Font;
         this.ClientSize = new Size(500, 550);
         this.Name = "OrderConfirmationForm";
-        this.Text = "Order Confirmed!";
+        this.Text = "Sipariş Onaylandı!";
         this.StartPosition = FormStartPosition.CenterParent;
         this.BackColor = Color.White;
         this.FormBorderStyle = FormBorderStyle.FixedDialog;
@@ -47,7 +47,7 @@ public partial class OrderConfirmationForm : Form
         // Success icon
         var lblIcon = new Label
         {
-            Text = "✅",
+            Text = "",
             Location = new Point(0, yPos),
             Width = this.ClientSize.Width,
             Font = new Font(DefaultFontFamily, 48),
@@ -60,7 +60,7 @@ public partial class OrderConfirmationForm : Form
         // Success message
         var lblSuccess = new Label
         {
-            Text = "Order Placed Successfully!",
+            Text = "Siparişiniz Başarıyla Oluşturuldu!",
             Location = new Point(0, yPos),
             Width = this.ClientSize.Width,
             Font = new Font(DefaultFontFamily, 18, FontStyle.Bold),
@@ -96,7 +96,7 @@ public partial class OrderConfirmationForm : Form
         // Order details
         var lblDetails = new Label
         {
-            Text = "Order Details",
+            Text = "Sipariş Detayları",
             Location = new Point(50, yPos),
             Width = 400,
             Font = new Font(DefaultFontFamily, 11, FontStyle.Bold)
@@ -116,7 +116,7 @@ public partial class OrderConfirmationForm : Form
 
         var lblItemCount = new Label
         {
-            Text = $"Items ordered: {_order.Items.Count} product(s), {_order.Items.Sum(i => i.Quantity)} unit(s)",
+            Text = $"Ürün: {_order.Items.Count} çeşit, {_order.Items.Sum(i => i.Quantity)} adet",
             Location = new Point(15, 12),
             AutoSize = true,
             Font = new Font(DefaultFontFamily, 10)
@@ -125,7 +125,7 @@ public partial class OrderConfirmationForm : Form
 
         var lblTotalAmount = new Label
         {
-            Text = $"Total amount: ${_order.Total:N2}",
+            Text = $"Toplam tutar: ${_order.Total:N2}",
             Location = new Point(15, 35),
             AutoSize = true,
             Font = new Font(DefaultFontFamily, 10, FontStyle.Bold)
@@ -133,8 +133,8 @@ public partial class OrderConfirmationForm : Form
         detailsPanel.Controls.Add(lblTotalAmount);
 
         var pickupText = _order.PickupDate.HasValue
-            ? $"Pickup date: {_order.PickupDate.Value:MMMM dd, yyyy}"
-            : "Pickup: As soon as possible";
+            ? $"Teslim alma tarihi: {_order.PickupDate.Value:dd.MM.yyyy}"
+            : "Teslim alma: En kısa sürede";
         var lblPickup = new Label
         {
             Text = pickupText,
@@ -146,7 +146,7 @@ public partial class OrderConfirmationForm : Form
 
         var lblPayment = new Label
         {
-            Text = "Payment: Cash at pickup",
+            Text = "Ödeme: Teslim alırken nakit",
             Location = new Point(15, 78),
             AutoSize = true,
             Font = new Font(DefaultFontFamily, 10),
@@ -168,7 +168,7 @@ public partial class OrderConfirmationForm : Form
 
         var lblEmail = new Label
         {
-            Text = $"📧 Invoice sent to: {_customer.Email}",
+            Text = $"Fatura e-posta ile gönderildi: {_customer.Email}",
             Dock = DockStyle.Fill,
             Font = new Font(DefaultFontFamily, 10),
             ForeColor = Color.FromArgb(21, 87, 36),
@@ -181,7 +181,7 @@ public partial class OrderConfirmationForm : Form
         // Instructions
         var lblInstructions = new Label
         {
-            Text = "📍 Please bring your invoice or order number when picking up your order.",
+            Text = "Teslim alırken faturayı veya sipariş numarasını yanınızda bulundurun.",
             Location = new Point(50, yPos),
             Width = 400,
             Height = 40,
@@ -196,7 +196,7 @@ public partial class OrderConfirmationForm : Form
         // Close button
         var btnClose = new Button
         {
-            Text = "Continue Shopping",
+            Text = "Alışverişe Devam Et",
             Location = new Point(150, yPos),
             Width = 200,
             Height = 45,

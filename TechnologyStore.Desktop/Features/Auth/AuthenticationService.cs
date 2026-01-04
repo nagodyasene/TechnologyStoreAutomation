@@ -28,12 +28,12 @@ public class AuthenticationService : IAuthenticationService
     {
         if (string.IsNullOrWhiteSpace(username))
         {
-            return AuthResult.Failed("Username is required.");
+            return AuthResult.Failed("Kullanıcı adı zorunludur.");
         }
 
         if (string.IsNullOrWhiteSpace(password))
         {
-            return AuthResult.Failed("Password is required.");
+            return AuthResult.Failed("Şifre zorunludur.");
         }
 
         try
@@ -45,19 +45,19 @@ public class AuthenticationService : IAuthenticationService
             if (user == null)
             {
                 _logger.LogWarning("Login failed: User not found - {Username}", username);
-                return AuthResult.Failed("Invalid username or password.");
+                return AuthResult.Failed("Kullanıcı adı veya şifre hatalı.");
             }
 
             if (!user.IsActive)
             {
                 _logger.LogWarning("Login failed: User account is deactivated - {Username}", username);
-                return AuthResult.Failed("This account has been deactivated.");
+                return AuthResult.Failed("Bu hesap pasif hale getirilmiş.");
             }
 
             if (!VerifyPassword(password, user.PasswordHash))
             {
                 _logger.LogWarning("Login failed: Invalid password for user - {Username}", username);
-                return AuthResult.Failed("Invalid username or password.");
+                return AuthResult.Failed("Kullanıcı adı veya şifre hatalı.");
             }
 
             // Update last login time
@@ -72,7 +72,7 @@ public class AuthenticationService : IAuthenticationService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error during login for user: {Username}", username);
-            return AuthResult.Failed("An error occurred during login. Please try again.");
+            return AuthResult.Failed("Giriş sırasında bir hata oluştu. Lütfen tekrar deneyin.");
         }
     }
 

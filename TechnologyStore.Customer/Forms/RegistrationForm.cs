@@ -36,7 +36,7 @@ public partial class RegistrationForm : Form
         this.AutoScaleMode = AutoScaleMode.Font;
         this.ClientSize = new Size(450, 520);
         this.Name = "RegistrationForm";
-        this.Text = "Create Account";
+        this.Text = "Hesap Oluştur";
         this.StartPosition = FormStartPosition.CenterParent;
         this.FormBorderStyle = FormBorderStyle.FixedDialog;
         this.MaximizeBox = false;
@@ -53,7 +53,7 @@ public partial class RegistrationForm : Form
         // Title
         var lblTitle = new Label
         {
-            Text = "📝 Create Your Account",
+            Text = "Hesap Oluştur",
             Location = new Point(0, yPos),
             Width = this.ClientSize.Width,
             Font = new Font(DefaultFontFamily, 16, FontStyle.Bold),
@@ -65,19 +65,19 @@ public partial class RegistrationForm : Form
         yPos += 50;
 
         // Full Name
-        AddField("Full Name *", ref yPos, centerX, out _txtFullName, false);
+        AddField("Ad Soyad *", ref yPos, centerX, out _txtFullName, false);
 
         // Email
-        AddField("Email Address *", ref yPos, centerX, out _txtEmail, false);
+        AddField("E-posta *", ref yPos, centerX, out _txtEmail, false);
 
         // Phone
-        AddField("Phone (optional)", ref yPos, centerX, out _txtPhone, false);
+        AddField("Telefon (opsiyonel)", ref yPos, centerX, out _txtPhone, false);
 
         // Password
-        AddField("Password *", ref yPos, centerX, out _txtPassword, true);
+        AddField("Şifre *", ref yPos, centerX, out _txtPassword, true);
 
         // Confirm Password
-        AddField("Confirm Password *", ref yPos, centerX, out _txtConfirmPassword, true);
+        AddField("Şifre Tekrar *", ref yPos, centerX, out _txtConfirmPassword, true);
 
         // Error label
         _lblError = new Label
@@ -97,7 +97,7 @@ public partial class RegistrationForm : Form
         // Register button
         _btnRegister = new Button
         {
-            Text = "Create Account",
+            Text = "Hesap Oluştur",
             Location = new Point(centerX, yPos),
             Width = 145,
             Height = 40,
@@ -114,7 +114,7 @@ public partial class RegistrationForm : Form
         // Cancel button
         _btnCancel = new Button
         {
-            Text = "Cancel",
+            Text = "İptal",
             Location = new Point(centerX + 155, yPos),
             Width = 145,
             Height = 40,
@@ -133,7 +133,7 @@ public partial class RegistrationForm : Form
         // Password requirements
         var lblRequirements = new Label
         {
-            Text = "* Password must be at least 6 characters",
+            Text = "* Şifre en az 6 karakter olmalıdır",
             Location = new Point(centerX, yPos),
             Width = 300,
             Font = new Font(DefaultFontFamily, 8),
@@ -233,8 +233,8 @@ public partial class RegistrationForm : Form
         if (result.Success)
         {
             MessageBox.Show(
-                "Account created successfully! You are now logged in.",
-                "Welcome!",
+                "Hesap başarıyla oluşturuldu! Artık giriş yaptınız.",
+                "Hoş geldiniz!",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Information);
 
@@ -243,7 +243,7 @@ public partial class RegistrationForm : Form
         }
         else
         {
-            ShowError(result.ErrorMessage ?? "Registration failed.");
+            ShowError(result.ErrorMessage ?? "Kayıt başarısız.");
         }
     }
 
@@ -252,22 +252,22 @@ public partial class RegistrationForm : Form
     private ValidationResult ValidateRegistrationForm(RegistrationFormData data)
     {
         if (string.IsNullOrWhiteSpace(data.FullName))
-            return new ValidationResult(false, "Please enter your full name.", _txtFullName);
+            return new ValidationResult(false, "Lütfen ad soyad girin.", _txtFullName);
 
         if (string.IsNullOrWhiteSpace(data.Email))
-            return new ValidationResult(false, "Please enter your email address.", _txtEmail);
+            return new ValidationResult(false, "Lütfen e-posta adresinizi girin.", _txtEmail);
 
         if (!IsValidEmail(data.Email))
-            return new ValidationResult(false, "Please enter a valid email address.", _txtEmail);
+            return new ValidationResult(false, "Lütfen geçerli bir e-posta adresi girin.", _txtEmail);
 
         if (string.IsNullOrWhiteSpace(data.Password))
-            return new ValidationResult(false, "Please enter a password.", _txtPassword);
+            return new ValidationResult(false, "Lütfen şifre girin.", _txtPassword);
 
         if (data.Password.Length < 6)
-            return new ValidationResult(false, "Password must be at least 6 characters.", _txtPassword);
+            return new ValidationResult(false, "Şifre en az 6 karakter olmalıdır.", _txtPassword);
 
         if (data.Password != data.ConfirmPassword)
-            return new ValidationResult(false, "Passwords do not match.", _txtConfirmPassword, _txtConfirmPassword);
+            return new ValidationResult(false, "Şifreler eşleşmiyor.", _txtConfirmPassword, _txtConfirmPassword);
 
         return new ValidationResult(true);
     }
@@ -313,7 +313,7 @@ public partial class RegistrationForm : Form
         if (_btnRegister != null)
         {
             _btnRegister.Enabled = enabled;
-            _btnRegister.Text = enabled ? "Create Account" : "Creating...";
+            _btnRegister.Text = enabled ? "Hesap Oluştur" : "Oluşturuluyor...";
         }
         if (_btnCancel != null) _btnCancel.Enabled = enabled;
     }

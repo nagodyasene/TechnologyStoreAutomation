@@ -33,7 +33,7 @@ public class TimeTrackingForm : Form
 
     private void InitializeComponent()
     {
-        this.Text = "Time Tracking";
+        this.Text = "Puantaj";
         this.Size = new Size(800, 600);
         this.StartPosition = FormStartPosition.CenterScreen;
 
@@ -53,7 +53,7 @@ public class TimeTrackingForm : Form
 
         _lblStatus = new Label
         {
-            Text = "Status: Loading...",
+            Text = "Durum: Yükleniyor...",
             Font = new Font("Segoe UI", 16, FontStyle.Bold),
             AutoSize = true,
             Location = new Point(10, 10)
@@ -61,7 +61,7 @@ public class TimeTrackingForm : Form
 
         _lblTimer = new Label
         {
-            Text = "Daily Hours: 00:00:00",
+            Text = "Günlük Süre: 00:00:00",
             Font = new Font("Segoe UI", 14),
             AutoSize = true,
             Location = new Point(10, 50),
@@ -80,10 +80,10 @@ public class TimeTrackingForm : Form
             AutoSize = true
         };
 
-        _btnClockIn = CreateActionButton("Clock In", Color.Green, BtnClockIn_Click);
-        _btnClockOut = CreateActionButton("Clock Out", Color.Red, BtnClockOut_Click);
-        _btnStartLunch = CreateActionButton("Start Lunch", Color.Orange, BtnStartLunch_Click);
-        _btnEndLunch = CreateActionButton("End Lunch", Color.Teal, BtnEndLunch_Click);
+        _btnClockIn = CreateActionButton("Mesai Başlat", Color.Green, BtnClockIn_Click);
+        _btnClockOut = CreateActionButton("Mesai Bitir", Color.Red, BtnClockOut_Click);
+        _btnStartLunch = CreateActionButton("Mola Başlat", Color.Orange, BtnStartLunch_Click);
+        _btnEndLunch = CreateActionButton("Molayı Bitir", Color.Teal, BtnEndLunch_Click);
 
         buttonPanel.Controls.AddRange(new Control[] { _btnClockIn, _btnClockOut, _btnStartLunch, _btnEndLunch });
         mainLayout.Controls.Add(buttonPanel, 0, 1);
@@ -91,7 +91,7 @@ public class TimeTrackingForm : Form
         // --- SECTION 3: History Grid ---
         var historyGroup = new GroupBox
         {
-            Text = "Recent Activity",
+            Text = "Son Hareketler",
             Dock = DockStyle.Fill,
             Font = new Font("Segoe UI", 10)
         };
@@ -148,7 +148,7 @@ public class TimeTrackingForm : Form
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Error loading data: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show($"Veriler yüklenirken hata oluştu: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 
@@ -178,7 +178,7 @@ public class TimeTrackingForm : Form
         {
             // Not working -> Can Clock In
             EnableButton(_btnClockIn, Color.Green);
-            _lblStatus.Text = "Status: Not Working";
+            _lblStatus.Text = "Durum: Çalışmıyor";
             _lblStatus.ForeColor = Color.Black;
         }
         else if (lastType == Shared.Models.TimeEntryType.ClockIn || lastType == Shared.Models.TimeEntryType.EndLunch)
@@ -186,14 +186,14 @@ public class TimeTrackingForm : Form
             // Working -> Can Clock Out OR Start Lunch
             EnableButton(_btnClockOut, Color.Red);
             EnableButton(_btnStartLunch, Color.Orange);
-            _lblStatus.Text = "Status: Working";
+            _lblStatus.Text = "Durum: Çalışıyor";
             _lblStatus.ForeColor = Color.Green;
         }
         else if (lastType == Shared.Models.TimeEntryType.StartLunch)
         {
             // On Lunch -> Can End Lunch
             EnableButton(_btnEndLunch, Color.Teal);
-            _lblStatus.Text = "Status: On Lunch Break";
+            _lblStatus.Text = "Durum: Molada";
             _lblStatus.ForeColor = Color.Orange;
         }
     }
@@ -214,7 +214,7 @@ public class TimeTrackingForm : Form
             h.Timestamp,
             Event = h.EventType.ToString(),
             h.Notes,
-            Manual = h.IsManualEntry ? "Yes" : "No"
+            Manual = h.IsManualEntry ? "Evet" : "Hayır"
         }).ToList();
     }
 
@@ -223,7 +223,7 @@ public class TimeTrackingForm : Form
         if (_authService.CurrentUser == null) return;
 
         var hours = await _timeTrackingService.CalculateDailyHoursAsync(_authService.CurrentUser.Id, DateTime.Today);
-        _lblTimer.Text = $"Daily Hours: {hours:hh\\:mm\\:ss}";
+        _lblTimer.Text = $"Günlük Süre: {hours:hh\\:mm\\:ss}";
     }
 
     private async void BtnClockIn_Click(object sender, EventArgs e) => await HandleActionAsync(() => _timeTrackingService.ClockInAsync(_authService.CurrentUser!.Id));
@@ -240,7 +240,7 @@ public class TimeTrackingForm : Form
         }
         catch (Exception ex)
         {
-            MessageBox.Show(ex.Message, "Action Failed", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show(ex.Message, "İşlem Başarısız", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
     }
 }

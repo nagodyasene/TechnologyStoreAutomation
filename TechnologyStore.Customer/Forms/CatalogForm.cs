@@ -59,7 +59,7 @@ public partial class CatalogForm : Form
         this.AutoScaleMode = AutoScaleMode.Font;
         this.ClientSize = new Size(1100, 700);
         this.Name = "CatalogForm";
-        this.Text = "Technology Store - Product Catalog";
+        this.Text = "Teknoloji Mağazası - Ürün Kataloğu";
         this.StartPosition = FormStartPosition.CenterScreen;
         this.BackColor = Color.FromArgb(245, 247, 250);
         this.ResumeLayout(false);
@@ -80,7 +80,7 @@ public partial class CatalogForm : Form
         // Logo
         var lblLogo = new Label
         {
-            Text = "🛒 Technology Store",
+            Text = "Teknoloji Mağazası",
             Location = new Point(20, 15),
             AutoSize = true,
             Font = new Font(DefaultFontFamily, 18, FontStyle.Bold),
@@ -101,7 +101,7 @@ public partial class CatalogForm : Form
         // Logout button
         _btnLogout = new Button
         {
-            Text = "Logout",
+            Text = "Çıkış Yap",
             Location = new Point(this.ClientSize.Width - 100, 20),
             Width = 80,
             Height = 30,
@@ -127,7 +127,7 @@ public partial class CatalogForm : Form
 
         var lblSearch = new Label
         {
-            Text = "Search:",
+            Text = "Ara:",
             Location = new Point(20, 20),
             AutoSize = true,
             Font = new Font(DefaultFontFamily, 10)
@@ -140,14 +140,14 @@ public partial class CatalogForm : Form
             Width = 250,
             Height = 28,
             Font = new Font(DefaultFontFamily, 10),
-            PlaceholderText = "Search products..."
+            PlaceholderText = "Ürün ara..."
         };
         _txtSearch.TextChanged += (s, e) => FilterProducts();
         filterPanel.Controls.Add(_txtSearch);
 
         var lblCategory = new Label
         {
-            Text = "Category:",
+            Text = "Kategori:",
             Location = new Point(360, 20),
             AutoSize = true,
             Font = new Font(DefaultFontFamily, 10)
@@ -167,7 +167,7 @@ public partial class CatalogForm : Form
         // Cart button
         _btnViewCart = new Button
         {
-            Text = "🛒 View Cart",
+            Text = "Sepeti Gör",
             Location = new Point(this.ClientSize.Width - 180, 12),
             Width = 150,
             Height = 36,
@@ -219,17 +219,17 @@ public partial class CatalogForm : Form
 
         // Configure columns
         _gridProducts.Columns.Add(new DataGridViewTextBoxColumn { Name = "Id", HeaderText = "ID", Width = 50, Visible = false });
-        _gridProducts.Columns.Add(new DataGridViewTextBoxColumn { Name = "Name", HeaderText = "Product Name", FillWeight = 150 });
-        _gridProducts.Columns.Add(new DataGridViewTextBoxColumn { Name = "Category", HeaderText = "Category", FillWeight = 80 });
-        _gridProducts.Columns.Add(new DataGridViewTextBoxColumn { Name = "Price", HeaderText = "Price", FillWeight = 60 });
-        _gridProducts.Columns.Add(new DataGridViewTextBoxColumn { Name = "Stock", HeaderText = "In Stock", FillWeight = 50 });
-        _gridProducts.Columns.Add(new DataGridViewTextBoxColumn { Name = "Status", HeaderText = "Status", FillWeight = 60 });
+        _gridProducts.Columns.Add(new DataGridViewTextBoxColumn { Name = "Name", HeaderText = "Ürün Adı", FillWeight = 150 });
+        _gridProducts.Columns.Add(new DataGridViewTextBoxColumn { Name = "Category", HeaderText = "Kategori", FillWeight = 80 });
+        _gridProducts.Columns.Add(new DataGridViewTextBoxColumn { Name = "Price", HeaderText = "Fiyat", FillWeight = 60 });
+        _gridProducts.Columns.Add(new DataGridViewTextBoxColumn { Name = "Stock", HeaderText = "Stok", FillWeight = 50 });
+        _gridProducts.Columns.Add(new DataGridViewTextBoxColumn { Name = "Status", HeaderText = "Durum", FillWeight = 60 });
         
         var btnColumn = new DataGridViewButtonColumn
         {
             Name = "AddToCart",
             HeaderText = "",
-            Text = "Add to Cart",
+            Text = "Sepete Ekle",
             UseColumnTextForButtonValue = true,
             FillWeight = 60
         };
@@ -264,12 +264,12 @@ public partial class CatalogForm : Form
             if (_authService.CurrentCustomer != null)
             {
                 var name = _authService.CurrentCustomer.FullName;
-                var prefix = _authService.IsGuest ? "Guest: " : "Welcome, ";
+                var prefix = _authService.IsGuest ? "Misafir: " : "Hoş geldiniz, ";
                 _lblWelcome.Text = $"{prefix}{name}";
             }
             else
             {
-                _lblWelcome.Text = "Welcome, Guest";
+                _lblWelcome.Text = "Hoş geldiniz, Misafir";
             }
         }
     }
@@ -281,8 +281,8 @@ public partial class CatalogForm : Form
             _allProducts = (await _productRepository.GetAvailableProductsAsync()).ToList();
             
             // Populate category filter
-            var categories = _allProducts.Select(p => p.Category ?? "Other").Distinct().OrderBy(c => c).ToList();
-            categories.Insert(0, "All Categories");
+            var categories = _allProducts.Select(p => p.Category ?? "Diğer").Distinct().OrderBy(c => c).ToList();
+            categories.Insert(0, "Tüm Kategoriler");
             
             _cboCategory?.Items.Clear();
             foreach (var cat in categories)
@@ -298,14 +298,14 @@ public partial class CatalogForm : Form
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Failed to load products: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show($"Ürünler yüklenemedi: {ex.Message}", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 
     private void FilterProducts()
     {
         var searchText = _txtSearch?.Text?.ToLowerInvariant() ?? string.Empty;
-        var selectedCategory = _cboCategory?.SelectedItem?.ToString() ?? "All Categories";
+        var selectedCategory = _cboCategory?.SelectedItem?.ToString() ?? "Tüm Kategoriler";
 
         var filtered = _allProducts
             .Where(p => MatchesSearchText(p, searchText))
@@ -324,8 +324,8 @@ public partial class CatalogForm : Form
 
     private static bool MatchesCategory(Product product, string selectedCategory)
     {
-        return selectedCategory == "All Categories" ||
-               (product.Category ?? "Other") == selectedCategory;
+        return selectedCategory == "Tüm Kategoriler" ||
+               (product.Category ?? "Diğer") == selectedCategory;
     }
 
     private void DisplayProducts(List<Product> products)
@@ -371,12 +371,12 @@ public partial class CatalogForm : Form
         if (_gridProducts.Columns[e.ColumnIndex].Name == "AddToCart")
         {
             var productId = (int)_gridProducts.Rows[e.RowIndex].Cells["Id"].Value;
-            var productName = _gridProducts.Rows[e.RowIndex].Cells["Name"].Value?.ToString() ?? "Product";
+            var productName = _gridProducts.Rows[e.RowIndex].Cells["Name"].Value?.ToString() ?? "Ürün";
             var stockText = _gridProducts.Rows[e.RowIndex].Cells["Stock"].Value?.ToString();
 
             if (stockText == OutOfStockText)
             {
-                MessageBox.Show("This product is currently out of stock.", OutOfStockText, 
+                MessageBox.Show("Bu ürün şu anda stokta yok.", OutOfStockText, 
                     MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
@@ -392,7 +392,7 @@ public partial class CatalogForm : Form
             }
             else
             {
-                MessageBox.Show($"Cannot add more '{productName}' - not enough stock.", "Stock Limit", 
+                MessageBox.Show($"'{productName}' ürünü için yeterli stok yok, daha fazla eklenemez.", "Stok Sınırı", 
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
@@ -405,7 +405,7 @@ public partial class CatalogForm : Form
         var count = _cartService.ItemCount;
         _lblCartCount.Text = count.ToString();
         _lblCartCount.Visible = count > 0;
-        _btnViewCart.Text = count > 0 ? $"🛒 View Cart ({count})" : "🛒 View Cart";
+        _btnViewCart.Text = count > 0 ? $"Sepeti Gör ({count})" : "Sepeti Gör";
     }
 
     private void BtnViewCart_Click(object? sender, EventArgs e)
@@ -421,8 +421,8 @@ public partial class CatalogForm : Form
         if (_cartService.ItemCount > 0)
         {
             var result = MessageBox.Show(
-                "You have items in your cart. Are you sure you want to logout?",
-                "Confirm Logout",
+                "Sepetinizde ürünler var. Çıkış yapmak istediğinizden emin misiniz?",
+                "Çıkışı Onayla",
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Question);
             

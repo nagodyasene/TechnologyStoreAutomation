@@ -34,7 +34,7 @@ public partial class SettingsForm : Form
         this.AutoScaleMode = AutoScaleMode.Font;
         this.ClientSize = new Size(450, 280);
         this.Name = "SettingsForm";
-        this.Text = "Settings";
+        this.Text = "Ayarlar";
         this.StartPosition = FormStartPosition.CenterParent;
         this.FormBorderStyle = FormBorderStyle.FixedDialog;
         this.MaximizeBox = false;
@@ -51,7 +51,7 @@ public partial class SettingsForm : Form
         // Title
         var lblTitle = new Label
         {
-            Text = "⚙️ Email Settings",
+            Text = "E-posta Ayarları",
             Location = new Point(20, yPos),
             Width = 400,
             Font = new Font(this.Font.FontFamily, 14, FontStyle.Bold),
@@ -64,7 +64,7 @@ public partial class SettingsForm : Form
         // Test Mode Toggle
         var lblTestMode = new Label
         {
-            Text = "Email Test Mode:",
+            Text = "E-posta Test Modu:",
             Location = new Point(20, yPos + 3),
             Width = labelWidth
         };
@@ -72,7 +72,7 @@ public partial class SettingsForm : Form
 
         _chkTestMode = new CheckBox
         {
-            Text = "Enabled (log emails instead of sending)",
+            Text = "Etkin (e-postalar gönderilmez, sadece loglanır)",
             Location = new Point(controlLeft, yPos),
             Width = 280,
             Checked = true
@@ -100,7 +100,7 @@ public partial class SettingsForm : Form
         // Sender Email
         var lblSenderEmail = new Label
         {
-            Text = "Sender Email:",
+            Text = "Gönderen E-posta:",
             Location = new Point(20, yPos + 3),
             Width = labelWidth
         };
@@ -110,7 +110,7 @@ public partial class SettingsForm : Form
         {
             Location = new Point(controlLeft, yPos),
             Width = 250,
-            PlaceholderText = "store@example.com"
+            PlaceholderText = "magaza@ornek.com"
         };
         this.Controls.Add(_txtSenderEmail);
 
@@ -128,8 +128,8 @@ public partial class SettingsForm : Form
 
         var lblInfo = new Label
         {
-            Text = "💡 Test Mode logs emails to console instead of sending.\n" +
-                   "   Turn off when ready to send real purchase order emails.",
+            Text = "Test modunda e-postalar gönderilmez, sadece loglanır.\n" +
+                   "Satın alma siparişlerini gerçekten göndermek için kapatın.",
             Location = new Point(10, 5),
             Width = 380,
             Height = 35,
@@ -142,7 +142,7 @@ public partial class SettingsForm : Form
         // Save Button
         _btnSave = new Button
         {
-            Text = "Save Settings",
+            Text = "Kaydet",
             Location = new Point(controlLeft, yPos),
             Width = 120,
             Height = 35,
@@ -157,7 +157,7 @@ public partial class SettingsForm : Form
         // Cancel Button
         _btnCancel = new Button
         {
-            Text = "Cancel",
+            Text = "İptal",
             Location = new Point(controlLeft + 130, yPos),
             Width = 100,
             Height = 35,
@@ -180,12 +180,12 @@ public partial class SettingsForm : Form
 
         if (_chkTestMode.Checked)
         {
-            _lblStatus.Text = "🔒 Safe Mode - Emails will be logged only";
+            _lblStatus.Text = "Güvenli Mod - E-postalar sadece loglanacak";
             _lblStatus.ForeColor = Color.Green;
         }
         else
         {
-            _lblStatus.Text = "⚠️ Live Mode - Emails will be sent to suppliers";
+            _lblStatus.Text = "Canlı Mod - E-postalar tedarikçilere gönderilecek";
             _lblStatus.ForeColor = Color.OrangeRed;
         }
     }
@@ -213,9 +213,9 @@ public partial class SettingsForm : Form
                 _emailSettings.TestMode, _emailSettings.SenderEmail);
             
             MessageBox.Show(
-                "Settings saved successfully!\n\n" +
-                $"Email Test Mode: {(_emailSettings.TestMode ? "ON (emails will be logged)" : "OFF (emails will be sent)")}",
-                "Settings Saved",
+                "Ayarlar başarıyla kaydedildi!\n\n" +
+                $"E-posta Test Modu: {(_emailSettings.TestMode ? "Açık (e-postalar loglanır)" : "Kapalı (e-postalar gönderilir)")}",
+                "Ayarlar Kaydedildi",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Information);
 
@@ -226,8 +226,8 @@ public partial class SettingsForm : Form
         {
             _logger.LogError(ex, "Failed to save settings");
             MessageBox.Show(
-                $"Failed to save settings: {ex.Message}",
-                "Error",
+                $"Ayarlar kaydedilemedi: {ex.Message}",
+                "Hata",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Error);
         }
@@ -239,7 +239,7 @@ public partial class SettingsForm : Form
         
         if (!File.Exists(appSettingsPath))
         {
-            throw new FileNotFoundException("appsettings.json not found", appSettingsPath);
+            throw new FileNotFoundException("appsettings.json bulunamadı", appSettingsPath);
         }
 
         var json = File.ReadAllText(appSettingsPath);
